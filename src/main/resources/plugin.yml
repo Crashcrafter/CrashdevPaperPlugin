@@ -1,0 +1,180 @@
+name: RLGPaperPlugin
+main: de.rlg.Main
+version: 0.1
+description: Nix lol
+api-version: 1.16
+author: Crashcrafter_LP
+depend: [Votifier]
+
+commands:
+  spawn:
+    description: Teleport to spawn
+    usage: /spawn
+  back:
+    description: Back to Death point
+    usage: /back
+  reloaddb:
+    description: Reload DB
+    usage: /reloaddb
+    permission: rlg.reloaddb
+  reloaduser:
+    description: Reload a user
+    usage: /reloaduser
+    permission: rlg.reloaddb
+  rank:
+    description: Manage Roles
+    usage: </command>
+    permission: rlg.rank
+  discord:
+    description: Send Discord link
+    usage: /discord
+  claim:
+    description: Claim Chunk
+    usage: </command>
+    aliases: [c]
+  key:
+    description: Key commands
+    usage: </command>
+    permission: rlg.key
+  ci:
+    description: Get cis
+    usage: </command>
+    permission: rlg.ci
+  tempban:
+    description: Tempbanne Spieler
+    usage: </command>
+    permission: rlg.tempban
+  home:
+    description: Teleportiere dich zu deinem Homepoint
+    usage: </command>
+    aliases: [h]
+  sethome:
+    description: Setze innerhalb deiner chunks deine Homepoint
+    usage: </command>
+  delhome:
+    description: Lösche deinen Homepoint
+    usage: </command>
+  homes:
+    description: Zeig alle deine Homepoints an
+    usage: /homes
+  warn:
+    description: Warnt einen User
+    usage: </command>
+    permission: rlg.warn
+  invsee:
+    description: Zeige das Inventar von einem Spieler
+    usage: </command>
+    permission: rlg.invsee
+  tpa:
+    description: TPA to a player
+    usage: </command>
+  tpaccept:
+    description: Accept a TPA request
+    usage: </command>
+  tpdeny:
+    description: Deny a TPA request
+    usage: </command>
+  invec:
+    description: Zeig die Enderchest
+    usage: </command>
+    permission: rlg.invec
+  ec:
+    description: Nutze die Ender Chest
+    usage: /ec
+    permission: rlg.ec
+  credits:
+    description: Zeigt deinen aktuellen Kontostand
+    usage: </command>
+    aliases: [cr]
+  multiv:
+    description: Kann Welten erstellen/benutzen
+    usage: </command>
+    permission: rlg.multiv
+  event:
+    description: Zum Event tp
+    usage: /event
+  drop:
+    description: Drop-Befehle
+    usage: </command>
+    permission: rlg.drop
+  modchat:
+    description: Modchat
+    usage: /mc message
+    permission: rlg.modchat
+    aliases: [staffchat, mc]
+  vote:
+    description: Voting
+    usage: /vote
+  quests:
+    description: Quest-Überblick
+    usage: /quests
+    aliases: [q]
+  exp:
+    description: Level-Verwaltung
+    usage: </command>
+    permission: rlg.exp
+  profile:
+    description: Info über den User
+    usage: /profile [Player]
+  m:
+    description: Private Nachricht
+    usage: /m [player] message
+    aliases: [msg, say, tell]
+  weekly:
+    description: Claim weekly Keys
+    usage: /weekly
+  mute:
+    description: Spieler muten
+    usage: /mute [player]
+    permission: rlg.mute
+  unmute:
+    description: Spieler entmuten
+    usage: /unmute [player]
+    permission: rlg.unmute
+
+permissions:
+  rlg.reloaddb:
+    description: Zugriff auf DB Reload
+    default: op
+  rlg.rank:
+    description: Zugriff auf Rollenverwaltung
+    default: op
+  rlg.key:
+    description: Kann keys verwalten
+    default: op
+  rlg.ci:
+    description: Kann Ci geben
+    default: op
+  rlg.tempban:
+    description: Kann User Tempbannen
+    default: op
+  rlg.warn:
+    description: Kann warnen
+    default: op
+  rlg.invsee:
+    description: Kann Inventare durchsuchen
+    default: op
+  rlg.invec:
+    description: Kann Ender Chest Inventar öffnen
+    default: op
+  rlg.ec:
+    description: Kann auf Enderchest
+    default: op
+  rlg.multiv:
+    description: Kann Welten verwalten
+    default: op
+  rlg.drop:
+    description: Kann Drop-Befehle
+    default: op
+  rlg.modchat:
+    description: Kann den Modchat bedienen
+    default: op
+  rlg.exp:
+    description: Kann Level verwalten
+    default: op
+  rlg.mute:
+    description: Kann Spieler muten
+    default: op
+  rlg.unmute:
+    description: Kann Spieler entmuten
+    default: op
