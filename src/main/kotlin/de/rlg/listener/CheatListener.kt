@@ -35,11 +35,9 @@ class CheatListener : Listener {
     @EventHandler
     fun onGameMode(e: PlayerGameModeChangeEvent) {
         val player = e.player
-        if (!player.world.name.contentEquals("event")) {
-            if (player.rlgPlayer().rank < rankData.size - 2) {
-                if (e.newGameMode == GameMode.SPECTATOR || e.newGameMode == GameMode.CREATIVE) {
-                    e.isCancelled = true
-                }
+        if (!player.rlgPlayer().isMod) {
+            if (e.newGameMode == GameMode.SPECTATOR || e.newGameMode == GameMode.CREATIVE) {
+                e.isCancelled = true
             }
         }
     }

@@ -183,7 +183,7 @@ fun waveManager(chunk: Chunk) {
                                     5f,
                                     1f
                                 )
-                                if (drop.participatingPlayer.size == 1 && drop.type == 4) {
+                                if (drop.participatingPlayer.size == 1 && drop.type == 3) {
                                     questCount(drop.participatingPlayer[0], 4, 1, true)
                                 }
                                 for (player in drop.participatingPlayer) {

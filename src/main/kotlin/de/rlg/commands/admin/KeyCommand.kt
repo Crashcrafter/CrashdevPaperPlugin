@@ -11,6 +11,7 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class KeyCommand : CommandExecutor, TabCompleter {
@@ -30,6 +31,7 @@ class KeyCommand : CommandExecutor, TabCompleter {
                         "epic" -> type = 2
                         "supreme" -> type = 3
                         "vote" -> type = 4
+                        "level" -> type = 5
                         else -> player.sendMessage("Bitte einen zulässigen Typ angeben")
                     }
                     if (type != 0) {
@@ -52,6 +54,7 @@ class KeyCommand : CommandExecutor, TabCompleter {
                         "epic" -> genKey(2)
                         "supreme" -> genKey(3)
                         "vote" -> genKey(4)
+                        "level" -> genKey(5)
                         else -> ItemStack(Material.STRUCTURE_VOID)
                     })
                 }
@@ -76,13 +79,13 @@ class KeyCommand : CommandExecutor, TabCompleter {
                 return mutableListOf("chest", "create")
             } else if (args.size == 2) {
                 if (args[0].equals("create", ignoreCase = true)) {
-                    return mutableListOf("common", "epic", "supreme", "vote")
+                    return mutableListOf("common", "epic", "supreme", "vote", "level")
                 } else if (args[0].equals("chest", ignoreCase = true)) {
                     return mutableListOf("add", "remove")
                 }
             } else if (args.size == 3) {
                 if (args[0].contentEquals("chest")) {
-                    return mutableListOf("common", "epic", "supreme", "vote")
+                    return mutableListOf("common", "epic", "supreme", "vote", "level")
                 } else if (args[0].contentEquals("create")) {
                     return mutableListOf("1", "2", "3", "5")
                 }
@@ -93,10 +96,13 @@ class KeyCommand : CommandExecutor, TabCompleter {
 }
 
 fun addKeyChest(block: Block, type: Int) {
+    val blockString = block.toSQLString()
     transaction {
-        KeyChestTable.insert {
-            it[chestPos] = block.toSQLString()
-            it[KeyChestTable.type] = type
+        if(KeyChestTable.select(where = {KeyChestTable.chestPos eq blockString}).empty()){
+            KeyChestTable.insert {
+                it[chestPos] = blockString
+                it[KeyChestTable.type] = type
+            }
         }
     }
     keyChests[block] = type

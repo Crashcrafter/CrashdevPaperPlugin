@@ -108,12 +108,13 @@ class DeathListener : Listener {
                 }
                 DamageCause.ENTITY_EXPLOSION -> deathMessage.append(player.name)
                     .append(" hat das Zischen nicht gehört")
-                else -> deathMessage.append(deathEvent.deathMessage().toString())
             }
         } catch (ignored: NullPointerException) {
             deathMessage.append(deathEvent.deathMessage().toString())
         }
-        deathEvent.deathMessage(Component.text(deathMessage.toString()))
+        if(deathMessage.toString() != "§4"){
+            deathEvent.deathMessage(Component.text(deathMessage.toString()))
+        }
         player.inventory.armorContents.forEach {
             try {
                 val durability = it.durability

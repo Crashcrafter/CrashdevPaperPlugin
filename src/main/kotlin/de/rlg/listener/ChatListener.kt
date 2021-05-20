@@ -17,7 +17,10 @@ class ChatListener : Listener {
         val player: Player = chatEvent.player
         val rlgPlayer = player.rlgPlayer()
         val message: String = (chatEvent.message() as TextComponent).content()
-        if (checkMessage(message, player) || rlgPlayer.mutedUntil > System.currentTimeMillis()) return
+        if (checkMessage(message, player) || rlgPlayer.mutedUntil > System.currentTimeMillis()) {
+            chatEvent.isCancelled = true
+            return
+        }
         if (setup1.containsKey(player)) {
             setupShop2(player, message)
             chatEvent.isCancelled = true

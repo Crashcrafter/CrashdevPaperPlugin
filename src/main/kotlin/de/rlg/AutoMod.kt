@@ -163,7 +163,9 @@ fun tempbanOnlineUser(target: Player, reason: String, date: Date?) {
     banList.addBan(Objects.requireNonNull(target.address).hostName, reason + " " + target.name, date, "System")
     val banList1 = Bukkit.getBanList(BanList.Type.NAME)
     banList1.addBan(target.name, reason + " Name:" + target.name, date, "System")
-    target.kick(Component.text(reason))
+    Bukkit.getScheduler().runTask(INSTANCE, Runnable {
+        target.kick(Component.text(reason))
+    })
 }
 
 fun addLinkSend(player: Player) {

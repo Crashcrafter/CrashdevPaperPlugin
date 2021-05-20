@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import org.bukkit.inventory.ItemStack
 import kotlin.collections.ArrayList
 
@@ -23,6 +24,9 @@ class JoinListener : Listener{
         player.sendMessage("Willkommen, ${player.name}!\nJoin unserem Discord Server, um Mitspieler zu finden und den Support zu kontaktieren!\n§o§nhttps://discord.gg/qQtaYsDN6w\n")
         player.load()
         player.setResourcePack(texturePackUrl, texturePackHash)
+        if(player.resourcePackStatus == PlayerResourcePackStatusEvent.Status.DECLINED){
+            player.sendMessage("§4Du solltest das Texturepack vom Server aktivieren!")
+        }
         player.updateScoreboard()
         joinEvent.joinMessage(Component.text("§a${player.name} ist erschienen!"))
         updateTabOfPlayers()

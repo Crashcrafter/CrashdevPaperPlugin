@@ -83,13 +83,13 @@ fun initQuests() {
     dailyquests[1] = Quest(1, Reward(1000, 125), "Ungewöhnlicher Sammler", 3, "Schließe 3 Ungewöhnliche Drops ab", true)
     dailyquests[2] = Quest(2, Reward(625, 125), "Monster Hunter", 100, "Töte 100 feindliche Mobs", true)
     dailyquests[3] = Quest(3, Reward(750, 150), "Killing Streak", 60, "Töte 60 Zombies", true)
-    dailyquests[4] = Quest(4, Reward(1000, 100), "Supreme!", 1, "Absolviere einen Supreme-Drop alleine", true)
+    dailyquests[4] = Quest(4, Reward(1000, 100), "Supreme!", 1, "Absolviere einen Epic-Drop alleine", true)
     dailyquests[5] = Quest(5, Reward(750, 150), "Angler", 20, "Angle 20 mal Kabeljau(Cod)", true)
     dailyquests[6] = Quest(6, Reward(1000, 100), "Unboxing!", 3, "Öffne 3 Crates", true)
     dailyquests[7] = Quest(7, Reward(1500, 200), "Reisender", 10, "Absolviere 10 Drops", true)
     dailyquests[8] = Quest(8, Reward(750, 100), "Servervoter", 4, "Vote 4 mal für den Server(/vote)", true)
     dailyquests[9] = Quest(9, Reward(1000, 100), "Kopfjäger", 3, "Töte 3 andere Spieler", true)
-    dailyquests[10] = Quest(10, Reward(1000, 100), "Epische Dropjäger", 3, "Absolviere 3 epische Drops", true)
+    dailyquests[10] = Quest(10, Reward(1000, 100), "Epische Dropjäger", 2, "Absolviere 2 epische Drops", true)
     dailyquests[11] = Quest(11, Reward(500, 75), "Namenangler", 1, "Angle einen Nametag", true)
     dailyquests[12] = Quest(12, Reward(500, 100), "Händler", 2500, "Verkaufe Items für 2500 Credits an den Shop", true)
     dailyquests[13] = Quest(13, Reward(500, 50), "Enchanter", 3, "Verzaubere 3 Items", true)
@@ -103,11 +103,11 @@ fun initQuests() {
     is1.itemMeta = im1
     weeklyquests[1] = Quest(1, Reward(2500, 100, is1), "Besiege das End!", 1, "Besiege den Enderdrache einmal", false)
     weeklyquests[2] = Quest(2, Reward(2500, 100), "Weg des Magiers", 1, "Crafte einen Zauberstab", false)
-    weeklyquests[3] = Quest(3, Reward(5000, 500, is1), "Weg zum Top-Voter", 25, "Vote 25-mal für den Server", false)
+    weeklyquests[3] = Quest(3, Reward(5000, 500, is1), "Weg zum Top-Voter", 20, "Vote 20-mal für den Server", false)
     weeklyquests[4] = Quest(4, Reward(2500, 200), "Verdorben", 1, "Töte den Wither einmal", false)
-    weeklyquests[5] = Quest(5, Reward(5000, 450, is1), "Drop-Sammler", 50, "Schließe 50 Drops ab", false)
+    weeklyquests[5] = Quest(5, Reward(5000, 450, is1), "Drop-Sammler", 25, "Schließe 25 Drops ab", false)
     weeklyquests[6] = Quest(6, Reward(2000, 150), "Monsterjäger", 500, "Töte 500 Monster", false)
-    weeklyquests[7] = Quest(7, Reward(3000, 300), "Held der Dörfer!", 10, "Gewinne 10 Raids", false)
+    weeklyquests[7] = Quest(7, Reward(3000, 300), "Held der Dörfer!", 5, "Gewinne 5 Raids", false)
     weeklyquests[8] = Quest(8, Reward(2000, 225), "Schlauer Händler", 12500, "Verdiene 12500 Credits durch den Shop", false)
     val inventory = Bukkit.createInventory(null, 27, Component.text("Quests"))
     val itemStack = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
@@ -474,10 +474,7 @@ private fun createDailyQuest(i: Int, player: Player, dailyChosen:MutableList<Int
 
 fun weeklyQuestCreation(player: Player) {
     val rlgPlayer = player.rlgPlayer()
-    val dailyChosen: MutableList<Int> = ArrayList()
-    for (i in 0..2) {
-        dailyChosen.add(createDailyQuest(i, player, dailyChosen))
-    }
+    dailyQuestCreation(player)
     val weeklyChosen: MutableList<Int> = ArrayList()
     for (i in 3..5) {
         val random = Random()

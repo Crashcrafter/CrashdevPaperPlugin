@@ -21,7 +21,7 @@ class MessageCommand : CommandExecutor {
             msgBuilder.append(args[i]).append(" ")
         }
         val msg = msgBuilder.toString()
-        if (!checkMessage(msg, sender.asPlayer()) && player.rlgPlayer().mutedUntil > System.currentTimeMillis()) {
+        if (!checkMessage(msg, sender.asPlayer()) && player.rlgPlayer().mutedUntil <= System.currentTimeMillis()) {
             target.sendMessage("§7" + player.name + " sagt: " + msg)
             player.sendMessage("§7" + target.name + " wurde gesagt: " + msg)
         }

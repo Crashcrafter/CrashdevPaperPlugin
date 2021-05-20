@@ -5,18 +5,19 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.block.Block
+import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -35,6 +36,7 @@ fun createLottery(player: Player, inventory: Inventory, type: Int) {
             2 -> items = LOOTTABLES.Epic.newloottable
             3 -> items = LOOTTABLES.Supreme.newloottable
             4 -> items = LOOTTABLES.Vote.newloottable
+            5 -> items = LOOTTABLES.Level.newloottable
         }
         val size = items.size
         for (i in 9..59) {
@@ -69,9 +71,9 @@ fun createLottery(player: Player, inventory: Inventory, type: Int) {
             )
         } else {
             player.sendMessage(
-                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} ${reward.itemMeta.displayName()}§r§6 erhalten!"
+                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} ${(reward.itemMeta.displayName() as TextComponent).content()}§r§6 erhalten!"
             )
-            println(player.name + " hat " + reward.amount + " " + reward.itemMeta.displayName() + "§r erhalten!")
+            println(player.name + " hat " + reward.amount + " " + (reward.itemMeta.displayName() as TextComponent).content() + "§r erhalten!")
         }
         player.inventory.addItem(reward)
         inventory.clear()
@@ -108,10 +110,12 @@ fun genKey(type: Int): ItemStack {
             2 -> "§5§l§oEpic Key"
             3 -> "§e§l§oSupreme Key"
             4 -> "§4§l§oVote Key"
+            5 -> "§b§l§oLevel Key"
             else -> ""
         }
     ))
     im.setCustomModelData(type)
+    im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING, token)
     itemStack.itemMeta = im
     insertKey(token, type)
     return itemStack
@@ -395,8 +399,9 @@ class LOOTTABLES {
                 im0.addEnchant(Enchantment.MENDING, 1, true)
                 is0.itemMeta = im0
                 newloottable.add(Pair(is0, getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.DIAMOND, 24), getPlane(5)))
+                newloottable.add(Pair(ItemStack(Material.DIAMOND, 20), getPlane(5)))
                 newloottable.add(Pair(CustomItems.throwableFireBall().asQuantity(4), getPlane(5)))
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(5)))
             }
         }
     }
@@ -406,31 +411,60 @@ class LOOTTABLES {
         fun setupVote() {
             newloottable.add(Pair(CustomItems.defaultCustomItem(Material.NAME_TAG, "§7§l§oCommon Key", arrayListOf(), 1), getPlane(1)))
             newloottable.add(Pair(CustomItems.ironKatana(), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.DIAMOND, 3), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 8), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 24), getPlane(1)))
+            newloottable.add(Pair(ItemStack(Material.DIAMOND, 4), getPlane(1)))
+            newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 15), getPlane(1)))
+            newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 30), getPlane(1)))
             for (i in 0..1) {
-                newloottable.add(Pair(ItemStack(Material.GOLD_INGOT, 8), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 12), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.ENDER_PEARL, 4), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.EMERALD, 3), getPlane(2)))
+                newloottable.add(Pair(ItemStack(Material.GOLD_INGOT, 10), getPlane(2)))
+                newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 15), getPlane(2)))
+                newloottable.add(Pair(ItemStack(Material.ENDER_PEARL, 3), getPlane(2)))
+                newloottable.add(Pair(ItemStack(Material.EMERALD, 12), getPlane(2)))
             }
             for (i in 0..2) {
-                newloottable.add(Pair(ItemStack(Material.IRON_AXE), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.IRON_PICKAXE), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.IRON_SWORD), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.IRON_SHOVEL), getPlane(3)))
+                newloottable.add(Pair(ItemStack(Material.DIAMOND_SWORD), getPlane(3)))
+                newloottable.add(Pair(CustomItems.throwableFireBall(), getPlane(3)))
+                newloottable.add(Pair(CustomItems.throwableFireBall().asQuantity(2), getPlane(3)))
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(12), getPlane(3)))
             }
             for (i in 0..3) {
-                newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 6), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.FIREWORK_ROCKET, 4), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.COAL, 8), getPlane(4)))
+                newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 9), getPlane(4)))
+                newloottable.add(Pair(ItemStack(Material.FIREWORK_ROCKET, 7), getPlane(4)))
+                newloottable.add(Pair(ItemStack(Material.COAL, 15), getPlane(4)))
             }
             for (i in 0..4) {
-                newloottable.add(Pair(ItemStack(Material.STONE, 32), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.COOKED_CHICKEN, 12), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.IRON_ORE, 4), getPlane(5)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(5)))
+                newloottable.add(Pair(ItemStack(Material.MAGMA_CREAM, 16), getPlane(5)))
+                newloottable.add(Pair(ItemStack(Material.GOLD_INGOT, 5), getPlane(5)))
+                newloottable.add(Pair(ItemStack(Material.IRON_ORE, 6), getPlane(5)))
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(6), getPlane(5)))
+            }
+        }
+    }
+
+    object Level {
+        var newloottable: MutableList<Pair<ItemStack, ItemStack>> = ArrayList()
+        fun setupLevel() {
+            newloottable.add(Pair(CustomItems.defaultCustomItem(Material.NAME_TAG, "§7§l§oCommon Key", arrayListOf(), 1), getPlane(1)))
+            newloottable.add(Pair(CustomItems.ironKatana(), getPlane(1)))
+            newloottable.add(Pair(CustomItems.manaShard().asQuantity(2), getPlane(1)))
+            for(i in 0..1) {
+                newloottable.add(Pair(CustomItems.throwableFireBall().asQuantity(4), getPlane(2)))
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(2)))
+                newloottable.add(Pair(CustomItems.manaShard().asQuantity(1), getPlane(2)))
+                newloottable.add(Pair(ItemStack(Material.END_CRYSTAL), getPlane(2)))
+            }
+            for(i in 0..2) {
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(10), getPlane(3)))
+                newloottable.add(Pair(ItemStack(Material.DIAMOND, 3), getPlane(3)))
+                newloottable.add(Pair(ItemStack(Material.EMERALD, 6), getPlane(3)))
+                newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 13), getPlane(3)))
+            }
+            for(i in 0..3) {
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(5), getPlane(4)))
+            }
+            for (i in 0..4) {
+                newloottable.add(Pair(ItemStack(Material.APPLE, 6), getPlane(5)))
+                newloottable.add(Pair(ItemStack(Material.HONEYCOMB, 8), getPlane(5)))
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(4), getPlane(5)))
             }
         }
     }
@@ -441,4 +475,5 @@ fun initLootTables() {
     LOOTTABLES.Epic.setupEpic()
     LOOTTABLES.Supreme.setupSupreme()
     LOOTTABLES.Vote.setupVote()
+    LOOTTABLES.Level.setupLevel()
 }

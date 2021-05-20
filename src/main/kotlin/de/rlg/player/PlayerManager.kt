@@ -25,11 +25,10 @@ fun Player.rlgPlayer() : RLGPlayer {
 fun Player.load(){
     val player = this
     if(PlayerData.containsKey(player)) return
-    lateinit var result : ResultRow
     transaction {
         val queryResult = PlayersTable.select(where = { PlayersTable.uuid eq player.uniqueId.toString() })
         if (!queryResult.empty()) {
-            result = queryResult.first()
+            val result = queryResult.first()
             val homes = HashMap<String, Block>()
             HomepointTable.select(where = { HomepointTable.uuid eq player.uniqueId.toString() }).forEach {
                 homes[it[HomepointTable.keyword]] = getBlockBySQLString(it[HomepointTable.homePos])

@@ -27,7 +27,7 @@ class LeaveListener : Listener {
         }
         leaveEvent.quitMessage(Component.text("§c${player.name} hat uns verlassen!"))
         moderator.remove(player)
-        updateTabOfPlayers()
+        updateTabOfPlayers(true)
         if (amount_Sleeping.size > 0 && time > 12541) {
             calcSleepMessage()
         }

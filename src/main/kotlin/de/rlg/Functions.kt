@@ -16,9 +16,9 @@ import kotlin.math.pow
 
 fun CommandSender.asPlayer() : Player = if (this is Player) this else throw Exception("Only a player can execute that command!")
 
-fun updateTabOfPlayers() {
+fun updateTabOfPlayers(leave: Boolean = false) {
     Bukkit.getOnlinePlayers().forEach {
-        it.sendPlayerListHeader(Component.text("§e§l---------------  MCGermany.de  ---------------§r§6\nSpieler online: §a${Bukkit.getOnlinePlayers().size}"))
+        it.sendPlayerListHeader(Component.text("§e§l---------------  MCGermany.de  ---------------§r§6\nSpieler online: §a${Bukkit.getOnlinePlayers().size - if(leave) 1 else 0}"))
         it.sendPlayerListFooter(Component.text("\n§6Komm auf unseren Discord (/discord) um Mitspieler zu finden\nund Vorschläge für neuen Content zu machen§r\n\n§2Du kannst für unseren Server voten (/vote) um Vote Keys zu erhalten!"))
     }
 }

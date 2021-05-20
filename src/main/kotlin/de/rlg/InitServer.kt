@@ -32,11 +32,11 @@ fun initServer(){
     loadSpawn()
     loadEvent()
 
+    initQuests()
     loadFromDb()
     fixDb()
 
     registerCustomItems()
-    initQuests()
     initLootTables()
     initTradingInventories()
     loadWorlds()
@@ -110,6 +110,7 @@ fun registerCommands(){
     INSTANCE.getCommand("mute")!!.setExecutor(MuteCommand())
     INSTANCE.getCommand("mute")!!.tabCompleter = MuteCommand()
     INSTANCE.getCommand("unmute")!!.setExecutor(UnmuteCommand())
+    INSTANCE.getCommand("crypto")!!.setExecutor(CryptoCommand())
 }
 
 fun registerCustomItems(){
@@ -205,8 +206,7 @@ fun loadFromDb(){
     updateTabOfPlayers()
     clearPlayerData()
     Bukkit.getOnlinePlayers().forEach {
-        player ->
-        run {
+        player -> run {
             player.setResourcePack(texturePackUrl, texturePackHash)
             player.load()
             player.updateScoreboard()

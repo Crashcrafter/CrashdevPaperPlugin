@@ -21,7 +21,7 @@ class ClaimCommand : CommandExecutor, TabCompleter {
         if (args.isEmpty()) {
             if (player.rlgPlayer().remainingClaims > 0 || player.isOp) {
                 if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE){
-                    chunk.claim("0", "Server-Team", null)
+                    chunk.claim("0", "Server-Team", player)
                 }else {
                     chunk.claim(player)
                 }
@@ -40,18 +40,19 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                 "§6Dieser Chunk gehört ${chunkClass.name}\nDu kannst noch ${getRemainingClaims(player.uniqueId.toString())} Chunks claimen"
             )
         } else if (args[0].equals("remove", ignoreCase = true)) {
-            if (player.isOp && (player.gameMode == GameMode.CREATIVE || player.gameMode == GameMode.SPECTATOR)) {
-                chunk.unClaim()
-            } else if (!player.world.name.contentEquals("shops")) {
-                if(chunk.isClaimed()){
-                    if(chunks[chunk]!!.owner_uuid == player.uniqueId.toString()){
+            if(chunk.isClaimed()) {
+                if (player.isOp && (player.gameMode == GameMode.CREATIVE || player.gameMode == GameMode.SPECTATOR)) {
+                    player.sendMessage("§aClaim wurde entfernt!")
+                    chunk.unClaim()
+                } else if (!player.world.name.contentEquals("shops")) {
+                    if (chunks[chunk]!!.owner_uuid == player.uniqueId.toString()) {
                         player.sendMessage("§aClaim wurde entfernt!")
                         chunk.unClaim()
                     }
+                } else {
+                    player.sendMessage("§4Du kannst nicht in der Shop-Welt Claims entfernen!")
                 }
-            } else {
-                player.sendMessage("§4Du kannst nicht in der Shop-Welt Claims entfernen!")
-            }
+            }else player.sendMessage("§4Chunk ist nicht geclaimt!")
         } else if (args[0].contentEquals("access")) {
             var s2 = ""
             try {

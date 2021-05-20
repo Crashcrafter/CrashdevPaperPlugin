@@ -34,7 +34,7 @@ class DamageListener : Listener {
                 }
             }
             val chunk = player.location.chunk
-            if (deventCancel(chunk, player)) {
+            if (e.cause != EntityDamageEvent.DamageCause.VOID && deventCancel(chunk, player)) {
                 e.isCancelled = true
                 return
             }

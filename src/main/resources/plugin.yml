@@ -131,6 +131,9 @@ commands:
     description: Spieler entmuten
     usage: /unmute [player]
     permission: rlg.unmute
+  crypto:
+    description: Info über aktuelle Kurse
+    usage: /crypto
 
 permissions:
   rlg.reloaddb:

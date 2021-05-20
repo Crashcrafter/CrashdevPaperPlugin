@@ -10,12 +10,13 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.properties.Delegates
 
 //CONST DATA
 lateinit var spawn: Location
 lateinit var event: Location
-const val texturePackUrl = "https://drive.google.com/uc?export=download&id=11EKlqDzYmO63x5IM06lTo25ixSmxCgcn"
-const val texturePackHash = "6D6CA4DF9DC84092C2D3A3964D0A5FC9589D4DD0"
+const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1_84AhiOXNNGmwPu3RJC2fNLCJDQxoIIa"
+const val texturePackHash = "2D08CD80DCE79C990C5B85F9301C474B8F721DE1"
 const val DropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
 const val dcLink = "https://discord.gg/qQtaYsDN6w"
@@ -31,6 +32,11 @@ var questinventories: MutableList<Inventory> = java.util.ArrayList()
 val moderator: ArrayList<Player> = ArrayList()
 val cachedVoteRewards: ArrayList<Vote> = ArrayList()
 val allJobs: ArrayList<Job> = ArrayList()
+var btcPrice: Int? = null
+var ltcPrice: Int? = null
+var ethPrice: Int? = null
+var nanoPrice: Int? = null
+var dogePrice: Int? = null
 
 //region NatureBlocks
 var natureBlocks: List<Material> = ArrayList(

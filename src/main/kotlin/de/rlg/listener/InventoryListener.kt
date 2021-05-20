@@ -4,13 +4,16 @@ import de.rlg.*
 import de.rlg.permission.invSeeECs
 import de.rlg.permission.invSeeInventories
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Chest
+import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
+import org.bukkit.persistence.PersistentDataType
 
 class InventoryListener : Listener {
 
@@ -41,14 +44,14 @@ class InventoryListener : Listener {
 
     @EventHandler
     fun onInventoryOpen(e: InventoryOpenEvent) {
-        if (e.inventory.holder is Chest && keyChests.containsKey((e.inventory.holder as Chest?)!!.block) && !lotteryI.contains(e.inventory)) {
+        if (e.inventory.holder is ShulkerBox && keyChests.containsKey((e.inventory.holder as ShulkerBox?)!!.block) && !lotteryI.contains(e.inventory)) {
             val player = e.player as Player
             val playerInventory = player.inventory
             val itemStack = playerInventory.itemInMainHand
             try {
-                val token = itemStack.itemMeta.lore!![0].split(" ").toTypedArray()[1]
-                val type: Int = keyChests[(e.inventory.holder as Chest).block]!!
-                if (itemStack.type == Material.NAME_TAG && token.isNotEmpty()) {
+                if (itemStack.type == Material.NAME_TAG) {
+                    val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING)!!
+                    val type: Int = keyChests[(e.inventory.holder as ShulkerBox).block]!!
                     if (getKeyType(token) == type) {
                         createLottery(player, e.inventory, type)
                         redeemKey(playerInventory, itemStack, token)

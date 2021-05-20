@@ -1,5 +1,7 @@
 package de.rlg
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import de.rlg.items.CustomItems
 import de.rlg.items.ciName
 import de.rlg.items.getByTypeCmd
@@ -26,8 +28,10 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.net.URL
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 var prices = HashMap<Material, Long>()
 var amountmap = HashMap<Int, Int>()
@@ -199,7 +203,7 @@ fun tradingInventory(player: Player) {
         val result = Bukkit.createInventory(
             null,
             27,
-            Component.text("Verkaufe " + isGiven.amount + " " + isGiven.itemMeta.displayName + " für " + prices[itemStack.type] as Long * itemStack.amount * multiplier + " Credits")
+            Component.text("Verkaufe " + isGiven.amount + " ").append(isGiven.itemMeta.displayName()!!.append(Component.text("§r für " + prices[itemStack.type] as Long * itemStack.amount * multiplier + " Credits")))
         )
         result.setItem(11, CustomItems.defaultCustomItem(Material.RED_WOOL, "§4Ablehnen", arrayListOf()))
         result.setItem(13, CustomItems.defaultCustomItem(isGiven.type, "Verkaufen für " + prices[itemStack.type] as Long * itemStack.amount * multiplier + " Credits", arrayListOf()))
@@ -746,14 +750,27 @@ fun updateCreditScore(){
     allJobs.add(GlobalScope.launch {
         while (true){
             creditsScoreBoard = getCreditsScoreboard()
-            delay(1000*60*60)
+            Bukkit.getScheduler().runTask(INSTANCE, Runnable {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as @e[type=boat] at @s store result score @s kb_isEmpty run data get entity @s Passengers")
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as @a at @s store result score @s kb_isEmpty run data get entity @s RootVehicle")
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as @a[scores={kb_isEmpty=1..}] at @s run scoreboard players set @e[type=boat,sort=nearest,limit=1] kb_isEmpty 1")
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=boat,scores={kb_isEmpty=0}]")
+            })
+            val response = URL("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin,nano,ethereum,litecoin&vs_currencies=usd").readText()
+            val obj = jacksonObjectMapper().readValue<CoingeckoPriceInfo>(response)
+            btcPrice = (obj["bitcoin"]!!.usd * 100).roundToInt()
+            ethPrice = (obj["ethereum"]!!.usd * 100).roundToInt()
+            ltcPrice = (obj["litecoin"]!!.usd * 100).roundToInt()
+            nanoPrice = (obj["nano"]!!.usd * 100).roundToInt()
+            dogePrice = (obj["dogecoin"]!!.usd * 100).roundToInt()
+            delay(1000*60*5)
         }
     })
 }
 
 fun getCreditsScoreboard(): String {
     val messageBuilder = StringBuilder()
-    messageBuilder.append("§6Aktuelles Ranking:\n")
+    messageBuilder.append("§6§l§nAktuelles Ranking:\n\n")
     transaction {
         var count = 1
         PlayersTable.selectAll().orderBy(PlayersTable.balance, SortOrder.DESC).limit(5).forEach {
@@ -761,7 +778,7 @@ fun getCreditsScoreboard(): String {
             count++
         }
     }
-    messageBuilder.append("§6Diese Statistik wird nur nach jedem Reload/Restart aktualisiert!")
+    messageBuilder.append("§6Diese Statistik wird alle 5 Minuten aktualisiert!")
     return messageBuilder.toString()
 }
 

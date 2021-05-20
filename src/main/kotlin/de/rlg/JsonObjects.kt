@@ -6,3 +6,9 @@ data class SpawnObj(
     val z: Double,
     val world: String
 )
+
+class CoingeckoPriceInfo(elements: Map<String, CoingeckoCurrencyValue>) : HashMap<String, CoingeckoCurrencyValue>(elements)
+
+data class CoingeckoCurrencyValue (
+    val usd: Double
+)
