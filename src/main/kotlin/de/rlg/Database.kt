@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.time.LocalDate
 
 fun initDatabase(){
-    TransactionManager.defaultDatabase = Database.connect("jdbc:mysql://localhost/mcplugin", user = loginData.user, password = loginData.pw)
+    TransactionManager.defaultDatabase = Database.connect("jdbc:mysql://${LoginData.ip}/mcplugin", user = LoginData.user, password = LoginData.pw)
 }
 
 object ChunkTable : Table("chunks"){
