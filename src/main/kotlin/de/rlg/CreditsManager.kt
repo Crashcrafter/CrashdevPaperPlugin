@@ -225,9 +225,9 @@ fun tradingInventory(player: Player) {
         }
     }
     val cmd = if(isGiven.itemMeta.hasCustomModelData()) isGiven.itemMeta.customModelData else 0
-    val result = Bukkit.createInventory(null, 27, Component.text("Verkaufe für $price Credits"))
+    val result = Bukkit.createInventory(null, 27, Component.text("Verkaufe für ${price.withPoints()} Credits"))
     result.setItem(11, CustomItems.defaultCustomItem(Material.RED_WOOL, "§4Ablehnen", arrayListOf()))
-    result.setItem(13, CustomItems.defaultCustomItem(isGiven.type, "Verkaufen für $price Credits", arrayListOf(), cmd).asQuantity(isGiven.amount))
+    result.setItem(13, CustomItems.defaultCustomItem(isGiven.type, "Verkaufen für ${price.withPoints()} Credits", arrayListOf(), cmd).asQuantity(isGiven.amount))
     result.setItem(15, CustomItems.defaultCustomItem(Material.GREEN_WOOL, "§2Annehmen", arrayListOf()))
     tradingInventoryCopies.add(result)
     player.openInventory(result)
@@ -292,15 +292,15 @@ fun clickHandler(item: ItemStack, player: Player) {
             if(dataArray.size == 1){
                 val cryptoOverview: Inventory = Bukkit.createInventory(null, 45, Component.text("Crypto Shop"))
                 for (i in 0 until amountmap.size){
-                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Bitcoin für ${amountmap[i]!! * btcPrice!!} Credits", arrayListOf(), 1,
+                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Bitcoin für ${(amountmap[i]!! * btcPrice!!).withPoints()} Credits", arrayListOf(), 1,
                         Pair("rlgAction", "crypto bitcoin ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Ethereum für ${amountmap[i]!! * ethPrice!!} Credits", arrayListOf(), 2,
+                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Ethereum für ${(amountmap[i]!! * ethPrice!!).withPoints()} Credits", arrayListOf(), 2,
                         Pair("rlgAction", "crypto ethereum ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Litecoin für ${amountmap[i]!! * ltcPrice!!} Credits", arrayListOf(), 3,
+                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Litecoin für ${(amountmap[i]!! * ltcPrice!!).withPoints()} Credits", arrayListOf(), 3,
                         Pair("rlgAction", "crypto litecoin ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Nano für ${amountmap[i]!! * nanoPrice!!} Credits", arrayListOf(), 5,
+                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Nano für ${(amountmap[i]!! * nanoPrice!!).withPoints()} Credits", arrayListOf(), 5,
                         Pair("rlgAction", "crypto nano ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Dogecoin für ${amountmap[i]!! * dogePrice!!} Credits", arrayListOf(), 4,
+                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Dogecoin für ${(amountmap[i]!! * dogePrice!!).withPoints()} Credits", arrayListOf(), 4,
                         Pair("rlgAction", "crypto dogecoin ${amountmap[i]}")))
                 }
                 showTradingInventory(player, cryptoOverview, "Crypto-Shop")
@@ -356,7 +356,7 @@ fun buyItem(m: Material, amount: Int, priceperone: Int, player: Player) {
 fun buyCrypto(type: String, amount: Int, player: Player) {
     if (isSpace(player.inventory, 1)) {
         try {
-            if (pay(player, amount.toLong() * getCryptoPrice(type), type)) {
+            if (pay(player, amount.toLong() * getCryptoPrice(type), type.toStartUppercaseMaterial())) {
                 val itemStack = getCryptoItem(type)
                 itemStack.amount = amount
                 player.inventory.addItem(itemStack)
@@ -580,12 +580,12 @@ fun showBuySellView(shop: Shop, player: Player, buy: Boolean) {
         if (buy) {
             im.displayName(Component.text(
                 "Kaufe " + amountmap[i] + " " + shop.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " für " +
-                        (amountmap[i]!! * shop.sellprice) + " Credits"))
+                        (amountmap[i]!! * shop.sellprice).withPoints() + " Credits"))
             im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgAction"), PersistentDataType.STRING, "buy ${amountmap[i]}")
         } else {
             im.displayName(Component.text(
                 "Verkaufe " + amountmap[i] + " " + shop.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " für " + (
-                        amountmap[i]!! * shop.buyprice) + " Credits"))
+                        amountmap[i]!! * shop.buyprice).withPoints() + " Credits"))
             im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgAction"), PersistentDataType.STRING, "sell ${amountmap[i]}")
         }
         itemStack.itemMeta = im
@@ -816,6 +816,7 @@ fun updateCreditScore(){
             ltcPrice = (obj["litecoin"]!!.usd * 100).roundToInt()
             nanoPrice = (obj["nano"]!!.usd * 100).roundToInt()
             dogePrice = (obj["dogecoin"]!!.usd * 100).roundToInt()
+            lastUpdate = Date(System.currentTimeMillis())
             delay(1000*60*5)
         }
     })
@@ -827,7 +828,7 @@ fun getCreditsScoreboard(): String {
     transaction {
         var count = 1
         PlayersTable.selectAll().orderBy(PlayersTable.balance, SortOrder.DESC).limit(5).forEach {
-            messageBuilder.append("§7$count. §2${MojangAPI.getName(UUID.fromString(it[PlayersTable.uuid]))}: §6${it[PlayersTable.balance]} Credits§r\n")
+            messageBuilder.append("§7$count. §2${MojangAPI.getName(UUID.fromString(it[PlayersTable.uuid]))}: §6${it[PlayersTable.balance].withPoints()} Credits§r\n")
             count++
         }
     }

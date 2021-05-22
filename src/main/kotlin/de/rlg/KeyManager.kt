@@ -207,6 +207,7 @@ class LOOTTABLES {
             is4.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3)
             newloottable.add(Pair(is4, getPlane(1)))
             newloottable.add(Pair(CustomItems.ironKatana(), getPlane(1)))
+            Epic.newloottable.add(Pair(CustomItems.nano(), getPlane(1)))
             for (i in 0..1) {
                 newloottable.add(Pair(ItemStack(Material.EXPERIENCE_BOTTLE, 15), getPlane(2)))
                 val is5 = ItemStack(Material.BOW)
@@ -255,6 +256,7 @@ class LOOTTABLES {
             newloottable.add(Pair(ItemStack(Material.END_PORTAL_FRAME), getPlane(1)))
             newloottable.add(Pair(ItemStack(Material.BEACON), getPlane(1)))
             newloottable.add(Pair(CustomItems.diaKatana(), getPlane(1)))
+            newloottable.add(Pair(CustomItems.nano().asQuantity(8), getPlane(1)))
             for (i in 0..1) {
                 newloottable.add(Pair(ItemStack(Material.CHICKEN_SPAWN_EGG), getPlane(2)))
                 newloottable.add(Pair(ItemStack(Material.COW_SPAWN_EGG), getPlane(2)))
@@ -314,6 +316,7 @@ class LOOTTABLES {
                 val is3 = ItemStack(Material.IRON_HELMET)
                 is3.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
                 newloottable.add(Pair(is3, getPlane(4)))
+                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(32), getPlane(4)))
             }
             for (i in 0..4) {
                 newloottable.add(Pair(ItemStack(Material.SEA_LANTERN, 64), getPlane(5)))
@@ -321,6 +324,7 @@ class LOOTTABLES {
                 newloottable.add(Pair(ItemStack(Material.GOLDEN_CARROT, 64), getPlane(5)))
                 newloottable.add(Pair(ItemStack(Material.SLIME_BALL, 32), getPlane(5)))
                 newloottable.add(Pair(CustomItems.throwableFireBall().asQuantity(3), getPlane(5)))
+                newloottable.add(Pair(CustomItems.nano().asQuantity(1), getPlane(5)))
             }
         }
     }
@@ -363,6 +367,7 @@ class LOOTTABLES {
                 is6.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
                 newloottable.add(Pair(is6, getPlane(1)))
                 newloottable.add(Pair(CustomItems.netherKatana(), getPlane(1)))
+                newloottable.add(Pair(CustomItems.litecoin(), getPlane(1)))
             }
             for (i in 0..1) {
                 val itemStack = ItemStack(Material.DIAMOND_SWORD)
@@ -392,6 +397,7 @@ class LOOTTABLES {
                 newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 64), getPlane(4)))
                 newloottable.add(Pair(ItemStack(Material.FIREWORK_ROCKET, 32), getPlane(4)))
                 newloottable.add(Pair(ItemStack(Material.EMERALD, 32), getPlane(4)))
+                newloottable.add(Pair(CustomItems.nano().asQuantity(3), getPlane(4)))
             }
             for (i in 0..4) {
                 val is0 = ItemStack(Material.ENCHANTED_BOOK)
@@ -402,6 +408,7 @@ class LOOTTABLES {
                 newloottable.add(Pair(ItemStack(Material.DIAMOND, 20), getPlane(5)))
                 newloottable.add(Pair(CustomItems.throwableFireBall().asQuantity(4), getPlane(5)))
                 newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(5)))
+                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(64), getPlane(5)))
             }
         }
     }
@@ -419,6 +426,7 @@ class LOOTTABLES {
                 newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 15), getPlane(2)))
                 newloottable.add(Pair(ItemStack(Material.ENDER_PEARL, 3), getPlane(2)))
                 newloottable.add(Pair(ItemStack(Material.EMERALD, 12), getPlane(2)))
+                newloottable.add(Pair(CustomItems.nano().asQuantity(2), getPlane(5)))
             }
             for (i in 0..2) {
                 newloottable.add(Pair(ItemStack(Material.DIAMOND_SWORD), getPlane(3)))
@@ -430,12 +438,15 @@ class LOOTTABLES {
                 newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 9), getPlane(4)))
                 newloottable.add(Pair(ItemStack(Material.FIREWORK_ROCKET, 7), getPlane(4)))
                 newloottable.add(Pair(ItemStack(Material.COAL, 15), getPlane(4)))
+                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(15), getPlane(4)))
             }
             for (i in 0..4) {
                 newloottable.add(Pair(ItemStack(Material.MAGMA_CREAM, 16), getPlane(5)))
                 newloottable.add(Pair(ItemStack(Material.GOLD_INGOT, 5), getPlane(5)))
                 newloottable.add(Pair(ItemStack(Material.IRON_ORE, 6), getPlane(5)))
                 newloottable.add(Pair(CustomItems.mudBall().asQuantity(6), getPlane(5)))
+                newloottable.add(Pair(CustomItems.nano().asQuantity(1), getPlane(5)))
+                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(5), getPlane(5)))
             }
         }
     }
@@ -460,6 +471,8 @@ class LOOTTABLES {
             }
             for(i in 0..3) {
                 newloottable.add(Pair(CustomItems.mudBall().asQuantity(5), getPlane(4)))
+                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(10), getPlane(4)))
+                newloottable.add(Pair(CustomItems.nano().asQuantity(1), getPlane(4)))
             }
             for (i in 0..4) {
                 newloottable.add(Pair(ItemStack(Material.APPLE, 6), getPlane(5)))

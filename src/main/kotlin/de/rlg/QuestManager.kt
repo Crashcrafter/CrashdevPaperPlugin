@@ -170,9 +170,7 @@ fun getQuestLore(quest: Quest, canStart: Boolean): MutableList<String> {
         if (quest.reward.itemStack!!.itemMeta.hasCustomModelData()) {
             list.add("§a-" + ciName(quest.reward.itemStack!!.type, quest.reward.itemStack!!.itemMeta.customModelData))
         } else {
-            list.add(
-                "§a-" + quest.reward.itemStack!!.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial()
-            )
+            list.add("§a-" + quest.reward.itemStack!!.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial())
         }
     }
     if (canStart) {

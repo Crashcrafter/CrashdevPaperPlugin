@@ -104,7 +104,6 @@ class DeathListener : Listener {
                         EntityType.IRON_GOLEM -> deathMessage.append(player.name)
                             .append(" hat sich mit dem Falschen angelegt")
                         EntityType.WOLF -> deathMessage.append(player.name).append(" wurde von einem Hund zerbissen")
-                        else -> deathMessage.append(deathEvent.deathMessage().toString())
                     }
                 }
                 DamageCause.ENTITY_EXPLOSION -> deathMessage.append(player.name)
@@ -115,6 +114,8 @@ class DeathListener : Listener {
         }
         if(deathMessage.toString() != "§4"){
             deathEvent.deathMessage(Component.text(deathMessage.toString()))
+        }else {
+            deathEvent.deathMessage(Component.text("§4").append(deathEvent.deathMessage()!!))
         }
         player.inventory.armorContents.forEach {
             try {

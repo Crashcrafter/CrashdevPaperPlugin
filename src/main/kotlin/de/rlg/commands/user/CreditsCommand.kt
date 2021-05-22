@@ -13,7 +13,7 @@ class CreditsCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
         if (args.isEmpty()) {
-            player.sendMessage("§6Dein aktueller Kontostand: " + player.rlgPlayer().balance + " Credits")
+            player.sendMessage("§6Dein aktueller Kontostand: " + player.rlgPlayer().balance.withPoints() + " Credits")
         } else if (args[0].contentEquals("transfer")) {
             try {
                 val target: Player

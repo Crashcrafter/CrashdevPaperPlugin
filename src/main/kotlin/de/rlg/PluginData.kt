@@ -15,8 +15,8 @@ import kotlin.properties.Delegates
 //CONST DATA
 lateinit var spawn: Location
 lateinit var event: Location
-const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1_84AhiOXNNGmwPu3RJC2fNLCJDQxoIIa"
-const val texturePackHash = "2D08CD80DCE79C990C5B85F9301C474B8F721DE1"
+const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1EmGbIe7ILFMao1YUwT3n54t-I9I6aAvj"
+const val texturePackHash = "342CFD6D505DA5CF52F0077C9C4B9BF3C30208B3"
 const val DropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
 const val dcLink = "https://discord.gg/qQtaYsDN6w"
@@ -37,6 +37,7 @@ var ltcPrice: Int? = null
 var ethPrice: Int? = null
 var nanoPrice: Int? = null
 var dogePrice: Int? = null
+var lastUpdate: Date? = null
 
 //region NatureBlocks
 var natureBlocks: List<Material> = ArrayList(

@@ -32,7 +32,7 @@ fun Player.updateScoreboard(){
     list.add("§6§lNEU§r: §5Level-System!")
     list.add("-------------------  ")
     list.add("§aDein Kontostand:")
-    list.add("§6" + player.rlgPlayer().balance.toString() + " Credits")
+    list.add("§6" + player.rlgPlayer().balance.withPoints() + " Credits")
     val quests: List<Quest> = getActiveQuests(player)
     if (quests.isNotEmpty()) {
         list.add("-------------------")
@@ -58,13 +58,6 @@ fun Player.updateScoreboard(){
         score.score = list.size - i
     }
     player.scoreboard = scoreboard
-}
-
-fun sendModchatMessage(message: String){
-    moderator.forEach {
-        val msg = "§2[Modchat]§f Server> $message"
-        it.sendMessage(msg)
-    }
 }
 
 fun sendModchatMessage(message: String, sender: Player){
@@ -215,3 +208,19 @@ fun getCryptoItem(input: String): ItemStack {
         else -> throw NullPointerException()
     }
 }
+
+fun Long.withPoints(): String {
+    val asString = this.toString()
+    val builder = StringBuilder()
+    var i = 0
+    for(c in asString.reversed()){
+        builder.append(c)
+        if(i == 2) {
+            builder.append(".")
+            i = 0
+        }else i++
+    }
+    return builder.toString().reversed().removePrefix(".")
+}
+
+fun Int.withPoints(): String = this.toLong().withPoints()

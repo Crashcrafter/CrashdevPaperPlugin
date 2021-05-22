@@ -19,17 +19,16 @@ repositories {
 }
 
 dependencies {
-    compile("org.jetbrains.exposed:exposed-core:0.31.1")
-    compile("org.jetbrains.exposed:exposed-dao:0.31.1")
-    compile("org.jetbrains.exposed:exposed-jdbc:0.31.1")
-    compile("org.jetbrains.exposed:exposed-java-time:0.31.1")
+    api("org.jetbrains.exposed:exposed-core:0.31.1")
+    api("org.jetbrains.exposed:exposed-dao:0.31.1")
+    api("org.jetbrains.exposed:exposed-jdbc:0.31.1")
+    api("org.jetbrains.exposed:exposed-java-time:0.31.1")
     implementation("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     implementation("com.github.NuVotifier.NuVotifier:nuvotifier-bukkit:2.7.2")
     implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:2.7.2")
-    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3")
-    compile("com.github.KevinPriv:MojangAPI:1.0")
-    compile("org.jetbrains.kotlin:kotlin-stdlib")
-    compile("mysql:mysql-connector-java:8.0.25")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3")
+    api("com.github.KevinPriv:MojangAPI:1.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib")
 }
 
 task fatJar(type: Jar) {

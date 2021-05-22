@@ -1,7 +1,6 @@
 package de.rlg
 
 import de.rlg.items.CustomItems
-import de.rlg.items.randomElement
 import de.rlg.permission.*
 import de.rlg.player.rlgPlayer
 import kotlinx.coroutines.GlobalScope
@@ -299,6 +298,8 @@ object DropLoottables {
         Common.add(ItemStack(Material.BONE))
         Common.add(CustomItems.katzeRose())
         Common.add(CustomItems.throwableFireBall())
+        Common.add(CustomItems.dogecoin().asQuantity(5))
+        Common.add(CustomItems.dogecoin().asQuantity(3))
         Common.add(CustomItems.mudBall().asQuantity(8))
     }
 
@@ -320,6 +321,8 @@ object DropLoottables {
         Uncommon.add(ItemStack(Material.BREAD, 4))
         Uncommon.add(ItemStack(Material.GUNPOWDER, 2))
         Uncommon.add(CustomItems.katzeRose())
+        Uncommon.add(CustomItems.nano())
+        Uncommon.add(CustomItems.dogecoin().asQuantity(12))
         Uncommon.add(CustomItems.throwableFireBall().asQuantity(3))
         Uncommon.add(CustomItems.mudBall().asQuantity(16))
     }
@@ -346,6 +349,8 @@ object DropLoottables {
         Rare.add(ItemStack(Material.CHAINMAIL_HELMET))
         Rare.add(ItemStack(Material.CHAINMAIL_LEGGINGS))
         Rare.add(CustomItems.manaShard())
+        Rare.add(CustomItems.nano().asQuantity(2))
+        Rare.add(CustomItems.nano().asQuantity(3))
         Rare.add(CustomItems.throwableFireBall().asQuantity(6))
     }
 
@@ -371,6 +376,7 @@ object DropLoottables {
         Epic.add(ItemStack(Material.LAVA_BUCKET))
         Epic.add(CustomItems.manaShard())
         Epic.add(CustomItems.manaShard())
+        Epic.add(CustomItems.nano().asQuantity(4))
         Epic.add(CustomItems.throwableFireBall().asQuantity(8))
     }
 
@@ -379,23 +385,46 @@ object DropLoottables {
         Supreme.add(ItemStack(Material.NETHERITE_SCRAP))
         Supreme.add(ItemStack(Material.ANCIENT_DEBRIS))
         Supreme.add(ItemStack(Material.DIAMOND_HORSE_ARMOR))
+        Supreme.add(ItemStack(Material.DIAMOND_HORSE_ARMOR))
         Supreme.add(ItemStack(Material.DIAMOND, 2))
+        Supreme.add(ItemStack(Material.DIAMOND, 4))
         Supreme.add(ItemStack(Material.DIAMOND, 4))
         Supreme.add(ItemStack(Material.EMERALD, 2))
         Supreme.add(ItemStack(Material.EMERALD, 4))
+        Supreme.add(ItemStack(Material.EMERALD, 4))
         Supreme.add(ItemStack(Material.IRON_BLOCK, 2))
+        Supreme.add(ItemStack(Material.LAPIS_BLOCK, 2))
         Supreme.add(ItemStack(Material.LAPIS_BLOCK, 2))
         Supreme.add(ItemStack(Material.OBSIDIAN, 3))
         Supreme.add(ItemStack(Material.OBSIDIAN))
+        Supreme.add(ItemStack(Material.OBSIDIAN))
         Supreme.add(ItemStack(Material.BOOK, 4))
+        Supreme.add(ItemStack(Material.BOOK, 7))
         Supreme.add(ItemStack(Material.BOOK, 7))
         Supreme.add(ItemStack(Material.GUNPOWDER, 12))
         Supreme.add(ItemStack(Material.GUNPOWDER, 16))
+        Supreme.add(ItemStack(Material.GUNPOWDER, 16))
+        Supreme.add(ItemStack(Material.FIREWORK_ROCKET, 6))
         Supreme.add(ItemStack(Material.FIREWORK_ROCKET, 6))
         Supreme.add(ItemStack(Material.FIREWORK_ROCKET, 8))
         Supreme.add(CustomItems.manaShard())
-        Supreme.add(randomElement())
+        Supreme.add(CustomItems.chaosElement())
+        Supreme.add(CustomItems.fireElement())
+        Supreme.add(CustomItems.natureElement())
+        Supreme.add(CustomItems.waterElement())
+        Supreme.add(CustomItems.weatherElement())
         Supreme.add(CustomItems.throwableFireBall())
+        Supreme.add(CustomItems.throwableFireBall())
+        Supreme.add(CustomItems.ethereum())
+        Supreme.add(CustomItems.litecoin())
+        Supreme.add(CustomItems.litecoin())
+        Supreme.add(CustomItems.litecoin().asQuantity(2))
+        Supreme.add(CustomItems.nano().asQuantity(5))
+        Supreme.add(CustomItems.nano().asQuantity(6))
+        Supreme.add(CustomItems.nano().asQuantity(7))
+        Supreme.add(CustomItems.dogecoin().asQuantity(26))
+        Supreme.add(CustomItems.dogecoin().asQuantity(30))
+        Supreme.add(CustomItems.dogecoin().asQuantity(32))
     }
 }
 
