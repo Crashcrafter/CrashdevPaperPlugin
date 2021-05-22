@@ -7,6 +7,7 @@ import de.rlg.permission.eventCancel
 import de.rlg.permission.isClaimed
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.block.ShulkerBox
 import org.bukkit.block.Sign
 import org.bukkit.entity.Fireball
 import org.bukkit.entity.Villager
@@ -27,7 +28,7 @@ class InteractListener : Listener {
         val block = e.clickedBlock
         val player = e.player
         if (keyChests.containsKey(block)) {
-            if (player.inventory.itemInMainHand.type != Material.NAME_TAG) {
+            if (!lotteryI.contains((block as ShulkerBox).inventory)) {
                 e.isCancelled = true
                 return
             }
@@ -101,9 +102,11 @@ class InteractListener : Listener {
                 Material.FIRE_CHARGE -> {
                     val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgItemData"), PersistentDataType.STRING) ?: return
                     if(data == "throwFireball") {
-                        e.isCancelled = true
-                        player.launchProjectile(Fireball::class.java, player.velocity)
-                        player.inventory.itemInMainHand.amount--
+                        if(!eventCancel(player.location.chunk, player)){
+                            e.isCancelled = true
+                            player.launchProjectile(Fireball::class.java, player.velocity)
+                            player.inventory.itemInMainHand.amount--
+                        }
                     }
                 }
                 else -> return

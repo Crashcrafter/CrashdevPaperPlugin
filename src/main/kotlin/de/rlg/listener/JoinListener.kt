@@ -30,11 +30,6 @@ class JoinListener : Listener{
         player.updateScoreboard()
         joinEvent.joinMessage(Component.text("§a${player.name} ist erschienen!"))
         updateTabOfPlayers()
-        val rlgPlayer = player.rlgPlayer()
-        val playerTextComponent = Component.text("${rankData[rlgPlayer.rank]!!.prefix} ${player.name}")
-        player.playerListName(playerTextComponent)
-        player.displayName(playerTextComponent)
-        player.customName(playerTextComponent)
         player.isCustomNameVisible = true
         val remove: MutableList<Vote> = ArrayList()
         for (vote in cachedVoteRewards) {

@@ -38,15 +38,16 @@ class RankCommand : CommandExecutor, TabCompleter {
                             target.sendMessage("Du hast den " + args[2] + "-Rank von " + player.name + " erhalten")
                             player.sendMessage("Der " + args[2] + "-Rank wurde an " + target.name + " vergeben")
                             setRank(target, rank)
-                            target.givePerms()
                         }
                     }
                 }
             } else if (args[0].contentEquals("info")) {
-                val target: Player = Bukkit.getPlayer(args[1])!!
-                player.sendMessage(
-                    "Der Spieler " + target.name + " hat den " + rankData[rlgPlayer.rank]!!.name + "-Rank"
-                )
+                try {
+                    val target: Player = Bukkit.getPlayer(args[1])!!
+                    player.sendMessage("Der Spieler " + target.name + " hat den " + rankData[target.rlgPlayer().rank]!!.name + "-Rank")
+                }catch (ex: NullPointerException) {
+                    player.sendMessage("§4Spieler ist nicht online!")
+                }
             }
         } else {
             player.sendMessage("You dont have the permissions to do that!")
@@ -120,6 +121,7 @@ fun setRank(player: Player, rank: Int) {
     rlgPlayer.remainingClaims = newRemainingClaims
     rlgPlayer.remainingHomes = newRemainingHomes
     rlgPlayer.isMod = rankData[rank]!!.isMod
+    rlgPlayer.setName()
     player.givePerms()
 }
 

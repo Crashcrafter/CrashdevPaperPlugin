@@ -114,7 +114,7 @@ fun isSpace(inventory: Inventory, amount: Int): Boolean {
     return false
 }
 
-fun getEXPForLevel(level: Int): Long = (12 + 9 * level).toDouble().pow(2.0).toLong()
+fun getEXPForLevel(level: Int): Long = (11 + 9 * level).toDouble().pow(2.0).toLong()
 
 fun getKeysPerRank(rank: Int): String {
     return when (rank) {

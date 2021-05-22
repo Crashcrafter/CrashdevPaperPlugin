@@ -4,6 +4,7 @@ import de.rlg.asPlayer
 import de.rlg.getEXPForLevel
 import de.rlg.getExpDisplay
 import de.rlg.player.rlgPlayer
+import de.rlg.withPoints
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -29,7 +30,7 @@ class ProfileCommand : CommandExecutor {
             """
                 §7----------------Profil----------------
                 §6Name: §a${target.name}
-                §6Credits: §a${targetRLGPlayer.balance}
+                §6Credits: §a${targetRLGPlayer.balance.withPoints()}
                 $builder
                 """.trimIndent()
         )

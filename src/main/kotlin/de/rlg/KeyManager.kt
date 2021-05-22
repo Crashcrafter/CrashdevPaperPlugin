@@ -79,7 +79,11 @@ fun createLottery(player: Player, inventory: Inventory, type: Int) {
         inventory.clear()
         lotteryI.remove(inventory)
         questCount(player, 6, 1, true)
-        Bukkit.getScheduler().runTask(INSTANCE, Runnable { player.closeInventory() })
+        Bukkit.getScheduler().runTask(INSTANCE, Runnable {
+            inventory.viewers.forEach {
+                it.closeInventory()
+            }
+        })
     })
 }
 
@@ -455,29 +459,26 @@ class LOOTTABLES {
         var newloottable: MutableList<Pair<ItemStack, ItemStack>> = ArrayList()
         fun setupLevel() {
             newloottable.add(Pair(CustomItems.defaultCustomItem(Material.NAME_TAG, "§7§l§oCommon Key", arrayListOf(), 1), getPlane(1)))
-            newloottable.add(Pair(CustomItems.ironKatana(), getPlane(1)))
+            newloottable.add(Pair(CustomItems.diaKatana(), getPlane(1)))
             newloottable.add(Pair(CustomItems.manaShard().asQuantity(2), getPlane(1)))
+            newloottable.add(Pair(CustomItems.litecoin(), getPlane(1)))
             for(i in 0..1) {
                 newloottable.add(Pair(CustomItems.throwableFireBall().asQuantity(4), getPlane(2)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(2)))
-                newloottable.add(Pair(CustomItems.manaShard().asQuantity(1), getPlane(2)))
+                newloottable.add(Pair(CustomItems.manaShard(), getPlane(2)))
                 newloottable.add(Pair(ItemStack(Material.END_CRYSTAL), getPlane(2)))
             }
             for(i in 0..2) {
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(10), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.DIAMOND, 3), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.EMERALD, 6), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 13), getPlane(3)))
+                newloottable.add(Pair(CustomItems.nano().asQuantity(3), getPlane(3)))
+                newloottable.add(Pair(CustomItems.ironKatana(), getPlane(3)))
             }
             for(i in 0..3) {
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(5), getPlane(4)))
-                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(10), getPlane(4)))
-                newloottable.add(Pair(CustomItems.nano().asQuantity(1), getPlane(4)))
+                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(12), getPlane(4)))
+                newloottable.add(Pair(CustomItems.nano(), getPlane(4)))
             }
             for (i in 0..4) {
-                newloottable.add(Pair(ItemStack(Material.APPLE, 6), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.HONEYCOMB, 8), getPlane(5)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(4), getPlane(5)))
+                newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(5)))
+                newloottable.add(Pair(ItemStack(Material.DIAMOND, 4), getPlane(5)))
+                newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 16), getPlane(5)))
             }
         }
     }

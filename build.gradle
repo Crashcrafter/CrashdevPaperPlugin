@@ -1,5 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.5.0'
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 group 'de.rlg'
@@ -31,8 +32,9 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-stdlib")
 }
 
-task fatJar(type: Jar) {
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+shadowJar {
+    dependencies {
+        exclude(dependency("com.github.NuVotifier.NuVotifier::2.7.2"))
+        exclude(dependency("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"))
+    }
 }

@@ -29,6 +29,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -802,6 +803,7 @@ private fun addShop(shop: Shop){
 fun updateCreditScore(){
     allJobs.add(GlobalScope.launch {
         while (true){
+            lastUpdate = Date(System.currentTimeMillis())
             creditsScoreBoard = getCreditsScoreboard()
             Bukkit.getScheduler().runTask(INSTANCE, Runnable {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as @e[type=boat] at @s store result score @s kb_isEmpty run data get entity @s Passengers")
@@ -816,7 +818,6 @@ fun updateCreditScore(){
             ltcPrice = (obj["litecoin"]!!.usd * 100).roundToInt()
             nanoPrice = (obj["nano"]!!.usd * 100).roundToInt()
             dogePrice = (obj["dogecoin"]!!.usd * 100).roundToInt()
-            lastUpdate = Date(System.currentTimeMillis())
             delay(1000*60*5)
         }
     })
@@ -824,7 +825,8 @@ fun updateCreditScore(){
 
 fun getCreditsScoreboard(): String {
     val messageBuilder = StringBuilder()
-    messageBuilder.append("§6§l§nAktuelles Ranking:\n\n")
+    val time = SimpleDateFormat("HH:mm:ss").format(lastUpdate)
+    messageBuilder.append("§6§l§nAktuelles Ranking:§r\n§7Letztes Update: $time\n")
     transaction {
         var count = 1
         PlayersTable.selectAll().orderBy(PlayersTable.balance, SortOrder.DESC).limit(5).forEach {

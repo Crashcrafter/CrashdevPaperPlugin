@@ -263,4 +263,11 @@ class RLGPlayer() {
         }
         player.sendMessage("§2Dein Homepoint $keyWord wurde entfernt!")
     }
+
+    fun setName(){
+        val playerTextComponent = Component.text("${rankData[rank]!!.prefix} ${player.name}")
+        player.playerListName(playerTextComponent)
+        player.displayName(playerTextComponent)
+        player.customName(playerTextComponent)
+    }
 }
