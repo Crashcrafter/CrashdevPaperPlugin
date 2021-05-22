@@ -104,7 +104,7 @@ object CustomItems {
 
     fun bitcoin(): ItemStack = defaultCustomItem(Material.STICK, "§eBitcoin", arrayListOf(), 1)
 
-    fun monero(): ItemStack = defaultCustomItem(Material.STICK, "§6Monero", arrayListOf(), 2)
+    fun ethereum(): ItemStack = defaultCustomItem(Material.STICK, "§7Ethereum", arrayListOf(), 2)
 
     fun litecoin(): ItemStack = defaultCustomItem(Material.STICK, "§1Litecoin", arrayListOf(), 3)
 

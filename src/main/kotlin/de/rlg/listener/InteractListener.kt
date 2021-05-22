@@ -120,13 +120,15 @@ class InteractListener : Listener {
                     "shop" -> {
                         tradingInventory(e.player)
                         e.isCancelled = true
+                        return
                     }
                     "quester" -> {
                         showAvailableQuests(e.player)
                         e.isCancelled = true
+                        return
                     }
                 }
-            } catch (ignored: NullPointerException) { }
+            } catch (ignored: NullPointerException) {}
         } else if (e.rightClicked is WanderingTrader) {
             val shop = e.rightClicked as WanderingTrader
             try {

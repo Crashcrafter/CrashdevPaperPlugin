@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.inventory.meta.Damageable
 import java.util.*
 
 class DeathListener : Listener {
@@ -117,13 +118,13 @@ class DeathListener : Listener {
         }
         player.inventory.armorContents.forEach {
             try {
-                val durability = it.durability
+                val durability = (it.itemMeta as Damageable).damage
                 val maxDurability = it.type.maxDurability
-                val newDurability = (durability + maxDurability / 4).toShort()
+                val newDurability = (durability + maxDurability / 4)
                 if (newDurability >= maxDurability) {
                     deathEvent.drops.remove(it)
                 } else {
-                    it.durability = newDurability
+                    (it.itemMeta as Damageable).damage = newDurability
                 }
             }catch (ex: NullPointerException) {}
         }

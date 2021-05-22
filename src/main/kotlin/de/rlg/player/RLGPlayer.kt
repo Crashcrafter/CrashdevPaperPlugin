@@ -3,9 +3,7 @@ package de.rlg.player
 import de.rlg.*
 import de.rlg.permission.rankData
 import kotlinx.coroutines.*
-import net.md_5.bungee.api.ChatMessageType
-import net.md_5.bungee.api.chat.TextComponent
-import org.bukkit.ChatColor
+import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -113,20 +111,20 @@ class RLGPlayer() {
         if (managen != null) {
             managen!!.cancel()
         }
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, *TextComponent.fromLegacyText(ChatColor.BLUE.toString() + "Mana: " + mana))
+        player.sendActionBar(Component.text("§1Mana: $mana"))
         val job = GlobalScope.launch {
             try {
                 delay(2000)
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, *TextComponent.fromLegacyText(ChatColor.BLUE.toString() + "Mana: " + mana))
+                player.sendActionBar(Component.text("§1Mana: $mana"))
                 delay(2000)
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, *TextComponent.fromLegacyText(ChatColor.BLUE.toString() + "Mana: " + mana))
+                player.sendActionBar(Component.text("§1Mana: $mana"))
                 delay(2000)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
             while (mana < 100) {
                 mana++
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, *TextComponent.fromLegacyText(ChatColor.BLUE.toString() + "Mana: " + mana))
+                player.sendActionBar(Component.text("§1Mana: $mana"))
                 if (mana == 100) break
                 try {
                     delay(350)
@@ -146,7 +144,6 @@ class RLGPlayer() {
             var xpForLevel = getEXPForLevel(xpLevel-1)
             while (xp < 0){
                 xp += xpForLevel
-                if(xpLevel == vxpLevel) vxpLevel--
                 xpLevel--
                 xpForLevel = getEXPForLevel(xpLevel-1)
             }
@@ -156,12 +153,12 @@ class RLGPlayer() {
         player.sendMessage("§a+$amount XP")
         if (amount > 10) player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f)
         println("Level Change for " + player.name + ": " + amount)
-        var needed: Long = getEXPForLevel(xpLevel+1)
+        var needed: Long = getEXPForLevel(xpLevel)
         if (xp >= needed) {
             while (xp >= needed) {
-                xpLevel++
+                levelUp()
                 xp -= needed
-                needed = getEXPForLevel(xpLevel+1)
+                needed = getEXPForLevel(xpLevel)
             }
             player.sendMessage("§2Level Up!\n§6Du bist jetzt Level $xpLevel!")
         }
@@ -171,6 +168,16 @@ class RLGPlayer() {
             val percent: Double = xp.toDouble().div(getEXPForLevel(xpLevel))
             builder.getExpDisplay(percent)
             player.sendMessage(builder.toString())
+        }
+    }
+
+    private fun levelUp(){
+        xpLevel++
+        if(xpLevel > vxpLevel){
+            if(isSpace(player.inventory, 1)){
+                player.inventory.addItem(genKey(5))
+                vxpLevel++
+            }
         }
     }
 

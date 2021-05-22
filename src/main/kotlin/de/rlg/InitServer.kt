@@ -134,7 +134,7 @@ fun registerCustomItems(){
     customItemsMap["DiaKatana"] = CustomItems.diaKatana()
     customItemsMap["NetherKatana"] = CustomItems.netherKatana()
     customItemsMap["Bitcoin"] = CustomItems.bitcoin()
-    customItemsMap["Monero"] = CustomItems.monero()
+    customItemsMap["Ethereum"] = CustomItems.ethereum()
     customItemsMap["Litecoin"] = CustomItems.litecoin()
     customItemsMap["Dogecoin"] = CustomItems.dogecoin()
     customItemsMap["Nano"] = CustomItems.nano()

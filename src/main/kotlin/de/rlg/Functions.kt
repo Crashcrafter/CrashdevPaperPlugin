@@ -1,5 +1,6 @@
 package de.rlg
 
+import de.rlg.items.CustomItems
 import de.rlg.permission.rankData
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
@@ -10,6 +11,7 @@ import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
 import java.util.*
 import kotlin.math.pow
@@ -178,5 +180,38 @@ fun StringBuilder.getExpDisplay(percent: Double){
     while (j <= 1) {
         this.append("█")
         j += 0.05f
+    }
+}
+
+fun getCryptoPrice(input: String): Int {
+    return when(input) {
+        "bitcoin" -> btcPrice!!
+        "ethereum" -> ethPrice!!
+        "litecoin" -> ltcPrice!!
+        "nano" -> nanoPrice!!
+        "dogecoin" -> dogePrice!!
+        else -> throw NullPointerException()
+    }
+}
+
+fun getCryptoPrice(input: Int): Int {
+    return when(input) {
+        1 -> btcPrice!!
+        2 -> ethPrice!!
+        3 -> ltcPrice!!
+        5 -> nanoPrice!!
+        4 -> dogePrice!!
+        else -> throw NullPointerException()
+    }
+}
+
+fun getCryptoItem(input: String): ItemStack {
+    return when(input) {
+        "bitcoin" -> CustomItems.bitcoin()
+        "ethereum" -> CustomItems.ethereum()
+        "litecoin" -> CustomItems.litecoin()
+        "nano" -> CustomItems.nano()
+        "dogecoin" -> CustomItems.dogecoin()
+        else -> throw NullPointerException()
     }
 }

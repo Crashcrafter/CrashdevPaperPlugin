@@ -48,13 +48,13 @@ fun initTradingInventories() {
     amountmap[0] = 1
     amountmap[1] = 8
     amountmap[2] = 16
-    amountmap[3] = 32
-    amountmap[4] = 64
+    amountmap[3] = 64
 
     val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
-    overview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "§rBuch-Shop", arrayListOf(), 1, Pair("rlgAction", "book")))
-    overview.setItem(1, CustomItems.defaultCustomItem(Material.OAK_LOG, "§rHolz-Shop", arrayListOf(), 0, Pair("rlgAction", "wood")))
-    overview.setItem(2, CustomItems.defaultCustomItem(Material.POLISHED_ANDESITE, "§rBau-Shop", arrayListOf(), 0, Pair("rlgAction", "build")))
+    overview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "§1Buch-Shop", arrayListOf(), 1, Pair("rlgAction", "book")))
+    overview.setItem(1, CustomItems.defaultCustomItem(Material.OAK_LOG, "§cHolz-Shop", arrayListOf(), 0, Pair("rlgAction", "wood")))
+    overview.setItem(2, CustomItems.defaultCustomItem(Material.POLISHED_ANDESITE, "§6Bau-Shop", arrayListOf(), 0, Pair("rlgAction", "build")))
+    overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf(), 1, Pair("rlgAction", "crypto")))
     TradingInventories.overview = overview
 
     val keyOverview: Inventory = Bukkit.createInventory(null, 9, Component.text("Buch-Shop"))
@@ -130,13 +130,11 @@ fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
         return false
     }
     playerRlgPlayer.balance -= amount
-    val msgPlayer = amount.toString() + " Credits wurden an " + target.name + " gesendet"
-    player.sendMessage(msgPlayer)
+    player.sendMessage(amount.toString() + " Credits wurden an " + target.name + " gesendet")
     player.changeCredits(playerRlgPlayer.balance)
     val targetRlgPlayer = target.rlgPlayer()
     targetRlgPlayer.balance += amount
-    val msgTarget = "Du hast " + amount + " Credits von " + player.name + " erhalten"
-    target.sendMessage(msgTarget)
+    target.sendMessage("Du hast " + amount + " Credits von " + player.name + " erhalten")
     target.changeCredits(targetRlgPlayer.balance)
     player.updateScoreboard()
     target.updateScoreboard()
@@ -174,11 +172,28 @@ fun sellItem(player: Player) {
     if (itemStack.itemMeta.hasLore() && itemStack.itemMeta.lore()!!.toStringList().contains("Aus Creative-Inventar")) {
         return
     }
-    val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
-    val value = (prices[itemStack.type]!! * itemStack.amount * multiplier).toLong()
-    giveBalance(player, value, "Shop")
-    questCount(player, 12, value.toInt(), true)
-    questCount(player, 8, value.toInt(), false)
+    if(itemStack.type == Material.STICK && itemStack.itemMeta.hasCustomModelData()){
+        try {
+            val price = when(itemStack.itemMeta.customModelData){
+                1 -> btcPrice!!
+                2 -> ethPrice!!
+                3 -> ltcPrice!!
+                5 -> nanoPrice!!
+                4 -> dogePrice!!
+                else -> return
+            }
+            giveBalance(player, (price * itemStack.amount).toLong(), "Shop")
+        }catch (ex: NullPointerException) {
+            player.closeInventory()
+            player.sendMessage("§4Versuch es später nochmal!")
+            return
+        }
+    }else {
+        val value = (prices[itemStack.type]!! * itemStack.amount * rankData[player.rlgPlayer().rank]!!.shopMultiplier).toLong()
+        giveBalance(player, value, "Shop")
+        questCount(player, 12, value.toInt(), true)
+        questCount(player, 8, value.toInt(), false)
+    }
     player.inventory.removeItem(itemStack)
     player.closeInventory()
     player.updateScoreboard()
@@ -187,39 +202,40 @@ fun sellItem(player: Player) {
 fun tradingInventory(player: Player) {
     try {
         if (player.inventory.itemInMainHand.type == Material.AIR) {
-            showTradingInventory(player, TradingInventories.overview, "Shop")
+            val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
+            overview.contents = TradingInventories.overview!!.contents.copyOf()
+            if(player.rlgPlayer().xpLevel < 15){
+                overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 15 benötigt"), 1, Pair("rlgAction", "crypto")))
+            }
+            showTradingInventory(player, overview, "Shop")
             return
         }
+    } catch (e: NullPointerException) { }
+    val isGiven = player.inventory.itemInMainHand
+    val itemStack = ItemStack(isGiven.type, isGiven.amount)
+    val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
+    val price: Long = try {
+        (prices[itemStack.type]!!.toLong() * itemStack.amount * multiplier).toLong()
     } catch (e: NullPointerException) {
-        showTradingInventory(player, TradingInventories.overview, "Shop")
-        return
+        if(isGiven.type == Material.STICK && isGiven.itemMeta.hasCustomModelData()){
+            getCryptoPrice(isGiven.itemMeta.customModelData).toLong() * itemStack.amount
+        }else {
+            player.sendMessage("§4Das Item steht nicht zum Verkauf!")
+            return
+        }
     }
-
-    try {
-        val isGiven = player.inventory.itemInMainHand
-        val itemStack = ItemStack(isGiven.type, isGiven.amount)
-        val rlgPlayer = player.rlgPlayer()
-        val multiplier = rankData[rlgPlayer.rank]!!.shopMultiplier
-        val result = Bukkit.createInventory(
-            null,
-            27,
-            Component.text("Verkaufe " + isGiven.amount + " ").append(isGiven.itemMeta.displayName()!!.append(Component.text("§r für " + prices[itemStack.type] as Long * itemStack.amount * multiplier + " Credits")))
-        )
-        result.setItem(11, CustomItems.defaultCustomItem(Material.RED_WOOL, "§4Ablehnen", arrayListOf()))
-        result.setItem(13, CustomItems.defaultCustomItem(isGiven.type, "Verkaufen für " + prices[itemStack.type] as Long * itemStack.amount * multiplier + " Credits", arrayListOf()))
-        result.setItem(15, CustomItems.defaultCustomItem(Material.GREEN_WOOL, "§2Annehmen", arrayListOf()))
-        tradingInventoryCopies.add(result)
-        player.openInventory(result)
-    } catch (e: NullPointerException) {
-        player.sendMessage("§4Das Item steht nicht zum Verkauf!")
-    }
+    val cmd = if(isGiven.itemMeta.hasCustomModelData()) isGiven.itemMeta.customModelData else 0
+    val result = Bukkit.createInventory(null, 27, Component.text("Verkaufe für $price Credits"))
+    result.setItem(11, CustomItems.defaultCustomItem(Material.RED_WOOL, "§4Ablehnen", arrayListOf()))
+    result.setItem(13, CustomItems.defaultCustomItem(isGiven.type, "Verkaufen für $price Credits", arrayListOf(), cmd).asQuantity(isGiven.amount))
+    result.setItem(15, CustomItems.defaultCustomItem(Material.GREEN_WOOL, "§2Annehmen", arrayListOf()))
+    tradingInventoryCopies.add(result)
+    player.openInventory(result)
 }
 
 fun showTradingInventory(player: Player, inventory: Inventory?, iname: String) {
     val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(iname))
-    val original = inventory.contents
-    val clone = original.copyOf()
-    cloned.contents = clone
+    cloned.contents = inventory.contents.copyOf()
     shopinventories.add(cloned)
     player.closeInventory()
     player.openInventory(cloned)
@@ -271,6 +287,27 @@ fun clickHandler(item: ItemStack, player: Player) {
                 else -> showTradingInventory(player, BlackMarketInventories.blackmarketkeyoverview, "Keys-Shop")
             }
         }
+        "crypto" -> {
+            if(player.rlgPlayer().xpLevel < 15) return
+            if(dataArray.size == 1){
+                val cryptoOverview: Inventory = Bukkit.createInventory(null, 45, Component.text("Crypto Shop"))
+                for (i in 0 until amountmap.size){
+                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Bitcoin für ${amountmap[i]!! * btcPrice!!} Credits", arrayListOf(), 1,
+                        Pair("rlgAction", "crypto bitcoin ${amountmap[i]}")))
+                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Ethereum für ${amountmap[i]!! * ethPrice!!} Credits", arrayListOf(), 2,
+                        Pair("rlgAction", "crypto ethereum ${amountmap[i]}")))
+                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Litecoin für ${amountmap[i]!! * ltcPrice!!} Credits", arrayListOf(), 3,
+                        Pair("rlgAction", "crypto litecoin ${amountmap[i]}")))
+                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Nano für ${amountmap[i]!! * nanoPrice!!} Credits", arrayListOf(), 5,
+                        Pair("rlgAction", "crypto nano ${amountmap[i]}")))
+                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Dogecoin für ${amountmap[i]!! * dogePrice!!} Credits", arrayListOf(), 4,
+                        Pair("rlgAction", "crypto dogecoin ${amountmap[i]}")))
+                }
+                showTradingInventory(player, cryptoOverview, "Crypto-Shop")
+                return
+            }
+            buyCrypto(dataArray[1], dataArray[2].toInt(), player)
+        }
     }
 }
 
@@ -310,6 +347,22 @@ fun buyItem(m: Material, amount: Int, priceperone: Int, player: Player) {
             player.inventory.addItem(itemStack)
             player.updateScoreboard()
         }
+    } else {
+        player.sendMessage("§4Dein Inventar ist voll!")
+        player.closeInventory()
+    }
+}
+
+fun buyCrypto(type: String, amount: Int, player: Player) {
+    if (isSpace(player.inventory, 1)) {
+        try {
+            if (pay(player, amount.toLong() * getCryptoPrice(type), type)) {
+                val itemStack = getCryptoItem(type)
+                itemStack.amount = amount
+                player.inventory.addItem(itemStack)
+                player.updateScoreboard()
+            }
+        } catch (ex: NullPointerException) {}
     } else {
         player.sendMessage("§4Dein Inventar ist voll!")
         player.closeInventory()
