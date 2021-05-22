@@ -34,7 +34,24 @@ dependencies {
 
 shadowJar {
     dependencies {
-        exclude(dependency("com.github.NuVotifier.NuVotifier::2.7.2"))
-        exclude(dependency("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"))
+        exclude(dependency("com.github.NuVotifier.NuVotifier::.*"))
+        exclude(dependency("com.destroystokyo.paper:paper-api"))
+        exclude(dependency("org.ow2.asm::.*"))
+        exclude(dependency("org.yaml:snakeyaml"))
+        exclude(dependency("org.hamcrest:hamcrest-core"))
+        exclude(dependency("org.checkerframework:checker-qual"))
+        exclude(dependency("junit:junit"))
+        exclude(dependency("net.kyori::.*"))
+        exclude(dependency("org.slf4j:slf4j-api"))
+        exclude(dependency("net.md-5::.*"))
+        exclude(dependency("com.google.code.findbugs::.*"))
+        exclude(dependency("com.google.code.gson::.*"))
+        exclude(dependency("com.google.guava::.*"))
+        exclude(dependency("com.google.googlecode.json-simple::.*"))
+        exclude(dependency("commons-lang::.*"))
+        exclude(dependency("it.unimi.dsi::.*"))
+        exclude(dependency("org.apache.maven::.*"))
+        exclude(dependency("org.apache.maven.resolver::.*"))
+        exclude(dependency("io.netty::.*"))
     }
 }
