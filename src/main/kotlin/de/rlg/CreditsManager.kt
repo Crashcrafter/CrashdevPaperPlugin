@@ -170,7 +170,7 @@ fun pay(target: Player, amount: Long, reason: String): Boolean {
 
 fun sellItem(player: Player) {
     val itemStack = player.inventory.itemInMainHand
-    if (itemStack.itemMeta.hasLore() && itemStack.itemMeta.lore()!!.toStringList().contains("Aus Creative-Inventar")) {
+    if (itemStack.hasItemMeta() && itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)) {
         return
     }
     if(itemStack.type == Material.STICK && itemStack.itemMeta.hasCustomModelData()){

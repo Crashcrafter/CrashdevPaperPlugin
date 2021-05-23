@@ -1,18 +1,30 @@
 package de.rlg.listener
 
+import de.rlg.INSTANCE
 import de.rlg.items.CraftingRecipes
 import de.rlg.questCount
+import de.rlg.toStringList
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.persistence.PersistentDataType
 
 class CraftingListener : Listener {
 
     @EventHandler
     fun onCrafting(e: CraftItemEvent) {
+        e.inventory.matrix.forEach {
+            if(it.hasItemMeta() && it.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
+                e.result = Event.Result.DENY
+                e.isCancelled = true
+                e.whoClicked.closeInventory()
+                return
+            }
+        }
         if (e.recipe.result.hasItemMeta()) {
             if (e.recipe.result.itemMeta.hasCustomModelData()) {
                 val inHand = e.whoClicked.inventory.itemInMainHand
@@ -45,6 +57,7 @@ class CraftingListener : Listener {
                         e.isCancelled = true
                         e.whoClicked.sendMessage("§4Das ist nicht das richtige Rezept!")
                         e.whoClicked.closeInventory()
+                        return
                     } else {
                         if (material == Material.GOLD_INGOT && modeldata == 2) {
                             questCount(e.whoClicked as Player, 17, 1, true)
@@ -56,6 +69,11 @@ class CraftingListener : Listener {
                     e.isCancelled = true
                 }
             }
+        }
+        if(e.inventory.result != null){
+            val item = e.inventory.result!!
+            val im = item.itemMeta
+            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING, (e.whoClicked as Player).name)
         }
     }
 }

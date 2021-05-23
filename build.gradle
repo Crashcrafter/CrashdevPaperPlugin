@@ -52,6 +52,5 @@ shadowJar {
         exclude(dependency("it.unimi.dsi::.*"))
         exclude(dependency("org.apache.maven::.*"))
         exclude(dependency("org.apache.maven.resolver::.*"))
-        exclude(dependency("io.netty::.*"))
     }
 }

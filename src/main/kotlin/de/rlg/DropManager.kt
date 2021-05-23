@@ -159,29 +159,14 @@ fun waveManager(chunk: Chunk) {
             player.playSound(location, "rlg.drop.music", 2f, 1f)
         }
         val job = GlobalScope.launch {
-            try {
-                delay(2500)
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-            }
+            delay(2500)
             while (true) {
-                try {
-                    delay(5000)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
+                delay(5000)
                 if (drop.entities.size == 0) {
                     if (drop.wave > drop.dropWaves.size) {
                         object : BukkitRunnable() {
                             override fun run() {
                                 unsetDrop(chunk, false)
-                                location.world.playSound(
-                                    chunk.getBlock(8, 8, 8).location,
-                                    Sound.UI_TOAST_CHALLENGE_COMPLETE,
-                                    SoundCategory.AMBIENT,
-                                    5f,
-                                    1f
-                                )
                                 if (drop.participatingPlayer.size == 1 && drop.type == 3) {
                                     questCount(drop.participatingPlayer[0], 4, 1, true)
                                 }
@@ -189,6 +174,7 @@ fun waveManager(chunk: Chunk) {
                                     try {
                                         player.stopSound("rlg.drop.musicfinal")
                                         player.stopSound("rlg.drop.music")
+                                        player.playSound(drop.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.AMBIENT, 5f, 1f)
                                         when(drop.type){
                                             0 -> questCount(player, 15, 1, true)
                                             1 -> questCount(player, 1, 1, true)
@@ -196,8 +182,7 @@ fun waveManager(chunk: Chunk) {
                                         }
                                         questCount(player, 7, 1, true)
                                         questCount(player, 5, 1, false)
-                                    } catch (ignored: NullPointerException) {
-                                    }
+                                    } catch (ignored: NullPointerException) { }
                                 }
                             }
                         }.runTask(INSTANCE)
@@ -237,7 +222,10 @@ fun Drop.spawnWave() {
     drop.dropWaves[drop.wave]!!.forEach {
         try {
             Bukkit.getScheduler().runTask(INSTANCE, Runnable {
-                val entity = location.world.spawnEntity(location, it)
+                val x = Random().nextInt(8) - 4
+                val z = Random().nextInt(8) - 4
+                val world = location.world
+                val entity = world.spawnEntity(world.getHighestBlockAt(location.blockX + x, location.blockZ + z).location.add(0.5, 1.0, 0.5), it)
                 entity.isGlowing = true
                 entity.customName = dropName
                 entity.isCustomNameVisible = true
@@ -378,6 +366,7 @@ object DropLoottables {
         Epic.add(CustomItems.manaShard())
         Epic.add(CustomItems.nano().asQuantity(4))
         Epic.add(CustomItems.throwableFireBall().asQuantity(8))
+        Epic.add(CustomItems.additionalClaim())
     }
 
     var Supreme: MutableList<ItemStack> = ArrayList()
@@ -425,6 +414,8 @@ object DropLoottables {
         Supreme.add(CustomItems.dogecoin().asQuantity(26))
         Supreme.add(CustomItems.dogecoin().asQuantity(30))
         Supreme.add(CustomItems.dogecoin().asQuantity(32))
+        Supreme.add(CustomItems.additionalClaim())
+        Supreme.add(CustomItems.additionalClaim())
     }
 }
 

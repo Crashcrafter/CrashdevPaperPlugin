@@ -118,6 +118,9 @@ object CustomItems {
     fun mudBall(): ItemStack = defaultCustomItem(Material.SNOWBALL, "§6Mudball", arrayListOf("§7Rechtsclick zum Werfen", "", "§7Verlangsamt Gegner"), 1,
     Pair("rlgItemData", "mudBall"))
 
+    fun additionalClaim(): ItemStack = defaultCustomItem(Material.STICK, "§2+1 Claim", arrayListOf("§7Rechtsclick, um einen zusätzlichen Claim zu erhalten!"), 6,
+    Pair("rlgItemData", "addClaim"))
+
     private fun bookCustomItem(title: String, author: String, pages: Array<String>, cmd: Int=0): ItemStack {
         val itemStack = ItemStack(Material.WRITTEN_BOOK)
         val bm = itemStack.itemMeta as BookMeta

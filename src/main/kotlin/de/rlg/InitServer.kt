@@ -43,6 +43,7 @@ fun initServer(){
     initDrops()
     updateCreditScore()
     CraftingRecipes.initRecipes()
+    initEnchLevel()
 
     registerCommands()
     registerEvents()
@@ -111,6 +112,7 @@ fun registerCommands(){
     INSTANCE.getCommand("mute")!!.tabCompleter = MuteCommand()
     INSTANCE.getCommand("unmute")!!.setExecutor(UnmuteCommand())
     INSTANCE.getCommand("crypto")!!.setExecutor(CryptoCommand())
+    INSTANCE.getCommand("checkitem")!!.setExecutor(CheckItemCommand())
 }
 
 fun registerCustomItems(){
@@ -143,6 +145,7 @@ fun registerCustomItems(){
     customItemsMap["ShopBook"] = CustomItems.shopBook()
     customItemsMap["Fireball"] = CustomItems.throwableFireBall()
     customItemsMap["MudBall"] = CustomItems.mudBall()
+    customItemsMap["AddClaim"] = CustomItems.additionalClaim()
 }
 
 fun loadWorlds(){

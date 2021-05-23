@@ -61,6 +61,7 @@ fun PermissionAttachment.modPerms() {
     this.setPermission("rlg.warn", true)
     this.setPermission("rlg.mute", true)
     this.setPermission("rlg.unmute", true)
+    this.setPermission("rlg.checkitem", true)
     this.setPermission("sv.use", true)
     this.setPermission("sv.keepfly", true)
     this.setPermission("sv.logout", true)

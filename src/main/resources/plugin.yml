@@ -134,6 +134,10 @@ commands:
   crypto:
     description: Info über aktuelle Kurse
     usage: /crypto
+  checkitem:
+    description: Info über aktuelles Item
+    usage: /checkitem
+    permission: rlg.checkitem
 
 permissions:
   rlg.reloaddb:
@@ -180,4 +184,7 @@ permissions:
     default: op
   rlg.unmute:
     description: Kann Spieler entmuten
+    default: op
+  rlg.checkitem:
+    description: Kann Items Checken
     default: op

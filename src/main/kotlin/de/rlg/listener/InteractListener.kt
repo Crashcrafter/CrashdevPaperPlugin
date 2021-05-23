@@ -2,6 +2,7 @@ package de.rlg.listener
 
 import de.rlg.*
 import de.rlg.items.staffs.*
+import de.rlg.permission.changeAddedClaims
 import de.rlg.permission.chunks
 import de.rlg.permission.eventCancel
 import de.rlg.permission.isClaimed
@@ -28,7 +29,13 @@ class InteractListener : Listener {
         val block = e.clickedBlock
         val player = e.player
         if (keyChests.containsKey(block)) {
-            if (!lotteryI.contains((block as ShulkerBox).inventory)) {
+            try {
+                if (!player.inventory.itemInMainHand.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING)
+                    && !lotteryI.contains((block!!.state as ShulkerBox).inventory)) {
+                    e.isCancelled = true
+                    return
+                }
+            }catch (ex: NullPointerException) {
                 e.isCancelled = true
                 return
             }
@@ -107,6 +114,15 @@ class InteractListener : Listener {
                             player.launchProjectile(Fireball::class.java, player.velocity)
                             player.inventory.itemInMainHand.amount--
                         }
+                    }
+                }
+                Material.STICK -> {
+                    val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgItemData"), PersistentDataType.STRING) ?: return
+                    if(data == "addClaim"){
+                        e.isCancelled = true
+                        changeAddedClaims(player, 1)
+                        player.inventory.itemInMainHand.amount--
+                        player.sendMessage("§2Herzlichen Glückwunsch! §6Du hast einen zusätzlichen Claim erhalten!")
                     }
                 }
                 else -> return

@@ -49,14 +49,18 @@ class KeyCommand : CommandExecutor, TabCompleter {
                     1
                 }
                 for(i in 0 until amount){
-                    player.inventory.addItem(when(args[1]){
-                        "common" -> genKey(1)
-                        "epic" -> genKey(2)
-                        "supreme" -> genKey(3)
-                        "vote" -> genKey(4)
-                        "level" -> genKey(5)
-                        else -> ItemStack(Material.STRUCTURE_VOID)
-                    })
+                    try {
+                        player.inventory.addItem(when(args[1]){
+                            "common" -> genKey(1)
+                            "epic" -> genKey(2)
+                            "supreme" -> genKey(3)
+                            "vote" -> genKey(4)
+                            "level" -> genKey(5)
+                            else -> ItemStack(Material.STRUCTURE_VOID)
+                        })
+                    }catch (ex: IndexOutOfBoundsException) {
+                        player.sendMessage("§4Bitte gib einen Typ an!")
+                    }
                 }
             } else {
                 player.sendMessage("&4Enter valid argument")

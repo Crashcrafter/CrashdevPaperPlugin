@@ -11,6 +11,7 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -23,7 +24,7 @@ import java.util.*
 
 private const val allowedSymbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-var lotteryI: MutableCollection<Inventory> = ArrayList()
+val lotteryI: MutableList<Inventory> = ArrayList()
 
 fun createLottery(player: Player, inventory: Inventory, type: Int) {
     allJobs.add(GlobalScope.launch {
@@ -80,7 +81,11 @@ fun createLottery(player: Player, inventory: Inventory, type: Int) {
         lotteryI.remove(inventory)
         questCount(player, 6, 1, true)
         Bukkit.getScheduler().runTask(INSTANCE, Runnable {
+            val viewers = mutableListOf<HumanEntity>()
             inventory.viewers.forEach {
+                viewers.add(it)
+            }
+            viewers.forEach {
                 it.closeInventory()
             }
         })
@@ -261,6 +266,7 @@ class LOOTTABLES {
             newloottable.add(Pair(ItemStack(Material.BEACON), getPlane(1)))
             newloottable.add(Pair(CustomItems.diaKatana(), getPlane(1)))
             newloottable.add(Pair(CustomItems.nano().asQuantity(8), getPlane(1)))
+            newloottable.add(Pair(CustomItems.additionalClaim(), getPlane(1)))
             for (i in 0..1) {
                 newloottable.add(Pair(ItemStack(Material.CHICKEN_SPAWN_EGG), getPlane(2)))
                 newloottable.add(Pair(ItemStack(Material.COW_SPAWN_EGG), getPlane(2)))
@@ -383,6 +389,7 @@ class LOOTTABLES {
                 newloottable.add(Pair(ItemStack(Material.VILLAGER_SPAWN_EGG), getPlane(2)))
                 newloottable.add(Pair(ItemStack(Material.SPAWNER), getPlane(2)))
                 newloottable.add(Pair(ItemStack(Material.END_PORTAL_FRAME, 3), getPlane(2)))
+                newloottable.add(Pair(CustomItems.additionalClaim(), getPlane(2)))
             }
             for (i in 0..2) {
                 val is0 = ItemStack(Material.TRIDENT)

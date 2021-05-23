@@ -1,14 +1,16 @@
 package de.rlg.listener
 
-import de.rlg.permission.rankData
+import de.rlg.INSTANCE
 import de.rlg.player.rlgPlayer
 import de.rlg.toComponentList
 import de.rlg.toStringList
 import org.bukkit.GameMode
+import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.player.PlayerGameModeChangeEvent
+import org.bukkit.persistence.PersistentDataType
 
 class CheatListener : Listener {
     
@@ -16,7 +18,10 @@ class CheatListener : Listener {
     fun onCreativeInv(e: InventoryCreativeEvent) {
         try {
             val itemStack = e.cursor
-            if (itemStack.itemMeta.hasLore()) {
+            val im = itemStack.itemMeta
+            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING, e.whoClicked.name)
+            itemStack.itemMeta = im
+            if (im.hasLore()) {
                 val list = itemStack.lore()!!.toStringList()
                 if (!list.contains("Aus Creative-Inventar")) {
                     list.add("Aus Creative-Inventar")
@@ -24,12 +29,9 @@ class CheatListener : Listener {
                     itemStack.lore(list.toComponentList())
                 }
             } else {
-                val list: MutableList<String> = ArrayList()
-                list.add("Aus Creative-Inventar")
-                itemStack.lore(list.toComponentList())
+                itemStack.lore(arrayListOf("Aus Creative-Inventar", "Von " + e.whoClicked.name).toComponentList())
             }
-        } catch (ignored: NullPointerException) {
-        }
+        } catch (ignored: NullPointerException) { }
     }
 
     @EventHandler

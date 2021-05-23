@@ -68,7 +68,7 @@ class RLGPlayer() {
                             it[leftKeys] = weeklyStatusString
                             it[lastTime] = LocalDate.now()
                         }
-                        player.sendMessage("§aDu kannst deine wöchentlichen Keys abholen!\nNutze dafür /weekly")
+                        player.sendMessage("§6Du kannst deine wöchentlichen Keys abholen!\nNutze dafür /weekly")
                     }
                     statusQuery.first()[ProcessedTable.lastTime].isBefore(LocalDate.now().minus(6, ChronoUnit.DAYS)) -> {
                         weeklyStatusString = getKeysPerRank(rank)
@@ -76,7 +76,7 @@ class RLGPlayer() {
                             it[leftKeys] = weeklyStatusString
                             it[lastTime] = LocalDate.now()
                         }
-                        player.sendMessage("§aDu kannst deine wöchentlichen Keys abholen!\nNutze dafür /weekly")
+                        player.sendMessage("§6Du kannst deine wöchentlichen Keys abholen!\nNutze dafür /weekly")
                     }
                     else -> {
                         weeklyStatusString = statusQuery.first()[ProcessedTable.leftKeys]
@@ -104,6 +104,7 @@ class RLGPlayer() {
         }
         changeMana(0)
         this.dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (15+ Random().nextInt(10))
+        this.setName()
     }
 
     fun changeMana(amount: Int) {
