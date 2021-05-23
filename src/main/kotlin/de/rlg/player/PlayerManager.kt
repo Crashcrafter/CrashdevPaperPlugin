@@ -5,7 +5,6 @@ import de.rlg.permission.givePerms
 import de.rlg.permission.rankData
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction

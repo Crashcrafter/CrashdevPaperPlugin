@@ -42,14 +42,13 @@ fun Player.updateScoreboard(){
             if (quest.counter >= quest.needed) {
                 color = "§2"
             }
-            list.add("§a" + quest.name + color + " (" + quest.counter.toString() + "/" + quest.needed.toString() + ")")
+            list.add("§a" + quest.name + color + " (" + quest.counter.withPoints() + "/" + quest.needed.withPoints() + ")")
         }
     }
     list.add("------------------- ")
     list.add("§4Tode:")
     list.add(INSTANCE.config.getInt("Players." + player.uniqueId.toString() + ".Deaths").toString())
-    val manager = Bukkit.getScoreboardManager()
-    val scoreboard = manager.newScoreboard
+    val scoreboard = Bukkit.getScoreboardManager().newScoreboard
     val objective = scoreboard.registerNewObjective("scoreboard", "scoreboard", Component.text("scoreboard"))
     objective.displaySlot = DisplaySlot.SIDEBAR
     objective.displayName(Component.text("§e§lMCGermany.de"))

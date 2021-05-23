@@ -2,6 +2,7 @@ package de.rlg.commands.admin
 
 import de.rlg.*
 import de.rlg.player.rlgPlayer
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.command.Command
@@ -25,19 +26,37 @@ class KeyCommand : CommandExecutor, TabCompleter {
                     return true
                 }
                 if (args[1].equals("add", ignoreCase = true)) {
-                    var type = 0
-                    when (args[2]) {
-                        "common" -> type = 1
-                        "epic" -> type = 2
-                        "supreme" -> type = 3
-                        "vote" -> type = 4
-                        "level" -> type = 5
-                        else -> player.sendMessage("Bitte einen zulässigen Typ angeben")
+                    val type = when (args[2]) {
+                        "common" -> {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:armor_stand ${block.x+0.5} ${block.y} ${block.z+0.5} {CustomName:'{\"text\":\"Common Crate\",\"color\":\"green\"}',CustomNameVisible:1,NoGravity:1b,Invulnerable:1,Invisible:1,Small:1,Tags:[\"crates\"]}")
+                            1
+                        }
+                        "epic" -> {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:armor_stand ${block.x+0.5} ${block.y} ${block.z+0.5} {CustomName:'{\"text\":\"Epic Crate\",\"color\":\"light_purple\"}',CustomNameVisible:1,NoGravity:1b,Invulnerable:1,Small:1,Invisible:1,Tags:[\"crates\"]}")
+                            2
+                        }
+                        "supreme" -> {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:armor_stand ${block.x+0.5} ${block.y} ${block.z+0.5} {CustomName:'{\"text\":\"Supreme Crate\",\"color\":\"yellow\"}',CustomNameVisible:1,NoGravity:1b,Invulnerable:1,Small:1,Invisible:1,Tags:[\"crates\"]}")
+                            3
+                        }
+                        "vote" -> {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:armor_stand ${block.x+0.5} ${block.y} ${block.z+0.5} {CustomName:'{\"text\":\"Vote Crate\",\"color\":\"red\"}',CustomNameVisible:1,NoGravity:1b,Invulnerable:1,Small:1,Invisible:1,Tags:[\"crates\"]}")
+                            4
+                        }
+                        "level" -> {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "summon minecraft:armor_stand ${block.x+0.5} ${block.y} ${block.z+0.5} {CustomName:'{\"text\":\"Level Crate\",\"color\":\"aqua\"}',CustomNameVisible:1,NoGravity:1b,Invulnerable:1,Small:1,Invisible:1,Tags:[\"crates\"]}")
+                            5
+                        }
+                        else -> {
+                            player.sendMessage("Bitte einen zulässigen Typ angeben")
+                            0
+                        }
                     }
                     if (type != 0) {
                         addKeyChest(block, type)
                     }
                 } else if (args[1].equals("remove", ignoreCase = true)) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute positioned ${block.x+0.5} ${block.y} ${block.z+0.5} run kill @e[tag=crates,distance=..1,limit=1]")
                     removeKeyChest(block)
                 } else {
                     player.sendMessage("&4Enter valid argument")

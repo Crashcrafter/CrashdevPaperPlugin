@@ -131,11 +131,11 @@ fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
         return false
     }
     playerRlgPlayer.balance -= amount
-    player.sendMessage(amount.toString() + " Credits wurden an " + target.name + " gesendet")
+    player.sendMessage(amount.withPoints() + " Credits wurden an " + target.name + " gesendet")
     player.changeCredits(playerRlgPlayer.balance)
     val targetRlgPlayer = target.rlgPlayer()
     targetRlgPlayer.balance += amount
-    target.sendMessage("Du hast " + amount + " Credits von " + player.name + " erhalten")
+    target.sendMessage("Du hast " + amount.withPoints() + " Credits von " + player.name + " erhalten")
     target.changeCredits(targetRlgPlayer.balance)
     player.updateScoreboard()
     target.updateScoreboard()
@@ -147,9 +147,9 @@ fun giveBalance(target: Player, amount: Long, reason: String) {
     rlgPlayer.balance += amount
     target.changeCredits(rlgPlayer.balance)
     if (amount < 0) {
-        target.sendMessage("§4Du hast " + abs(amount) + " Credits für " + reason + " ausgegeben")
+        target.sendMessage("§4Du hast " + abs(amount).withPoints() + " Credits für " + reason + " ausgegeben")
     } else {
-        target.sendMessage("§2Du hast " + abs(amount) + " Credits durch " + reason + " erhalten")
+        target.sendMessage("§2Du hast " + abs(amount).withPoints() + " Credits durch " + reason + " erhalten")
     }
     target.updateScoreboard()
 }
@@ -159,7 +159,7 @@ fun pay(target: Player, amount: Long, reason: String): Boolean {
     return if (rlgPlayer.balance >= amount) {
         rlgPlayer.balance -= amount
         target.changeCredits(rlgPlayer.balance)
-        target.sendMessage("§2Du hast $amount Credits für $reason ausgegeben!")
+        target.sendMessage("§2Du hast ${amount.withPoints()} Credits für $reason ausgegeben!")
         target.updateScoreboard()
         true
     } else {

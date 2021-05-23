@@ -15,6 +15,7 @@ class LeaveListener : Listener {
     @EventHandler
     fun onQuit(leaveEvent: PlayerQuitEvent){
         val player: Player = leaveEvent.player
+        ipsOnServer.remove(player.address.hostString)
         try {
             if(player.rlgPlayer().lastDamage!! <= System.currentTimeMillis()){
                 player.damage(100.0)

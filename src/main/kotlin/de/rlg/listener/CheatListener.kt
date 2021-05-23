@@ -16,6 +16,9 @@ class CheatListener : Listener {
     
     @EventHandler
     fun onCreativeInv(e: InventoryCreativeEvent) {
+        if(e.whoClicked.isOp){
+            return
+        }
         try {
             val itemStack = e.cursor
             val im = itemStack.itemMeta

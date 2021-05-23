@@ -2,18 +2,14 @@ package de.rlg.listener
 
 import com.vexsoftware.votifier.model.Vote
 import de.rlg.*
-import de.rlg.permission.rankData
 import de.rlg.player.load
-import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent
-import org.bukkit.inventory.ItemStack
 import kotlin.collections.ArrayList
 
 class JoinListener : Listener{
@@ -21,6 +17,14 @@ class JoinListener : Listener{
     @EventHandler
     fun onJoin(joinEvent: PlayerJoinEvent){
         val player = joinEvent.player
+        val hostString = player.address.hostString
+        println(player.address.hostName)
+        println("${player.name}'s IP: $hostString")
+        if(ipsOnServer.contains(hostString)) {
+            player.kick(Component.text("§4Mehrere Accounts vom selben PC sind nicht erlaubt!"))
+            return
+        }
+        ipsOnServer.add(hostString)
         player.sendMessage("Willkommen, ${player.name}!\nJoin unserem Discord Server, um Mitspieler zu finden und den Support zu kontaktieren!\n§o§nhttps://discord.gg/qQtaYsDN6w\n")
         player.load()
         player.setResourcePack(texturePackUrl, texturePackHash)

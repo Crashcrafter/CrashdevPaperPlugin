@@ -43,7 +43,7 @@ class CreditsCommand : CommandExecutor, TabCompleter {
                     val target: Player = Bukkit.getPlayer(args[1])!!
                     val amount: Long = args[2].toLong()
                     giveBalance(target, amount, player.name)
-                    player.sendMessage("§2Dem Spieler " + target.name + " wurden " + amount + " Credits gegeben")
+                    player.sendMessage("§2Dem Spieler " + target.name + " wurden " + amount.withPoints() + " Credits gegeben")
                 } catch (e: NullPointerException) {
                     player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
                 } catch (e: NumberFormatException) {
