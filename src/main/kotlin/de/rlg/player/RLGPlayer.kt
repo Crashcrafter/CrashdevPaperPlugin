@@ -29,9 +29,10 @@ class RLGPlayer() {
     var xpLevel by Delegates.notNull<Int>()
     var xp by Delegates.notNull<Long>()
     var vxpLevel by Delegates.notNull<Int>()
-    var isMod by Delegates.notNull<Boolean>()
+    var guildId = 0
+    var isMod = false
     var mana = 0
-    private var managen: Job? = null
+    var managen: Job? = null
 
     var quests :ArrayList<Quest> = ArrayList()
     var hasDaily by Delegates.notNull<Boolean>()
@@ -43,13 +44,14 @@ class RLGPlayer() {
     var disabledMovement = false
     var dropCoolDown by Delegates.notNull<Long>()
     var elytraCoolDown = System.currentTimeMillis() + 1000*30
+    var randomTpCoolDown = System.currentTimeMillis()
     var mutedUntil = System.currentTimeMillis()
     val playerLinkCounter = mutableListOf<Long>()
     val playerOffenseCounter = mutableListOf<Long>()
     val playerAfkCounter = mutableListOf<Long>()
 
     constructor(player: Player, rank: Int, remainingClaims: Int, homes: HashMap<String, Block>, remainingHomes: Int, balance: Long,
-                questsString: String,questsStatusString:String, questsProgressString: String, xpLevel: Int, xp: Long, vxpLevel: Int) : this() {
+                questsString: String,questsStatusString:String, questsProgressString: String, xpLevel: Int, xp: Long, vxpLevel: Int, guildId: Int) : this() {
         this.player = player
         this.rank = rank
         this.remainingClaims = remainingClaims
@@ -104,6 +106,7 @@ class RLGPlayer() {
         }
         changeMana(0)
         this.dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (15+ Random().nextInt(10))
+        this.guildId = guildId
         this.setName()
     }
 
@@ -266,9 +269,14 @@ class RLGPlayer() {
     }
 
     fun setName(){
-        val playerTextComponent = Component.text("${rankData[rank]!!.prefix} ${player.name}")
+        val playerTextComponent = if(guildId == 0){
+            Component.text("${rankData[rank]!!.prefix} ${player.name}")
+        }else {
+            Component.text("${rankData[rank]!!.prefix} ${player.name} §8[§6${this.guild()!!.suffix}§8]§r")
+        }
         player.playerListName(playerTextComponent)
         player.displayName(playerTextComponent)
         player.customName(playerTextComponent)
+        player.isCustomNameVisible = true
     }
 }

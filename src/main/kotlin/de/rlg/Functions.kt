@@ -1,6 +1,7 @@
 package de.rlg
 
 import de.rlg.items.CustomItems
+import de.rlg.permission.rank
 import de.rlg.permission.rankData
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
+import org.bukkit.scoreboard.Scoreboard
 import java.util.*
 import kotlin.math.pow
 
@@ -22,6 +24,7 @@ fun updateTabOfPlayers(leave: Boolean = false) {
     Bukkit.getOnlinePlayers().forEach {
         it.sendPlayerListHeader(Component.text("§e§l---------------  MCGermany.de  ---------------§r§6\nSpieler online: §a${Bukkit.getOnlinePlayers().size - if(leave) 1 else 0}"))
         it.sendPlayerListFooter(Component.text("\n§6Komm auf unseren Discord (/discord) um Mitspieler zu finden\nund Vorschläge für neuen Content zu machen§r\n\n§2Du kannst für unseren Server voten (/vote) um Vote Keys zu erhalten!"))
+        it.updateScoreboard()
     }
 }
 
@@ -48,20 +51,44 @@ fun Player.updateScoreboard(){
     list.add("------------------- ")
     list.add("§4Tode:")
     list.add(INSTANCE.config.getInt("Players." + player.uniqueId.toString() + ".Deaths").toString())
-    val scoreboard = Bukkit.getScoreboardManager().newScoreboard
-    val objective = scoreboard.registerNewObjective("scoreboard", "scoreboard", Component.text("scoreboard"))
-    objective.displaySlot = DisplaySlot.SIDEBAR
-    objective.displayName(Component.text("§e§lMCGermany.de"))
-    for (i in list.indices) {
-        val score = objective.getScore(list[i])
-        score.score = list.size - i
+    Bukkit.getScheduler().runTask(INSTANCE, Runnable {
+        val scoreboard = Bukkit.getScoreboardManager().newScoreboard
+        scoreboard.getServerTeams()
+        val objective = scoreboard.registerNewObjective("scoreboard", "scoreboard", Component.text("scoreboard"))
+        objective.displaySlot = DisplaySlot.SIDEBAR
+        objective.displayName(Component.text("§e§lMCGermany.de"))
+        for (i in list.indices) {
+            val score = objective.getScore(list[i])
+            score.score = list.size - i
+        }
+        player.scoreboard = scoreboard
+    })
+}
+
+fun Scoreboard.getServerTeams(){
+    Bukkit.getOnlinePlayers().forEach {
+        val rlgPlayer = it.rlgPlayer()
+        val team = this.registerNewTeam(it.name)
+        team.setAllowFriendlyFire(true)
+        team.setCanSeeFriendlyInvisibles(false)
+        team.prefix(Component.text("${rlgPlayer.rank().prefix}§r "))
+        if(rlgPlayer.guildId != 0){
+            team.suffix(Component.text(" [§6${rlgPlayer.guild()!!.suffix}§r]"))
+        }
+        team.addEntry(it.name)
     }
-    player.scoreboard = scoreboard
 }
 
 fun sendModchatMessage(message: String, sender: Player){
     moderator.forEach {
         val msg = "§2[Modchat]§f ${rankData[sender.rlgPlayer().rank]!!.prefix} ${sender.name}> $message"
+        it.sendMessage(msg)
+    }
+}
+
+fun sendModchatMessage(message: String){
+    moderator.forEach {
+        val msg = "§2[Modchat] §fServer>§r $message"
         it.sendMessage(msg)
     }
 }
@@ -122,7 +149,7 @@ fun getKeysPerRank(rank: Int): String {
         2 -> "5 2 0"
         3 -> "3 4 1"
         4 -> "8 3 3"
-        5 -> "20 10 15"
+        5 -> "15 10 10"
         else -> "1 1 1"
     }
 }

@@ -16,20 +16,32 @@ class ChatListener : Listener {
     fun onChat(chatEvent: AsyncChatEvent){
         val player: Player = chatEvent.player
         val rlgPlayer = player.rlgPlayer()
-        val message: String = (chatEvent.message() as TextComponent).content()
-        if (checkMessage(message, player) || rlgPlayer.mutedUntil > System.currentTimeMillis()) {
-            chatEvent.isCancelled = true
-            return
+        val message: String = (chatEvent.message() as TextComponent).content().replace("$", "§")
+        when {
+            checkMessage(message, player) || rlgPlayer.mutedUntil > System.currentTimeMillis() -> {
+                chatEvent.isCancelled = true
+                return
+            }
+            setup1.containsKey(player) -> {
+                setupShop2(player, message)
+                chatEvent.isCancelled = true
+                return
+            }
+            setup2.containsKey(player) -> {
+                setupShop3(player, message)
+                chatEvent.isCancelled = true
+                return
+            }
+            guildSetupProgress.containsKey(player) -> {
+                guildSetup(player, message)
+                chatEvent.isCancelled = true
+                return
+            }
         }
-        if (setup1.containsKey(player)) {
-            setupShop2(player, message)
-            chatEvent.isCancelled = true
-            return
-        } else if (setup2.containsKey(player)) {
-            setupShop3(player, message)
-            chatEvent.isCancelled = true
-            return
+        if(rlgPlayer.guildId == 0){
+            chatEvent.composer { _, _, _ -> Component.text("${rankData[rlgPlayer.rank]!!.prefix} ${player.name}> $message")}
+        }else {
+            chatEvent.composer { _, _, _ -> Component.text("${rankData[rlgPlayer.rank]!!.prefix} §8[§6${rlgPlayer.guild()!!.suffix}§8]§r ${player.name}> $message")}
         }
-        chatEvent.composer { _, _, _ -> Component.text("${rankData[rlgPlayer.rank]!!.prefix} ${player.name}> $message")}
     }
 }

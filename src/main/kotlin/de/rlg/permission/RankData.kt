@@ -1,5 +1,7 @@
 package de.rlg.permission
 
+import de.rlg.player.RLGPlayer
+
 val rankData = HashMap<Int, RankObj>()
 
 data class RankObj(val prefix: String, val name: String, val claims: Int, val isMod: Boolean, val homes: Int, val shopMultiplier: Double)
@@ -12,3 +14,5 @@ fun getRankByString(rankString: String?): Int {
     }
     return rankData.size + 1
 }
+
+fun RLGPlayer.rank(): RankObj = rankData[this.rank]!!

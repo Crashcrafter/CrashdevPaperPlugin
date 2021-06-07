@@ -10,7 +10,6 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.properties.Delegates
 
 //CONST DATA
 lateinit var spawn: Location
@@ -163,25 +162,6 @@ var beginnerbook = arrayOf(
     ("\n~~~~~~~~~~~~~~~~\n" +
             "Du kannst als normales Mitglied 4 Chunks claimen. Nutze einfach den Befehl /claim, um einen Chunk zu claimen. " +
             "Um zu überprüfen, ob ein Chunk einem anderen Spieler bereits gehört, nutze /claim info.\n" +
-            "~~~~~~~~~~~~~~~~"), "", "", "", "", "",
-    "\n\n§oPsst: Schaut mal auf der Spitze des Berges vorbei..."
-)
-//endregion
-
-//region Shop Book
-var shopbook = arrayOf(
-    ("\n~~~~~~~~~~~~~~~~\n" +
-            "Es gibt eine Shop-Welt, in der du in Ruhe einen Laden in 4 Chunks aufbauen kannst. Denk daran, den Spawnpunkt nicht zu blockieren!" +
-            "\n§oDieses Buch aktualisiert sich von selbst!§r\n\n" +
-            "~~~~~~~~~~~~~~~~"),
-    ("~~~~~~~~~~~~~~~~\n" +
-            "§l§nCommands:§r\n\n" +
-            "/plot auto : Gibt dir einen Plot\n" +
-            "/plot tp [Player] : Teleportier dich zu deinem Plot oder zum Plot des angegebenen Spielers. Denk daran, diesen Punkt nicht zuzubauen!" +
-            "\n\n~~~~~~~~~~~~~~~~"),
-    ("~~~~~~~~~~~~~~~~\n" +
-            "§l§nPortal:§r\n\n" +
-            "Geh einfach in die Höhle am Spawn, dort befindet sich links der Eingang zum Portalraum. Dort werdet ihr noch in andere Welten kommen können..." +
-            "\n\n~~~~~~~~~~~~~~~~")
+            "~~~~~~~~~~~~~~~~")
 )
 //endregion

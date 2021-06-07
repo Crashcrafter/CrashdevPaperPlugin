@@ -33,6 +33,7 @@ fun initServer(){
     loadEvent()
 
     initQuests()
+    initGuilds()
     loadFromDb()
     fixDb()
 
@@ -113,6 +114,9 @@ fun registerCommands(){
     INSTANCE.getCommand("unmute")!!.setExecutor(UnmuteCommand())
     INSTANCE.getCommand("crypto")!!.setExecutor(CryptoCommand())
     INSTANCE.getCommand("checkitem")!!.setExecutor(CheckItemCommand())
+    INSTANCE.getCommand("randomtp")!!.setExecutor(RandomTpCommand())
+    INSTANCE.getCommand("guild")!!.setExecutor(GuildCommand())
+    INSTANCE.getCommand("guild")!!.tabCompleter = GuildCommand()
 }
 
 fun registerCustomItems(){
@@ -142,8 +146,9 @@ fun registerCustomItems(){
     customItemsMap["Nano"] = CustomItems.nano()
     customItemsMap["MagicBook"] = CustomItems.magicBook()
     customItemsMap["BeginnerBook"] = CustomItems.beginnerBook()
-    customItemsMap["ShopBook"] = CustomItems.shopBook()
-    customItemsMap["Fireball"] = CustomItems.throwableFireBall()
+    customItemsMap["SmallFireball"] = CustomItems.throwableSmallFireBall()
+    customItemsMap["MediumFireball"] = CustomItems.throwableMediumFireBall()
+    customItemsMap["BigFireball"] = CustomItems.throwableBigFireBall()
     customItemsMap["MudBall"] = CustomItems.mudBall()
     customItemsMap["AddClaim"] = CustomItems.additionalClaim()
 }

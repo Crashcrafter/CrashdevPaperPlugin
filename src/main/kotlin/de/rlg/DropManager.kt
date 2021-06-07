@@ -285,7 +285,7 @@ object DropLoottables {
         Common.add(ItemStack(Material.BONE, 2))
         Common.add(ItemStack(Material.BONE))
         Common.add(CustomItems.katzeRose())
-        Common.add(CustomItems.throwableFireBall())
+        Common.add(CustomItems.throwableSmallFireBall())
         Common.add(CustomItems.dogecoin().asQuantity(5))
         Common.add(CustomItems.dogecoin().asQuantity(3))
         Common.add(CustomItems.mudBall().asQuantity(8))
@@ -311,7 +311,7 @@ object DropLoottables {
         Uncommon.add(CustomItems.katzeRose())
         Uncommon.add(CustomItems.nano())
         Uncommon.add(CustomItems.dogecoin().asQuantity(12))
-        Uncommon.add(CustomItems.throwableFireBall().asQuantity(3))
+        Uncommon.add(CustomItems.throwableSmallFireBall().asQuantity(3))
         Uncommon.add(CustomItems.mudBall().asQuantity(16))
     }
 
@@ -339,7 +339,7 @@ object DropLoottables {
         Rare.add(CustomItems.manaShard())
         Rare.add(CustomItems.nano().asQuantity(2))
         Rare.add(CustomItems.nano().asQuantity(3))
-        Rare.add(CustomItems.throwableFireBall().asQuantity(6))
+        Rare.add(CustomItems.throwableSmallFireBall().asQuantity(6))
     }
 
     var Epic: MutableList<ItemStack> = ArrayList()
@@ -365,7 +365,7 @@ object DropLoottables {
         Epic.add(CustomItems.manaShard())
         Epic.add(CustomItems.manaShard())
         Epic.add(CustomItems.nano().asQuantity(4))
-        Epic.add(CustomItems.throwableFireBall().asQuantity(8))
+        Epic.add(CustomItems.throwableSmallFireBall().asQuantity(8))
         Epic.add(CustomItems.additionalClaim())
     }
 
@@ -402,8 +402,8 @@ object DropLoottables {
         Supreme.add(CustomItems.natureElement())
         Supreme.add(CustomItems.waterElement())
         Supreme.add(CustomItems.weatherElement())
-        Supreme.add(CustomItems.throwableFireBall())
-        Supreme.add(CustomItems.throwableFireBall())
+        Supreme.add(CustomItems.throwableSmallFireBall())
+        Supreme.add(CustomItems.throwableSmallFireBall())
         Supreme.add(CustomItems.ethereum())
         Supreme.add(CustomItems.litecoin())
         Supreme.add(CustomItems.litecoin())

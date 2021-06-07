@@ -91,7 +91,7 @@ fun initQuests() {
     dailyquests[9] = Quest(9, Reward(1000, 100), "Kopfjäger", 3, "Töte 3 andere Spieler", true)
     dailyquests[10] = Quest(10, Reward(1000, 100), "Epische Dropjäger", 2, "Absolviere 2 epische Drops", true)
     dailyquests[11] = Quest(11, Reward(500, 75), "Namenangler", 1, "Angle einen Nametag", true)
-    dailyquests[12] = Quest(12, Reward(500, 100), "Händler", 2500, "Verkaufe Items für 2500 Credits an den Shop", true)
+    dailyquests[12] = Quest(12, Reward(500, 100), "Händler", 2500, "Verkaufe Items für 2.500 Credits an den Shop", true)
     dailyquests[13] = Quest(13, Reward(500, 50), "Enchanter", 3, "Verzaubere 3 Items", true)
     dailyquests[14] = Quest(14, Reward(250, 50), "Fleisch-Lieferant", 30, "Töte 30 Kühe", true)
     dailyquests[15] = Quest(15, Reward(750, 100), "Gewöhnlicher Sammler", 5, "Beende 5 gewöhnliche Drops", true)
@@ -108,7 +108,7 @@ fun initQuests() {
     weeklyquests[5] = Quest(5, Reward(5000, 450, is1), "Drop-Sammler", 25, "Schließe 25 Drops ab", false)
     weeklyquests[6] = Quest(6, Reward(2000, 150), "Monsterjäger", 500, "Töte 500 Monster", false)
     weeklyquests[7] = Quest(7, Reward(3000, 300), "Held der Dörfer!", 5, "Gewinne 5 Raids", false)
-    weeklyquests[8] = Quest(8, Reward(2000, 225), "Schlauer Händler", 12500, "Verdiene 12500 Credits durch den Shop", false)
+    weeklyquests[8] = Quest(8, Reward(2000, 225), "Schlauer Händler", 12500, "Verdiene 12.500 Credits durch den Shop", false)
     val inventory = Bukkit.createInventory(null, 27, Component.text("Quests"))
     val itemStack = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
     val im = itemStack.itemMeta
@@ -499,8 +499,6 @@ fun weeklyQuestCreation(player: Player) {
     rlgPlayer.hasWeekly = false
     qidUpdate(player, false)
     player.updateScoreboard()
-    rlgPlayer.changeXP(40)
-    giveBalance(player, 100, "Täglicher Login")
 }
 
 fun Player.canGetQuest(): Boolean {

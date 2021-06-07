@@ -22,7 +22,7 @@ class CheatListener : Listener {
         try {
             val itemStack = e.cursor
             val im = itemStack.itemMeta
-            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING, e.whoClicked.name)
+            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING, e.whoClicked.name)
             itemStack.itemMeta = im
             if (im.hasLore()) {
                 val list = itemStack.lore()!!.toStringList()

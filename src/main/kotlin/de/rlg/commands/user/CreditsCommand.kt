@@ -67,7 +67,7 @@ class CreditsCommand : CommandExecutor, TabCompleter {
             if (player.isOp) {
                 try {
                     val target: Player = Bukkit.getPlayer(args[1])!!
-                    player.sendMessage("§6" + target.name + " hat " + target.rlgPlayer().balance + " Credits")
+                    player.sendMessage("§6" + target.name + " hat " + target.rlgPlayer().balance.withPoints() + " Credits")
                 } catch (e: NullPointerException) {
                     player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
                 } catch (e: NumberFormatException) {

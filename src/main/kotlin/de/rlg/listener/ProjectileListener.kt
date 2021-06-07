@@ -17,9 +17,26 @@ class ProjectileListener : Listener {
         if(e.hitEntity!=null && e.hitEntity is LivingEntity){
             if(e.entity.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING)){
                 val entity = e.hitEntity as LivingEntity
-                if(e.entity.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING) == "mudBall"){
-                    entity.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 50, 2))
-                    entity.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 100, 4))
+                when(e.entity.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING)){
+                    "mudBall" -> {
+                        entity.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 50, 2))
+                        entity.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 100, 4))
+                    }
+                }
+            }
+        }else {
+            if(e.entity.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING)){
+                val loc = e.entity.location
+                when(e.entity.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING)) {
+                    "throwSmallFireball" -> {
+                        loc.world.createExplosion(loc, 1f)
+                    }
+                    "throwMediumFireball" -> {
+                        loc.world.createExplosion(loc, 2.5f)
+                    }
+                    "throwBigFireball" -> {
+                        loc.world.createExplosion(loc, 5f)
+                    }
                 }
             }
         }

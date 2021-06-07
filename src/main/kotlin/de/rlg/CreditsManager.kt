@@ -58,15 +58,12 @@ fun initTradingInventories() {
     overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf(), 1, Pair("rlgAction", "crypto")))
     TradingInventories.overview = overview
 
-    val keyOverview: Inventory = Bukkit.createInventory(null, 9, Component.text("Buch-Shop"))
-    keyOverview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "Kaufe 1 Einsteiger-Buch für 100 Credits", arrayListOf(), 2,
+    val bookOverview: Inventory = Bukkit.createInventory(null, 9, Component.text("Buch-Shop"))
+    bookOverview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "Kaufe 1 Einsteiger-Buch für 100 Credits", arrayListOf(), 2,
     Pair("rlgAction", "book beginner")))
-    keyOverview.setItem(1, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "Kaufe 1 Magie-Buch für 5000 Credits", arrayListOf(), 1,
+    bookOverview.setItem(1, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "Kaufe 1 Magie-Buch für 5000 Credits", arrayListOf(), 1,
     Pair("rlgAction", "book magic")))
-    keyOverview.setItem(2, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "Kaufe 1 Shop-Buch für 25000 Credits", arrayListOf(), 3,
-    Pair("rlgAction", "book shop")
-    ))
-    TradingInventories.bookoverview = keyOverview
+    TradingInventories.bookOverview = bookOverview
 
     val woodMaterials: List<Material> = arrayListOf(Material.OAK_LOG, Material.BIRCH_LOG, Material.SPRUCE_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG, Material.JUNGLE_LOG)
     val woodOverview: Inventory = Bukkit.createInventory(null, 54, Component.text("Holz-Shop"))
@@ -77,7 +74,7 @@ fun initTradingInventories() {
             Pair("rlgAction", "wood ${woodMaterials[j].name.lowercase()} ${amountmap[i]}")))
         }
     }
-    TradingInventories.woodoverview = woodOverview
+    TradingInventories.woodOverview = woodOverview
 
     val buildOverview: Inventory = Bukkit.createInventory(null, 54, Component.text("Bau-Shop"))
     for (i in 0 until amountmap.size) {
@@ -101,18 +98,18 @@ fun initTradingInventories() {
             Pair("rlgAction", "build ${buildMaterials[j].name.lowercase()} ${amountmap[i]}")))
         }
     }
-    TradingInventories.buildoverview = buildOverview
+    TradingInventories.buildOverview = buildOverview
 
     val inventory: Inventory = Bukkit.createInventory(null, 27, Component.text("Normal Shop"))
     val itemStack = CustomItems.defaultCustomItem(Material.GRAY_STAINED_GLASS_PANE, " ", arrayListOf())
     for (i in 0 until inventory.size) {
         inventory.setItem(i, itemStack)
     }
-    ShopInventories.normalview = inventory
+    ShopInventories.normalView = inventory
 
     val blackMarketInv: Inventory = Bukkit.createInventory(null, 9, Component.text("Schwarzmarkt"))
     blackMarketInv.setItem(0, CustomItems.defaultCustomItem(Material.NAME_TAG, "Keys-Shop", arrayListOf(), 1, Pair("rlgAction", "key")))
-    BlackMarketInventories.blackmarketoverview = blackMarketInv
+    BlackMarketInventories.blackMarketOverview = blackMarketInv
 
     val blackMarketKeysInv: Inventory = Bukkit.createInventory(null, 9, Component.text("Schwarzmarkt"))
     blackMarketKeysInv.setItem(0, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 CommonKey für 5000 Credits", arrayListOf(), 1,
@@ -121,7 +118,7 @@ fun initTradingInventories() {
     Pair("rlgAction", "key epic")))
     blackMarketKeysInv.setItem(2, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 SupremeKey für 50000 Credits", arrayListOf(), 3,
     Pair("rlgAction", "key supreme")))
-    BlackMarketInventories.blackmarketkeyoverview = blackMarketKeysInv
+    BlackMarketInventories.blackMarketKeyOverview = blackMarketKeysInv
 }
 
 fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
@@ -248,19 +245,19 @@ fun clickHandler(item: ItemStack, player: Player) {
     when(dataArray[0]) {
         "book" -> {
             if(dataArray.size == 1) {
-                showTradingInventory(player, TradingInventories.bookoverview, "Magic-Shop")
+                showTradingInventory(player, TradingInventories.bookOverview, "Magic-Shop")
                 return
             }
             when(dataArray[1]){
                 "beginner" -> buyBook(player, 2)
                 "magic" -> buyBook(player, 1)
                 "shop" -> buyBook(player, 3)
-                else -> showTradingInventory(player, TradingInventories.bookoverview, "Magic-Shop")
+                else -> showTradingInventory(player, TradingInventories.bookOverview, "Magic-Shop")
             }
         }
         "wood" -> {
             if(dataArray.size == 1) {
-                showTradingInventory(player, TradingInventories.woodoverview, "Holz-Shop")
+                showTradingInventory(player, TradingInventories.woodOverview, "Holz-Shop")
                 return
             }
             val material = Material.valueOf(dataArray[1].uppercase())
@@ -268,7 +265,7 @@ fun clickHandler(item: ItemStack, player: Player) {
         }
         "build" -> {
             if(dataArray.size == 1) {
-                showTradingInventory(player, TradingInventories.buildoverview, "Bau-Shop")
+                showTradingInventory(player, TradingInventories.buildOverview, "Bau-Shop")
                 return
             }
             when(dataArray[1]){
@@ -278,14 +275,14 @@ fun clickHandler(item: ItemStack, player: Player) {
         }
         "key" -> {
             if(dataArray.size == 1) {
-                showTradingInventory(player, BlackMarketInventories.blackmarketkeyoverview, "Keys-Shop")
+                showTradingInventory(player, BlackMarketInventories.blackMarketKeyOverview, "Keys-Shop")
                 return
             }
             when(dataArray[1]){
                 "common" -> buyKey(1, player, 5000)
                 "epic" -> buyKey(2, player, 20000)
                 "supreme" -> buyKey(3, player, 50000)
-                else -> showTradingInventory(player, BlackMarketInventories.blackmarketkeyoverview, "Keys-Shop")
+                else -> showTradingInventory(player, BlackMarketInventories.blackMarketKeyOverview, "Keys-Shop")
             }
         }
         "crypto" -> {
@@ -324,7 +321,6 @@ fun buyBook(player: Player, type: Int) {
             player.inventory.addItem(when(type) {
                 1 -> CustomItems.magicBook()
                 2 -> CustomItems.beginnerBook()
-                3 -> CustomItems.shopBook()
                 else -> ItemStack(Material.STRUCTURE_VOID)
             })
             player.updateScoreboard()
@@ -382,19 +378,19 @@ fun buyKey(type: Int, player: Player, price: Long) {
 }
 
 object BlackMarketInventories {
-    var blackmarketoverview: Inventory? = null
-    var blackmarketkeyoverview: Inventory? = null
+    var blackMarketOverview: Inventory? = null
+    var blackMarketKeyOverview: Inventory? = null
 }
 
 object TradingInventories {
     var overview: Inventory? = null
-    var bookoverview: Inventory? = null
-    var woodoverview: Inventory? = null
-    var buildoverview: Inventory? = null
+    var bookOverview: Inventory? = null
+    var woodOverview: Inventory? = null
+    var buildOverview: Inventory? = null
 }
 
 object ShopInventories {
-    var normalview: Inventory? = null
+    var normalView: Inventory? = null
 }
 
 fun setupShop1(chest: Chest, sign: Sign, player: Player) {
@@ -530,7 +526,7 @@ class Shop {
 }
 
 fun showNormalShopView(shop: Shop?, player: Player) {
-    val inventory = ShopInventories.normalview
+    val inventory = ShopInventories.normalView
     val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(shop!!.playername + "'s Shop"))
     val original = inventory.contents
     val clone = original.copyOf()
@@ -547,7 +543,7 @@ fun showNormalShopView(shop: Shop?, player: Player) {
 }
 
 fun showOwnerView(shop: Shop, player: Player) {
-    val inventory = ShopInventories.normalview
+    val inventory = ShopInventories.normalView
     val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(shop.playername + "'s Shop"))
     val clone = inventory.contents.copyOf()
     cloned.contents = clone
@@ -566,7 +562,7 @@ fun showOwnerView(shop: Shop, player: Player) {
 }
 
 fun showBuySellView(shop: Shop, player: Player, buy: Boolean) {
-    val inventory = ShopInventories.normalview
+    val inventory = ShopInventories.normalView
     val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(shop.playername + "'s Shop"))
     val clone = inventory.contents.copyOf()
     cloned.contents = clone

@@ -1,11 +1,13 @@
 package de.rlg
 
 import de.rlg.permission.rankData
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.`java-time`.date
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import java.time.Instant
 import java.time.LocalDate
 
 fun initDatabase(){
@@ -45,7 +47,6 @@ object PlayersTable : Table("players"){
     val remainingHomes = integer("remaininghomes").default(rankData[0]!!.homes)
     val addedClaims = integer("addedClaims").default(0)
     val balance = long("balance").default(0)
-    val plot = integer("plot").default(1)
     val questStatus = varchar("queststatus", 50).default("0 0 0 0 0 0 0 0")
     val quests = varchar("quests", 50).default("1 2 3 1 2 3")
     val questProgress = varchar("questprogress", 50).default("0 0 0 0 0 0")
@@ -54,12 +55,8 @@ object PlayersTable : Table("players"){
     val xpLevel = integer("xpLevel").default(0)
     val xp = long("xp").default(0)
     val vxpLevel = integer("vxpLevel").default(0)
+    val guildId = integer("guildId").default(0)
     override val primaryKey = PrimaryKey(uuid)
-}
-
-object PlotTable : Table("plots"){
-    val uuid = varchar("uuid", 36)
-    val chunks = text("chunks")
 }
 
 object PortalTable : Table("portals"){
@@ -108,4 +105,14 @@ object WarnTable : Table("warns"){
     val reason = text("reason")
     val modName = varchar("modname", 100)
     val time = timestamp("time")
+}
+
+object GuildTable : IntIdTable("guilds"){
+    val suffix = varchar("suffix", 4)
+    val name = varchar("name", 20)
+    val owner_uuid = varchar("owner_uuid", 36)
+    val owner_name = text("owner_name")
+    val member_names = text("member_names")
+    val member_uuids = text("member_uuids")
+    val created = timestamp("created").default(Instant.now())
 }

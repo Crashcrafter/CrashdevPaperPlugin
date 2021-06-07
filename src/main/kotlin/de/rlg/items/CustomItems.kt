@@ -3,7 +3,6 @@ package de.rlg.items
 import de.rlg.INSTANCE
 import de.rlg.basicmagicbook
 import de.rlg.beginnerbook
-import de.rlg.shopbook
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -112,8 +111,14 @@ object CustomItems {
 
     fun nano(): ItemStack = defaultCustomItem(Material.STICK, "§bNano", arrayListOf(), 5)
 
-    fun throwableFireBall(): ItemStack = defaultCustomItem(Material.FIRE_CHARGE, "§6Fireball", arrayListOf("§7Rechtsclick zum Schießen"), 0,
-    Pair("rlgItemData", "throwFireball"))
+    fun throwableSmallFireBall(): ItemStack = defaultCustomItem(Material.FIRE_CHARGE, "§6Small Fireball", arrayListOf("§7Rechtsclick zum Schießen"), 0,
+    Pair("rlgItemData", "throwSmallFireball"))
+
+    fun throwableMediumFireBall(): ItemStack = defaultCustomItem(Material.FIRE_CHARGE, "§cMedium Fireball", arrayListOf("§7Rechtsclick zum Schießen"), 0,
+    Pair("rlgItemData", "throwMediumFireball"))
+
+    fun throwableBigFireBall(): ItemStack = defaultCustomItem(Material.FIRE_CHARGE, "§4Big Fireball", arrayListOf("§7Rechtsclick zum Schießen"), 0,
+    Pair("rlgItemData", "throwBigFireball"))
 
     fun mudBall(): ItemStack = defaultCustomItem(Material.SNOWBALL, "§6Mudball", arrayListOf("§7Rechtsclick zum Werfen", "", "§7Verlangsamt Gegner"), 1,
     Pair("rlgItemData", "mudBall"))
@@ -140,7 +145,4 @@ object CustomItems {
     fun magicBook(): ItemStack = bookCustomItem("Basiswissen Magie", "Magieorden", basicmagicbook, 1)
 
     fun beginnerBook(): ItemStack = bookCustomItem("Beginner-Guide", "Server Team", beginnerbook, 2)
-
-    fun shopBook(): ItemStack = bookCustomItem("Shop-Book", "Server Team", shopbook, 3)
-
 }

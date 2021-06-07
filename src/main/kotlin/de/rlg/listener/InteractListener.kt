@@ -91,7 +91,6 @@ class InteractListener : Listener {
                     bm.pages(when(bm.customModelData){
                         1 -> basicmagicbook.toMutableList().toComponentList()
                         2 -> beginnerbook.toMutableList().toComponentList()
-                        3 -> shopbook.toMutableList().toComponentList()
                         else -> bm.pages()
                     })
                     itemStack.setItemMeta(bm)
@@ -108,12 +107,11 @@ class InteractListener : Listener {
                 }
                 Material.FIRE_CHARGE -> {
                     val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgItemData"), PersistentDataType.STRING) ?: return
-                    if(data == "throwFireball") {
-                        if(!eventCancel(player.location.chunk, player)){
-                            e.isCancelled = true
-                            player.launchProjectile(Fireball::class.java, player.velocity)
-                            player.inventory.itemInMainHand.amount--
-                        }
+                    if(!eventCancel(player.location.chunk, player)){
+                        e.isCancelled = true
+                        val fireball = player.launchProjectile(Fireball::class.java, player.velocity)
+                        fireball.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING, data)
+                        player.inventory.itemInMainHand.amount--
                     }
                 }
                 Material.STICK -> {
@@ -153,7 +151,7 @@ class InteractListener : Listener {
             try {
                 if (shop.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING) == "blackmarket") {
                     e.isCancelled = true
-                    showTradingInventory(e.player, BlackMarketInventories.blackmarketoverview, "Schwarzmarkt")
+                    showTradingInventory(e.player, BlackMarketInventories.blackMarketOverview, "Schwarzmarkt")
                     return
                 }
             } catch (ignored: NullPointerException) { }

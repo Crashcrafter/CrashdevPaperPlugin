@@ -138,6 +138,12 @@ commands:
     description: Info über aktuelles Item
     usage: /checkitem
     permission: rlg.checkitem
+  guild:
+    description: Guild Command
+    usage: </command>
+  randomtp:
+    description: Random Tp
+    usage: /randomtp
 
 permissions:
   rlg.reloaddb:

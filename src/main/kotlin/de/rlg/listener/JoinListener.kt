@@ -9,7 +9,6 @@ import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import kotlin.collections.ArrayList
 
 class JoinListener : Listener{
@@ -18,18 +17,18 @@ class JoinListener : Listener{
     fun onJoin(joinEvent: PlayerJoinEvent){
         val player = joinEvent.player
         val hostString = player.address.hostString
-        println(player.address.hostName)
-        println("${player.name}'s IP: $hostString")
+        println(hostString)
         if(ipsOnServer.contains(hostString)) {
             player.kick(Component.text("§4Mehrere Accounts vom selben PC sind nicht erlaubt!"))
+            sendModchatMessage("Doppelter Account wurde geblockt: ${player.name} von $hostString")
             return
         }
         ipsOnServer.add(hostString)
         player.sendMessage("Willkommen, ${player.name}!\nJoin unserem Discord Server, um Mitspieler zu finden und den Support zu kontaktieren!\n§o§nhttps://discord.gg/qQtaYsDN6w\n")
         player.load()
         player.setResourcePack(texturePackUrl, texturePackHash)
-        if(player.resourcePackStatus == PlayerResourcePackStatusEvent.Status.DECLINED){
-            player.sendMessage("§4Du solltest das Texturepack vom Server aktivieren!")
+        if(player.hasResourcePack()){
+            player.sendMessage("§4Die Texturen des Server-Texturepack sind auf das Standard-Texturen ausgelegt!")
         }
         player.updateScoreboard()
         joinEvent.joinMessage(Component.text("§a${player.name} ist erschienen!"))

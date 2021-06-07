@@ -1,10 +1,7 @@
 package de.rlg.listener
 
 import de.rlg.dropName
-import de.rlg.permission.chunks
 import de.rlg.permission.deventCancel
-import de.rlg.permission.eventCancel
-import de.rlg.permission.isClaimed
 import de.rlg.player.rlgPlayer
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
@@ -29,9 +26,6 @@ class DamageListener : Listener {
                 if (e.damager.isCustomNameVisible && e.damager.customName == dropName){
                     return
                 }
-                if (e.damager.type == EntityType.ENDER_DRAGON) {
-                    e.setDamage(EntityDamageEvent.DamageModifier.MAGIC, e.damage)
-                }
             }
             val chunk = player.location.chunk
             if (e.cause != EntityDamageEvent.DamageCause.VOID && deventCancel(chunk, player)) {
@@ -39,9 +33,6 @@ class DamageListener : Listener {
                 return
             }
             val cause = e.cause
-            if (cause == EntityDamageEvent.DamageCause.LIGHTNING) {
-                e.setDamage(EntityDamageEvent.DamageModifier.MAGIC, e.damage / 2)
-            }
             var itemStack = player.inventory.itemInMainHand
             val rlgPlayer = player.rlgPlayer()
             if (rlgPlayer.mana >= 1) {
@@ -99,10 +90,10 @@ class DamageListener : Listener {
             }
         } else if (e.entity.type == EntityType.ENDER_DRAGON) {
             val damage = e.damage
-            e.damage = damage / 5
+            e.damage = damage / 3
         } else if (e.entity.type == EntityType.WITHER) {
             val damage = e.damage
-            e.damage = damage / 3
+            e.damage = damage / 2
         }
     }
 

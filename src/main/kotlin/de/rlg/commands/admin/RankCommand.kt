@@ -6,6 +6,7 @@ import de.rlg.permission.getRankByString
 import de.rlg.permission.givePerms
 import de.rlg.permission.rankData
 import de.rlg.player.rlgPlayer
+import de.rlg.updateTabOfPlayers
 import me.kbrewster.mojangapi.MojangAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -123,6 +124,7 @@ fun setRank(player: Player, rank: Int) {
     rlgPlayer.isMod = rankData[rank]!!.isMod
     rlgPlayer.setName()
     player.givePerms()
+    updateTabOfPlayers()
 }
 
 fun setRank(uuid: String, rank: Int) {

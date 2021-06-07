@@ -3,7 +3,6 @@ package de.rlg.listener
 import de.rlg.INSTANCE
 import de.rlg.items.CraftingRecipes
 import de.rlg.questCount
-import de.rlg.toStringList
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -18,7 +17,7 @@ class CraftingListener : Listener {
     @EventHandler
     fun onCrafting(e: CraftItemEvent) {
         e.inventory.matrix.forEach {
-            if(it.hasItemMeta() && it.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
+            if(it != null && it.hasItemMeta() && it.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
                 e.result = Event.Result.DENY
                 e.isCancelled = true
                 e.whoClicked.closeInventory()

@@ -44,7 +44,8 @@ fun Player.load(){
                 result[PlayersTable.questProgress],
                 result[PlayersTable.xpLevel],
                 result[PlayersTable.xp],
-                result[PlayersTable.vxpLevel]
+                result[PlayersTable.vxpLevel],
+                result[PlayersTable.guildId]
             )
             if (rlgPlayer.isMod) moderator.add(player)
             PlayerData[player] = rlgPlayer
@@ -60,7 +61,7 @@ fun Player.load(){
             }
             val rlgPlayer = RLGPlayer(
                 player, 0, rankData[0]!!.claims, HashMap(), rankData[0]!!.homes, 0,
-                "1 2 3 1 2 3", "0 0 0 0 0 0 0 0", "0 0 0 0 0 0", 0, 0, 0
+                "1 2 3 1 2 3", "0 0 0 0 0 0 0 0", "0 0 0 0 0 0", 0, 0, 0, 0
             )
             PlayerData[player] = rlgPlayer
             player.givePerms()
@@ -70,7 +71,9 @@ fun Player.load(){
 
 fun Player.unload(){
     val player = this
+    if(!PlayerData.containsKey(player)) return
     val rlgPlayer = player.rlgPlayer()
+    rlgPlayer.managen?.cancel()
     val quests: List<Quest> = rlgPlayer.quests
     val questStatusBuilder = StringBuilder()
     val questProgressBuilder = StringBuilder()
