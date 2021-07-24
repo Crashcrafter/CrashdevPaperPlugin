@@ -155,6 +155,7 @@ fun RLGPlayer.deleteGuild(){
         player.sendMessage("§4Du bist nicht der Owner der Guild!")
         return
     }
+    this.guildId = 0
     transaction {
         guild.member_uuids.forEach { it2 ->
             PlayersTable.update(where = {PlayersTable.uuid eq it2}){

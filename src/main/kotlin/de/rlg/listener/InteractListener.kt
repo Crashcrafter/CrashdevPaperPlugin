@@ -42,14 +42,12 @@ class InteractListener : Listener {
         } else {
             if (e.hasBlock()) {
                 if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET) {
-                    val chunk = Objects.requireNonNull(e.clickedBlock)!!.chunk
+                    val chunk = Objects.requireNonNull(block)!!.chunk
                     if (chunk.isClaimed()) {
                         val uuid: String = chunks[chunk]!!.owner_uuid
-                        if (uuid.length == 1 && !uuid.contentEquals("0")) {
-                            if (e.clickedBlock!!.type == Material.CHEST) {
-                                waveManager(chunk)
-                                return
-                            }
+                        if (uuid.length <= 3 && !uuid.contentEquals("0") && block!!.type == Material.CHEST) {
+                            waveManager(chunk)
+                            return
                         }
                     }
                     if (eventCancel(chunk, player)) {
@@ -57,7 +55,7 @@ class InteractListener : Listener {
                         return
                     }
                 } else {
-                    val chunk = Objects.requireNonNull(e.clickedBlock)!!.chunk
+                    val chunk = Objects.requireNonNull(block)!!.chunk
                     if (eventCancel(chunk, player)) {
                         e.isCancelled = true
                         return

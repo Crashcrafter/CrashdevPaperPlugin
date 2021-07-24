@@ -201,7 +201,7 @@ fun tradingInventory(player: Player) {
     val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
     val cmd = if(!isGiven.itemMeta.hasCustomModelData()) 0 else isGiven.itemMeta.customModelData
     val price: Long = try {
-        (prices[isGiven.type]!![cmd]!!.toLong() * isGiven.amount * multiplier).toLong()
+        (prices[isGiven.type]!![cmd]!!.toLong() * isGiven.amount * (if((isGiven.type == Material.STICK && cmd !in 1..5) || isGiven.type != Material.STICK) multiplier else 1.0)).toLong()
     } catch (e: NullPointerException) {
         player.sendMessage("§4Das Item steht nicht zum Verkauf!")
         return
