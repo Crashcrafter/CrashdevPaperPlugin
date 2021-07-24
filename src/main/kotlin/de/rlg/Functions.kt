@@ -140,7 +140,7 @@ fun isSpace(inventory: Inventory, amount: Int): Boolean {
     return false
 }
 
-fun getEXPForLevel(level: Int): Long = (11 + 9 * level).toDouble().pow(2.0).toLong()
+fun getEXPForLevel(level: Int): Long = (15 + 7 * level).toDouble().pow(2.0).toLong()
 
 fun getKeysPerRank(rank: Int): String {
     return when (rank) {
@@ -202,24 +202,13 @@ fun StringBuilder.getExpDisplay(percent: Double){
     }
 }
 
-fun getCryptoPrice(input: String): Int {
+fun getCryptoPrice(input: String): Long {
     return when(input) {
-        "bitcoin" -> btcPrice!!
-        "ethereum" -> ethPrice!!
-        "litecoin" -> ltcPrice!!
-        "nano" -> nanoPrice!!
-        "dogecoin" -> dogePrice!!
-        else -> throw NullPointerException()
-    }
-}
-
-fun getCryptoPrice(input: Int): Int {
-    return when(input) {
-        1 -> btcPrice!!
-        2 -> ethPrice!!
-        3 -> ltcPrice!!
-        5 -> nanoPrice!!
-        4 -> dogePrice!!
+        "bitcoin" -> prices[Material.STICK]!![1]!!
+        "ethereum" -> prices[Material.STICK]!![2]!!
+        "litecoin" -> prices[Material.STICK]!![3]!!
+        "nano" -> prices[Material.STICK]!![5]!!
+        "dogecoin" -> prices[Material.STICK]!![4]!!
         else -> throw NullPointerException()
     }
 }

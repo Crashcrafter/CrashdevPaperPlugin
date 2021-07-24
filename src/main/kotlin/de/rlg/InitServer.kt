@@ -205,7 +205,12 @@ fun loadFromDb(){
         }
         prices.clear()
         PricesTable.selectAll().forEach {
-            prices[Material.valueOf(it[PricesTable.itemId])] = hashMapOf(0 to it[PricesTable.credits])
+            val material = Material.valueOf(it[PricesTable.itemId])
+            if(!prices.containsKey(material)){
+                prices[material] = hashMapOf(it[PricesTable.cmd] to it[PricesTable.credits])
+            }else {
+                prices[material]!![it[PricesTable.cmd]] = it[PricesTable.credits]
+            }
         }
         portals.clear()
         PortalTable.selectAll().forEach {

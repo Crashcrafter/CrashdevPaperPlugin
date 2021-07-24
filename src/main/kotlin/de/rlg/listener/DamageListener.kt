@@ -88,10 +88,7 @@ class DamageListener : Listener {
                     }
                 }
             }
-        } else if (e.entity.type == EntityType.ENDER_DRAGON) {
-            val damage = e.damage
-            e.damage = damage / 3
-        } else if (e.entity.type == EntityType.WITHER) {
+        } else if (e.entityType == EntityType.ENDER_DRAGON || e.entityType == EntityType.WITHER) {
             val damage = e.damage
             e.damage = damage / 2
         }

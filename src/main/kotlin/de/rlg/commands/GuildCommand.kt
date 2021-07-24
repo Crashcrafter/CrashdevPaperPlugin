@@ -13,15 +13,45 @@ import kotlin.collections.HashMap
 class GuildCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
+        val rlgPlayer = player.rlgPlayer()
         when(args.size){
             1 -> {
                 when(args[0]){
                     "setup" -> guildSetup(player, "")
-                    "leave" -> player.rlgPlayer().removeFromGuild()
-                    "delete" -> player.rlgPlayer().deleteGuild()
+                    "leave" -> rlgPlayer.removeFromGuild()
+                    "delete" -> rlgPlayer.deleteGuild()
                     "accept" -> {
                         if(inviteTargetMap.containsKey(player.uniqueId)){
-
+                            val inviter = Bukkit.getPlayer(inviteTargetMap[player.uniqueId]!!)
+                            when {
+                                inviter == null -> {
+                                    player.sendMessage("§4Der andere Spieler ist offline gegangen!")
+                                    inviteTargetMap.remove(player.uniqueId)
+                                    return true
+                                }
+                                inviter.rlgPlayer().guildId == 0 -> {
+                                    player.sendMessage("§4Der andere Spieler ist in keiner Guild!")
+                                    inviteTargetMap.remove(player.uniqueId)
+                                    return true
+                                }
+                                rlgPlayer.guildId != 0 -> {
+                                    player.sendMessage("§4Du bist bereits in einer Guild!")
+                                    inviteTargetMap.remove(player.uniqueId)
+                                    return true
+                                }
+                                else -> rlgPlayer.joinGuild(inviter.rlgPlayer().guildId)
+                            }
+                        }else {
+                            player.sendMessage("§4Du hast keine offenen Einladungen!")
+                        }
+                    }
+                    "decline" -> {
+                        if(inviteTargetMap.containsKey(player.uniqueId)){
+                            Bukkit.getPlayer(inviteTargetMap[player.uniqueId]!!)?.sendMessage("§cEinladung an ${player.name} wurde abgelehnt.")
+                            player.sendMessage("§aEinladung erfolgreich abgelehnt")
+                            inviteTargetMap.remove(player.uniqueId)
+                        }else {
+                            player.sendMessage("§4Du hast keine offenen Einladungen!")
                         }
                     }
                 }
@@ -35,7 +65,6 @@ class GuildCommand : CommandExecutor, TabCompleter {
                         }
                     }
                     "invite" -> {
-                        val rlgPlayer = player.rlgPlayer()
                         if(rlgPlayer.guildId == 0) {
                             player.sendMessage("§4Du bist in keiner Guild!")
                             return true
@@ -55,6 +84,7 @@ class GuildCommand : CommandExecutor, TabCompleter {
                             return true
                         }
                         inviteTargetMap[target.uniqueId] = player.uniqueId
+                        target.sendMessage("§bDu wurdest von ${player.name} in die Guild ${rlgPlayer.guild()!!.name} eingeladen!\n\nDu kannst diese Einladung mit /guild accept annehmen oder mit /guild decline ablehnen.")
                     }
                 }
             }

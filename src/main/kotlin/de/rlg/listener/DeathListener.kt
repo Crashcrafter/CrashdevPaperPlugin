@@ -1,9 +1,13 @@
 package de.rlg.listener
 
 import de.rlg.*
+import de.rlg.items.CustomItems
+import de.rlg.permission.canBack
+import de.rlg.permission.isClaimed
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
@@ -13,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import java.util.*
 
@@ -29,7 +34,9 @@ class DeathListener : Listener {
         } catch (ignored: NullPointerException) {
         }
         val location: Location = deathEvent.entity.location
-        player.rlgPlayer().deathPos = location
+        if(canBack(location.chunk, player)){
+            player.rlgPlayer().deathPos = location
+        }
         val deathMessage = StringBuilder()
         deathMessage.append("§4")
         try {
@@ -163,7 +170,10 @@ class DeathListener : Listener {
                     questCount(player, 2, 1, true)
                     questCount(player, 6, 1, false)
                 }
-                EntityType.ENDER_DRAGON -> questCount(player, 1, 1, false)
+                EntityType.ENDER_DRAGON -> {
+                    questCount(player, 1, 1, false)
+                    e.drops.add(CustomItems.dragonScale().asQuantity(Random().nextInt(3)-1))
+                }
                 EntityType.COW -> questCount(player, 14, 1, true)
                 EntityType.WITHER -> questCount(player, 4, 1, false)
                 EntityType.PILLAGER -> questCount(player, 16, 1, true)

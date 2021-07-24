@@ -177,5 +177,10 @@ fun RLGPlayer.deleteGuild(){
 }
 
 fun RLGPlayer.joinGuild(id: Int) {
-
+    if(this.guildId != 0){
+        this.guildId = id
+        this.setName()
+    }else {
+        this.player.sendMessage("§4Du bist bereits in einer Guild!")
+    }
 }

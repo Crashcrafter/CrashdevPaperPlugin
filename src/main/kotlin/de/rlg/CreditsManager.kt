@@ -8,6 +8,7 @@ import de.rlg.items.getByTypeCmd
 import de.rlg.listener.addMessageListener
 import de.rlg.permission.rankData
 import de.rlg.player.rlgPlayer
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -173,25 +174,9 @@ fun sellItem(player: Player) {
     }
     val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
     val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
-    if(itemStack.type == Material.STICK && cmd in 1..5){
-        try {
-            val price = when(cmd){
-                1 -> btcPrice!!
-                2 -> ethPrice!!
-                3 -> ltcPrice!!
-                5 -> nanoPrice!!
-                4 -> dogePrice!!
-                else -> return
-            }
-            giveBalance(player, (price * itemStack.amount).toLong(), "Shop")
-        }catch (ex: NullPointerException) {
-            player.closeInventory()
-            player.sendMessage("§4Versuch es später nochmal!")
-            return
-        }
-    }else {
-        val value = (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong()
-        giveBalance(player, value, "Shop")
+    val value = (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong()
+    giveBalance(player, value, "Shop")
+    if((itemStack.type == Material.STICK && cmd !in 1..5) || itemStack.type != Material.STICK){
         questCount(player, 12, value.toInt(), true)
         questCount(player, 8, value.toInt(), false)
     }
@@ -213,18 +198,13 @@ fun tradingInventory(player: Player) {
         }
     } catch (e: NullPointerException) {return}
     val isGiven = player.inventory.itemInMainHand
-    val itemStack = ItemStack(isGiven.type, isGiven.amount)
     val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
-    val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
+    val cmd = if(!isGiven.itemMeta.hasCustomModelData()) 0 else isGiven.itemMeta.customModelData
     val price: Long = try {
-        (prices[itemStack.type]!![cmd]!!.toLong() * itemStack.amount * multiplier).toLong()
+        (prices[isGiven.type]!![cmd]!!.toLong() * isGiven.amount * multiplier).toLong()
     } catch (e: NullPointerException) {
-        if(isGiven.type == Material.STICK && isGiven.itemMeta.hasCustomModelData()){
-            getCryptoPrice(isGiven.itemMeta.customModelData).toLong() * itemStack.amount
-        }else {
-            player.sendMessage("§4Das Item steht nicht zum Verkauf!")
-            return
-        }
+        player.sendMessage("§4Das Item steht nicht zum Verkauf!")
+        return
     }
     val result = Bukkit.createInventory(null, 27, Component.text("Verkaufe für ${price.withPoints()} Credits"))
     result.setItem(11, CustomItems.defaultCustomItem(Material.RED_WOOL, "§4Ablehnen", arrayListOf()))
@@ -293,15 +273,15 @@ fun clickHandler(item: ItemStack, player: Player) {
             if(dataArray.size == 1){
                 val cryptoOverview: Inventory = Bukkit.createInventory(null, 45, Component.text("Crypto Shop"))
                 for (i in 0 until amountmap.size){
-                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Bitcoin für ${(amountmap[i]!! * btcPrice!!).withPoints()} Credits", arrayListOf(), 1,
+                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Bitcoin für ${(amountmap[i]!! * prices[Material.STICK]!![1]!!).withPoints()} Credits", arrayListOf(), 1,
                         Pair("rlgAction", "crypto bitcoin ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Ethereum für ${(amountmap[i]!! * ethPrice!!).withPoints()} Credits", arrayListOf(), 2,
+                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Ethereum für ${(amountmap[i]!! * prices[Material.STICK]!![2]!!).withPoints()} Credits", arrayListOf(), 2,
                         Pair("rlgAction", "crypto ethereum ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Litecoin für ${(amountmap[i]!! * ltcPrice!!).withPoints()} Credits", arrayListOf(), 3,
+                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Litecoin für ${(amountmap[i]!! * prices[Material.STICK]!![3]!!).withPoints()} Credits", arrayListOf(), 3,
                         Pair("rlgAction", "crypto litecoin ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Nano für ${(amountmap[i]!! * nanoPrice!!).withPoints()} Credits", arrayListOf(), 5,
+                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Nano für ${(amountmap[i]!! * prices[Material.STICK]!![5]!!).withPoints()} Credits", arrayListOf(), 5,
                         Pair("rlgAction", "crypto nano ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Dogecoin für ${(amountmap[i]!! * dogePrice!!).withPoints()} Credits", arrayListOf(), 4,
+                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Dogecoin für ${(amountmap[i]!! * prices[Material.STICK]!![4]!!).withPoints()} Credits", arrayListOf(), 4,
                         Pair("rlgAction", "crypto dogecoin ${amountmap[i]}")))
                 }
                 showTradingInventory(player, cryptoOverview, "Crypto-Shop")
@@ -805,6 +785,7 @@ private fun addShop(shop: Shop){
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun updateCreditScore(){
     allJobs.add(GlobalScope.launch {
         while (true){
@@ -818,12 +799,12 @@ fun updateCreditScore(){
             })
             val response = URL("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin,nano,ethereum,litecoin&vs_currencies=usd").readText()
             val obj = jacksonObjectMapper().readValue<CoingeckoPriceInfo>(response)
-            btcPrice = (obj["bitcoin"]!!.usd * 100).roundToInt()
-            ethPrice = (obj["ethereum"]!!.usd * 100).roundToInt()
-            ltcPrice = (obj["litecoin"]!!.usd * 100).roundToInt()
-            nanoPrice = (obj["nano"]!!.usd * 100).roundToInt()
-            dogePrice = (obj["dogecoin"]!!.usd * 100).roundToInt()
-            delay(1000*60*5)
+            prices[Material.STICK]!![1] = (obj["bitcoin"]!!.usd * 100).roundToInt().toLong()
+            prices[Material.STICK]!![2] = (obj["ethereum"]!!.usd * 100).roundToInt().toLong()
+            prices[Material.STICK]!![3] = (obj["litecoin"]!!.usd * 100).roundToInt().toLong()
+            prices[Material.STICK]!![5] = (obj["nano"]!!.usd * 100).roundToInt().toLong()
+            prices[Material.STICK]!![4] = (obj["dogecoin"]!!.usd * 100).roundToInt().toLong()
+            delay(300000)
         }
     })
 }

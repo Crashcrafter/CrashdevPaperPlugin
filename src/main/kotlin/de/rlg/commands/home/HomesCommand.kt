@@ -2,6 +2,7 @@ package de.rlg.commands.home
 
 import de.rlg.asPlayer
 import de.rlg.permission.rankData
+import de.rlg.player.RLGPlayer
 import de.rlg.player.rlgPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -19,20 +20,21 @@ class HomesCommand : CommandExecutor {
             val targetRlgPlayer = target.rlgPlayer()
             val msgBuilder = StringBuilder()
             msgBuilder.append("§6Das sind " + target.name + "'s Homepoints:§r")
-            for (name in targetRlgPlayer.homes.keys) {
-                val location: Location = targetRlgPlayer.homes[name]!!.location
-                msgBuilder.append("\n§a" + name + "§r: " + location.world.name + ": " + location.x + "|" + location.y + "|" + location.z)
-            }
+            msgBuilder.addHomes(targetRlgPlayer)
             player.sendMessage(msgBuilder.toString())
         } else {
             val msgBuilder = StringBuilder()
             msgBuilder.append("§6Das sind deine Homepoints:§r")
-            for (name in rlgPlayer.homes.keys) {
-                val location: Location = rlgPlayer.homes[name]!!.location
-                msgBuilder.append("\n§a" + name + "§r: " + location.world.name + ": " + location.x + "|" + location.y + "|" + location.z)
-            }
+            msgBuilder.addHomes(rlgPlayer)
             player.sendMessage(msgBuilder.toString())
         }
         return true
+    }
+}
+
+fun StringBuilder.addHomes(rlgPlayer: RLGPlayer){
+    for (name in rlgPlayer.homes.keys) {
+        val location: Location = rlgPlayer.homes[name]!!.location
+        this.append("\n§a" + name + "§r: " + location.world.name + ": " + location.x + "|" + location.y + "|" + location.z)
     }
 }

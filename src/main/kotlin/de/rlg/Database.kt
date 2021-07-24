@@ -66,8 +66,8 @@ object PortalTable : Table("portals"){
 
 object PricesTable : Table("prices"){
     val itemId = varchar("itemid", 100)
+    val cmd = integer("cmd")
     val credits = long("credits")
-    override val primaryKey = PrimaryKey(itemId)
 }
 
 object ProcessedTable : Table("processed"){

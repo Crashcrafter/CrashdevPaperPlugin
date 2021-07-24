@@ -3,10 +3,7 @@ package de.rlg
 import de.rlg.items.CustomItems
 import de.rlg.permission.*
 import de.rlg.player.rlgPlayer
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.bukkit.*
 import org.bukkit.block.Chest
 import org.bukkit.entity.Entity
@@ -15,6 +12,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
+import java.lang.Runnable
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -119,6 +117,7 @@ fun initDrops() {
     canDropStart = true
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun waveManager(chunk: Chunk) {
     if (!canDropStart) {
         println("[WARN] §4Cannot start Raid! Drops disabled")
@@ -153,7 +152,7 @@ fun waveManager(chunk: Chunk) {
                     drop.participatingPlayer.add(entity)
                     drop.musicJobs.add(GlobalScope.launch {
                         while (true){
-                            entity.playSound(location, "rlg.drop.music", 2f, 1f)
+                            entity.playSound(location, "rlg.drop.music", SoundCategory.AMBIENT, 2f, 1f)
                             delay(162000)
                         }
                     })
@@ -163,7 +162,7 @@ fun waveManager(chunk: Chunk) {
         for (player in drop.participatingPlayer) {
             drop.musicJobs.add(GlobalScope.launch {
                 while (true){
-                    player.playSound(location, "rlg.drop.music", 2f, 1f)
+                    player.playSound(location, "rlg.drop.music", SoundCategory.AMBIENT, 2f, 1f)
                     delay(162000)
                 }
             })

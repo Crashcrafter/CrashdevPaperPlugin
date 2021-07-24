@@ -14,7 +14,7 @@ class ChunkListener : Listener {
         val player = e.player
         if (player.canGenDrops()) {
             val random = Random()
-            player.rlgPlayer().dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (30+Random().nextInt(10))
+            player.rlgPlayer().dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+Random().nextInt(10))
             val possibility = random.nextInt(2500)
             if (possibility == 100) {
                 val block = e.chunk.getBlock(0, 0, 0)

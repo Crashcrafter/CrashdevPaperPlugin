@@ -31,11 +31,6 @@ var questinventories: MutableList<Inventory> = java.util.ArrayList()
 val moderator: ArrayList<Player> = ArrayList()
 val cachedVoteRewards: ArrayList<Vote> = ArrayList()
 val allJobs: ArrayList<Job> = ArrayList()
-var btcPrice: Int? = null
-var ltcPrice: Int? = null
-var ethPrice: Int? = null
-var nanoPrice: Int? = null
-var dogePrice: Int? = null
 var lastUpdate: Date? = null
 
 //region NatureBlocks

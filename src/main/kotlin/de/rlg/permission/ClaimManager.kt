@@ -2,6 +2,7 @@ package de.rlg.permission
 
 import de.rlg.ChunkTable
 import de.rlg.PlayersTable
+import de.rlg.guild
 import de.rlg.player.rlgPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -199,4 +200,13 @@ fun deventCancel(chunk: Chunk, player: Player): Boolean {
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
     if(chunkClass.shared.contains(player.uniqueId.toString())) return true
     return false
+}
+
+fun canBack(chunk: Chunk, player: Player): Boolean {
+    if(!chunk.isClaimed()) return true
+    val chunkClass = chunks[chunk]!!
+    if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
+    val guild = player.rlgPlayer().guild()
+    if(guild != null && guild.member_uuids.contains(chunkClass.owner_uuid)) return true
+    return chunkClass.owner_uuid.length < 3
 }

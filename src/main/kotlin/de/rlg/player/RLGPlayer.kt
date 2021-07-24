@@ -105,7 +105,7 @@ class RLGPlayer() {
             if(i == 5) this.hasWeekly = questStatusArray[7] == "2"
         }
         changeMana(0)
-        this.dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (15+ Random().nextInt(10))
+        this.dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+ Random().nextInt(10))
         this.guildId = guildId
         this.setName()
     }

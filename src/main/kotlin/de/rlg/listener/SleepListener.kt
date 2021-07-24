@@ -47,7 +47,6 @@ class SleepListener : Listener {
                             }
                             if (percent2 >= 0.25f) {
                                 Bukkit.getScheduler().runTask(INSTANCE, Runnable {
-                                    player.world.time = 23999
                                     Bukkit.getServer().sendMessage(Component.text("§eNacht wurde übersprungen!"))
                                 })
                             }
