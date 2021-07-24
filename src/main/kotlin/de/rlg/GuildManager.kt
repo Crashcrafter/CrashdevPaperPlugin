@@ -1,6 +1,7 @@
 package de.rlg
 
 import de.rlg.listener.addMessageListener
+import de.rlg.listener.removeMessageListener
 import de.rlg.player.RLGPlayer
 import de.rlg.player.rlgPlayer
 import org.bukkit.Bukkit
@@ -173,4 +174,8 @@ fun RLGPlayer.deleteGuild(){
     }
     this.setName()
     updateTabOfPlayers()
+}
+
+fun RLGPlayer.joinGuild(id: Int) {
+
 }

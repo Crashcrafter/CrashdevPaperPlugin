@@ -205,7 +205,7 @@ fun loadFromDb(){
         }
         prices.clear()
         PricesTable.selectAll().forEach {
-            prices[Material.valueOf(it[PricesTable.itemId])] = it[PricesTable.credits]
+            prices[Material.valueOf(it[PricesTable.itemId])] = hashMapOf(0 to it[PricesTable.credits])
         }
         portals.clear()
         PortalTable.selectAll().forEach {

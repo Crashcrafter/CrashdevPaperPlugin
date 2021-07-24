@@ -26,8 +26,10 @@ class MultivCommand : CommandExecutor, TabCompleter {
             if (args[0].contentEquals("tp")) {
                 if (args.size >= 2) {
                     val w: World = Bukkit.getWorld(args[1])!!
-                    var p: Player?
-                    p = Bukkit.getPlayer(args[2])
+                    var p: Player? = null
+                    try {
+                        p = Bukkit.getPlayer(args[2])
+                    }catch (ex: ArrayIndexOutOfBoundsException){ }
                     if (p == null) {
                         p = player
                     }

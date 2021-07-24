@@ -132,8 +132,6 @@ val offenses = listOf(
 )
 //endregion
 
-val ipsOnServer = mutableListOf<String>()
-
 fun checkMessage(message: String, player: Player): Boolean {
     for (domain in domainEndings) {
         if (message.contains(domain)) {

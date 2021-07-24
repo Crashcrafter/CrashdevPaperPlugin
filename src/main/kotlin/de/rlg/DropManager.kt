@@ -151,12 +151,22 @@ fun waveManager(chunk: Chunk) {
             if (entity is Player) {
                 if (!drop.participatingPlayer.contains(entity)) {
                     drop.participatingPlayer.add(entity)
-                    entity.playSound(location, "rlg.drop.music", 2f, 1f)
+                    drop.musicJobs.add(GlobalScope.launch {
+                        while (true){
+                            entity.playSound(location, "rlg.drop.music", 2f, 1f)
+                            delay(162000)
+                        }
+                    })
                 }
             }
         }
         for (player in drop.participatingPlayer) {
-            player.playSound(location, "rlg.drop.music", 2f, 1f)
+            drop.musicJobs.add(GlobalScope.launch {
+                while (true){
+                    player.playSound(location, "rlg.drop.music", 2f, 1f)
+                    delay(162000)
+                }
+            })
         }
         val job = GlobalScope.launch {
             delay(2500)
@@ -169,6 +179,9 @@ fun waveManager(chunk: Chunk) {
                                 unsetDrop(chunk, false)
                                 if (drop.participatingPlayer.size == 1 && drop.type == 3) {
                                     questCount(drop.participatingPlayer[0], 4, 1, true)
+                                }
+                                drop.musicJobs.forEach {
+                                    it.cancel()
                                 }
                                 for (player in drop.participatingPlayer) {
                                     try {
@@ -464,7 +477,7 @@ object Waves {
 
 data class Drop(val type: Int, val location: Location, var wave: Int = 1, var started: Boolean = false,
                 val participatingPlayer: MutableList<Player> = mutableListOf(), val dropWaves: HashMap<Int, List<EntityType>> = waves[type]!!,
-                val entities: MutableList<Entity> = mutableListOf(), var waveManager: Job?=null
+                val entities: MutableList<Entity> = mutableListOf(), var waveManager: Job?=null, var musicJobs: MutableList<Job> = mutableListOf()
 )
 
 fun getDropType(): Int {

@@ -21,7 +21,7 @@ class HomesCommand : CommandExecutor {
             msgBuilder.append("§6Das sind " + target.name + "'s Homepoints:§r")
             for (name in targetRlgPlayer.homes.keys) {
                 val location: Location = targetRlgPlayer.homes[name]!!.location
-                msgBuilder.append("\n§a" + name + "§r: " + location.world + ":" + location.x + "|" + location.y + "|" + location.z)
+                msgBuilder.append("\n§a" + name + "§r: " + location.world.name + ": " + location.x + "|" + location.y + "|" + location.z)
             }
             player.sendMessage(msgBuilder.toString())
         } else {
@@ -29,7 +29,7 @@ class HomesCommand : CommandExecutor {
             msgBuilder.append("§6Das sind deine Homepoints:§r")
             for (name in rlgPlayer.homes.keys) {
                 val location: Location = rlgPlayer.homes[name]!!.location
-                msgBuilder.append("\n§a" + name + "§r: " + location.world + ":" + location.x + "|" + location.y + "|" + location.z)
+                msgBuilder.append("\n§a" + name + "§r: " + location.world.name + ": " + location.x + "|" + location.y + "|" + location.z)
             }
             player.sendMessage(msgBuilder.toString())
         }

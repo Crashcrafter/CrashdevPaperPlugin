@@ -38,6 +38,7 @@ class ChatListener : Listener {
 val playerMessageMap = hashMapOf<Player, (AsyncChatEvent, String) -> Unit>()
 
 fun Player.addMessageListener(f: (AsyncChatEvent, String) -> Unit){
+    this.removeMessageListener()
     playerMessageMap[this] = f
 }
 

@@ -20,7 +20,9 @@ class GuildCommand : CommandExecutor, TabCompleter {
                     "leave" -> player.rlgPlayer().removeFromGuild()
                     "delete" -> player.rlgPlayer().deleteGuild()
                     "accept" -> {
+                        if(inviteTargetMap.containsKey(player.uniqueId)){
 
+                        }
                     }
                 }
             }
@@ -46,6 +48,10 @@ class GuildCommand : CommandExecutor, TabCompleter {
                         val targetRLGPlayer = target.rlgPlayer()
                         if(targetRLGPlayer.guildId != 0){
                             player.sendMessage("§4Der Spieler ist bereits in einer Guild!")
+                            return true
+                        }
+                        else if(inviteTargetMap.containsKey(target.uniqueId)){
+                            player.sendMessage("§4Der Spieler hat bereits eine Einladung in eine andere Guild!")
                             return true
                         }
                         inviteTargetMap[target.uniqueId] = player.uniqueId

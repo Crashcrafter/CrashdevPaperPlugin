@@ -32,10 +32,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-var prices = HashMap<Material, Long>()
+var prices = HashMap<Material, HashMap<Int, Long>>()
 var amountmap = HashMap<Int, Int>()
 var shops: MutableList<Shop> = ArrayList()
 var signs = HashMap<Block, Shop>()
@@ -170,9 +171,11 @@ fun sellItem(player: Player) {
     if (itemStack.hasItemMeta() && itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)) {
         return
     }
-    if(itemStack.type == Material.STICK && itemStack.itemMeta.hasCustomModelData()){
+    val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
+    val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
+    if(itemStack.type == Material.STICK && cmd in 1..5){
         try {
-            val price = when(itemStack.itemMeta.customModelData){
+            val price = when(cmd){
                 1 -> btcPrice!!
                 2 -> ethPrice!!
                 3 -> ltcPrice!!
@@ -187,7 +190,7 @@ fun sellItem(player: Player) {
             return
         }
     }else {
-        val value = (prices[itemStack.type]!! * itemStack.amount * rankData[player.rlgPlayer().rank]!!.shopMultiplier).toLong()
+        val value = (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong()
         giveBalance(player, value, "Shop")
         questCount(player, 12, value.toInt(), true)
         questCount(player, 8, value.toInt(), false)
@@ -208,12 +211,13 @@ fun tradingInventory(player: Player) {
             showTradingInventory(player, overview, "Shop")
             return
         }
-    } catch (e: NullPointerException) { }
+    } catch (e: NullPointerException) {return}
     val isGiven = player.inventory.itemInMainHand
     val itemStack = ItemStack(isGiven.type, isGiven.amount)
     val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
+    val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
     val price: Long = try {
-        (prices[itemStack.type]!!.toLong() * itemStack.amount * multiplier).toLong()
+        (prices[itemStack.type]!![cmd]!!.toLong() * itemStack.amount * multiplier).toLong()
     } catch (e: NullPointerException) {
         if(isGiven.type == Material.STICK && isGiven.itemMeta.hasCustomModelData()){
             getCryptoPrice(isGiven.itemMeta.customModelData).toLong() * itemStack.amount
@@ -222,7 +226,6 @@ fun tradingInventory(player: Player) {
             return
         }
     }
-    val cmd = if(isGiven.itemMeta.hasCustomModelData()) isGiven.itemMeta.customModelData else 0
     val result = Bukkit.createInventory(null, 27, Component.text("Verkaufe für ${price.withPoints()} Credits"))
     result.setItem(11, CustomItems.defaultCustomItem(Material.RED_WOOL, "§4Ablehnen", arrayListOf()))
     result.setItem(13, CustomItems.defaultCustomItem(isGiven.type, "Verkaufen für ${price.withPoints()} Credits", arrayListOf(), cmd).asQuantity(isGiven.amount))

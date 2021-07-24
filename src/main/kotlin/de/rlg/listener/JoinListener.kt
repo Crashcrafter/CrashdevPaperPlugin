@@ -18,12 +18,17 @@ class JoinListener : Listener{
         val player = joinEvent.player
         val hostString = player.address.hostString
         println(hostString)
-        if(ipsOnServer.contains(hostString)) {
-            player.kick(Component.text("§4Mehrere Accounts vom selben PC sind nicht erlaubt!"))
-            sendModchatMessage("Doppelter Account wurde geblockt: ${player.name} von $hostString")
-            return
+        var count = 0
+        Bukkit.getOnlinePlayers().forEach {
+            if(it.address.hostString == hostString) {
+                count++
+                if(count >= 2){
+                    player.kick(Component.text("§4Mehrere Accounts vom selben PC sind nicht erlaubt!"))
+                    sendModchatMessage("Doppelter Account wurde geblockt: ${player.name} von $hostString")
+                    return
+                }
+            }
         }
-        ipsOnServer.add(hostString)
         player.sendMessage("Willkommen, ${player.name}!\nJoin unserem Discord Server, um Mitspieler zu finden und den Support zu kontaktieren!\n§o§nhttps://discord.gg/qQtaYsDN6w\n")
         player.load()
         player.setResourcePack(texturePackUrl, texturePackHash)
