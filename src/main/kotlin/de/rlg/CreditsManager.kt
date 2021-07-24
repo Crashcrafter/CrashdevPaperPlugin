@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import de.rlg.items.CustomItems
 import de.rlg.items.ciName
 import de.rlg.items.getByTypeCmd
+import de.rlg.listener.addMessageListener
 import de.rlg.permission.rankData
 import de.rlg.player.rlgPlayer
 import kotlinx.coroutines.GlobalScope
@@ -38,8 +39,7 @@ var prices = HashMap<Material, Long>()
 var amountmap = HashMap<Int, Int>()
 var shops: MutableList<Shop> = ArrayList()
 var signs = HashMap<Block, Shop>()
-var setup1 = HashMap<Player, Shop>()
-var setup2 = HashMap<Player, Shop>()
+var setupShop = HashMap<Player, Shop>()
 var shopinventories: MutableList<Inventory> = ArrayList()
 var playershopinventories = HashMap<Inventory, Shop>()
 var creditsScoreBoard = ""
@@ -395,8 +395,12 @@ object ShopInventories {
 
 fun setupShop1(chest: Chest, sign: Sign, player: Player) {
     val shop = Shop(chest, sign, player)
-    setup1[player] = shop
+    setupShop[player] = shop
     player.sendMessage("§6Bitte leg das Item, was du ankaufen/verkaufen willst, in den ersten Slot der Kiste!\n§2Schreib in den Chat den Verkaufspreis §l§4pro 1 Item in Credits§r§2 rein (Keine Kommastellen!)\nSchreib - wenn du nicht verkaufen möchtest")
+    player.addMessageListener { asyncChatEvent, s ->
+        setupShop2(player, s)
+        asyncChatEvent.isCancelled = true
+    }
 }
 
 fun setupShop2(player: Player, msgPrice: String) {
@@ -409,7 +413,7 @@ fun setupShop2(player: Player, msgPrice: String) {
             return
         }
     }
-    val shop = setup1[player]
+    val shop = setupShop[player]
     val shopInv = shop!!.chest.blockInventory
     var type = Material.AIR
     var cmd = 0
@@ -437,17 +441,19 @@ fun setupShop2(player: Player, msgPrice: String) {
         itemStack!!.type
     } catch (ignored: NullPointerException) {
         player.sendMessage("§4Es befindet sich kein Item in der Kiste!\nBitte starte das Setup von vorne!")
-        setup1.remove(player)
+        setupShop.remove(player)
         return
     }
     shop.setOffer(itemStack, price)
     if (cmd != 0) {
         shop.cmd = cmd
     }
-    setup1.remove(player)
-    setup2[player] = shop
     player.sendMessage("§6Verkaufspreis wurde gesetzt! ($msgPrice)")
     player.sendMessage("§2Schreib in den Chat den Ankaufspreis §l§4pro 1 Item in Credits§r§2 rein (Keine Kommastellen!)\nSchreib - wenn du nicht ankaufen möchtest")
+    player.addMessageListener { asyncChatEvent, s ->
+        setupShop3(player, s)
+        asyncChatEvent.isCancelled = true
+    }
 }
 
 fun setupShop3(player: Player, msgPrice: String) {
@@ -460,10 +466,10 @@ fun setupShop3(player: Player, msgPrice: String) {
             return
         }
     }
-    val shop = setup2[player]
+    val shop = setupShop[player]
     shop!!.buyprice = price
     shops.add(shop)
-    setup2.remove(player)
+    setupShop.remove(player)
     val sign = shop.sign
     signs[sign.block] = shop
     val itemString: String = ciName(shop.type!!, shop.cmd) ?: shop.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial()

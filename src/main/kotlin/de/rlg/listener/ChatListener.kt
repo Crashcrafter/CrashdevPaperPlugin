@@ -22,19 +22,8 @@ class ChatListener : Listener {
                 chatEvent.isCancelled = true
                 return
             }
-            setup1.containsKey(player) -> {
-                setupShop2(player, message)
-                chatEvent.isCancelled = true
-                return
-            }
-            setup2.containsKey(player) -> {
-                setupShop3(player, message)
-                chatEvent.isCancelled = true
-                return
-            }
-            guildSetupProgress.containsKey(player) -> {
-                guildSetup(player, message)
-                chatEvent.isCancelled = true
+            playerMessageMap.containsKey(player) -> {
+                playerMessageMap[player]!!.invoke(chatEvent, message)
                 return
             }
         }
@@ -45,3 +34,11 @@ class ChatListener : Listener {
         }
     }
 }
+
+val playerMessageMap = hashMapOf<Player, (AsyncChatEvent, String) -> Unit>()
+
+fun Player.addMessageListener(f: (AsyncChatEvent, String) -> Unit){
+    playerMessageMap[this] = f
+}
+
+fun Player.removeMessageListener() = playerMessageMap.remove(this)

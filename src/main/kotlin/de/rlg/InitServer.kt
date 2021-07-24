@@ -151,6 +151,7 @@ fun registerCustomItems(){
     customItemsMap["BigFireball"] = CustomItems.throwableBigFireBall()
     customItemsMap["MudBall"] = CustomItems.mudBall()
     customItemsMap["AddClaim"] = CustomItems.additionalClaim()
+    customItemsMap["DragonScale"] = CustomItems.dragonScale()
 }
 
 fun loadWorlds(){

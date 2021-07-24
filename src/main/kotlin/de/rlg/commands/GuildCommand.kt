@@ -65,8 +65,9 @@ class GuildCommand : CommandExecutor, TabCompleter {
         val player = sender.asPlayer()
         return when(args.size){
             1 -> {
-                val result = arrayListOf("setup")
-                try { if(player.rlgPlayer().guild()!!.owner_uuid == player.uniqueId.toString()) result.add("delete") else result.add("leave") }catch (ex: NullPointerException) {result.add("accept")}
+                val result = arrayListOf<String>()
+                try { if(player.rlgPlayer().guild()!!.owner_uuid == player.uniqueId.toString()) result.add("delete") else result.add("leave") }catch (ex: NullPointerException) {
+                    result.addAll(arrayListOf("accept", "setup"))}
                 result
             }
             2 -> {

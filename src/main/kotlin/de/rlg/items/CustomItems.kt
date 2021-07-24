@@ -35,11 +35,11 @@ object CustomItems {
 
     fun manaCrystal(): ItemStack = defaultCustomItem(Material.GOLD_NUGGET, "Mana Crystal", arrayListOf("Basismaterial für Magie"), 3)
 
-    fun weatherElement(): ItemStack = defaultCustomItem(Material.LIGHT_GRAY_DYE, "Wetter-Element", arrayListOf("Element der Magie"), 1)
-    fun chaosElement(): ItemStack = defaultCustomItem(Material.BLACK_DYE, "Chaos-Element", arrayListOf("Element der Magie"), 1)
-    fun waterElement(): ItemStack = defaultCustomItem(Material.BLUE_DYE, "Wasser-Element", arrayListOf("Element der Magie"), 1)
-    fun natureElement(): ItemStack = defaultCustomItem(Material.GREEN_DYE, "Natur-Element", arrayListOf("Element der Magie"), 1)
-    fun fireElement(): ItemStack = defaultCustomItem(Material.RED_DYE, "Feuer-Element", arrayListOf("Element der Magie"), 1)
+    fun weatherElement(): ItemStack = defaultCustomItem(Material.LIGHT_GRAY_DYE, "Wetter-Element", arrayListOf("Element der Magie", "Kann zum Färben benutzt werden"), 1)
+    fun chaosElement(): ItemStack = defaultCustomItem(Material.BLACK_DYE, "Chaos-Element", arrayListOf("Element der Magie", "Kann zum Färben benutzt werden"), 1)
+    fun waterElement(): ItemStack = defaultCustomItem(Material.BLUE_DYE, "Wasser-Element", arrayListOf("Element der Magie", "Kann zum Färben benutzt werden"), 1)
+    fun natureElement(): ItemStack = defaultCustomItem(Material.GREEN_DYE, "Natur-Element", arrayListOf("Element der Magie", "Kann zum Färben benutzt werden"), 1)
+    fun fireElement(): ItemStack = defaultCustomItem(Material.RED_DYE, "Feuer-Element", arrayListOf("Element der Magie", "Kann zum Färben benutzt werden"), 1)
 
     fun natureStaff1(): ItemStack = defaultCustomItem(Material.WOODEN_HOE, "§r§l§2Natur-Stab", arrayListOf(
         "", "§fLeft-Click §1(30)§f:", "§2Entfernt an dem Ort alle Natur-Blöcke und vergiftet die Mobs",
@@ -125,6 +125,8 @@ object CustomItems {
 
     fun additionalClaim(): ItemStack = defaultCustomItem(Material.STICK, "§2+1 Claim", arrayListOf("§7Rechtsclick, um einen zusätzlichen Claim zu erhalten!"), 6,
     Pair("rlgItemData", "addClaim"))
+
+    fun dragonScale(): ItemStack = defaultCustomItem(Material.STICK, "§5Drachenschuppe", arrayListOf(), 7)
 
     private fun bookCustomItem(title: String, author: String, pages: Array<String>, cmd: Int=0): ItemStack {
         val itemStack = ItemStack(Material.WRITTEN_BOOK)

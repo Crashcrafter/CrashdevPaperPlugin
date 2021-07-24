@@ -1,5 +1,6 @@
 package de.rlg
 
+import de.rlg.listener.addMessageListener
 import de.rlg.player.RLGPlayer
 import de.rlg.player.rlgPlayer
 import org.bukkit.Bukkit
@@ -58,6 +59,10 @@ fun guildSetup(player: Player, msg: String){
         guildSetupProgress[player] = guild
         player.sendMessage("§6§lGuild Setup§r\n\n§cDas erstellen einer Guild kostet dich 25.000 Credits!§r\nWenn du das Setup abbrechen möchtest, gib /guild setup cancel ein.\n" +
                 "§2Gib nun den Namen der Guild ein:")
+        player.addMessageListener {event, message ->
+            guildSetup(player, message)
+            event.isCancelled = true
+        }
         return
     }
     if(guildSetupProgress[player]!!.name == ""){
@@ -70,6 +75,10 @@ fun guildSetup(player: Player, msg: String){
                 }else {
                     player.sendMessage("§2Name wurde gesetzt §r($msg)§2!\nGib jetzt das Kürzel der Guild ein:")
                     guildSetupProgress[player]!!.name = msg
+                    player.addMessageListener {event, message ->
+                        guildSetup(player, message)
+                        event.isCancelled = true
+                    }
                 }
             }
         }
@@ -139,7 +148,7 @@ fun RLGPlayer.removeFromGuild(){
 
 fun RLGPlayer.deleteGuild(){
     val guildId = this.guildId
-    if(guildId != 0) return
+    if(guildId == 0) return
     val guild = this.guild()!!
     if(guild.owner_uuid != this.player.uniqueId.toString()){
         player.sendMessage("§4Du bist nicht der Owner der Guild!")
@@ -162,5 +171,6 @@ fun RLGPlayer.deleteGuild(){
         }
         guilds.remove(guildId)
     }
+    this.setName()
     updateTabOfPlayers()
 }
