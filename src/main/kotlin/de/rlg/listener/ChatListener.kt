@@ -39,9 +39,9 @@ class ChatListener : Listener {
             }
         }
         if(rlgPlayer.guildId == 0){
-            chatEvent.composer { _, _, _ -> Component.text("${rankData[rlgPlayer.rank]!!.prefix} ${player.name}> $message")}
+            chatEvent.renderer { _, _, _, _ -> Component.text("${rankData[rlgPlayer.rank]!!.prefix} ${player.name}> $message")}
         }else {
-            chatEvent.composer { _, _, _ -> Component.text("${rankData[rlgPlayer.rank]!!.prefix} §8[§6${rlgPlayer.guild()!!.suffix}§8]§r ${player.name}> $message")}
+            chatEvent.renderer { _, _, _, _ -> Component.text("${rankData[rlgPlayer.rank]!!.prefix} §8[§6${rlgPlayer.guild()!!.suffix}§8]§r ${player.name}> $message")}
         }
     }
 }

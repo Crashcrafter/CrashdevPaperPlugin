@@ -14,8 +14,8 @@ import kotlin.collections.ArrayList
 //CONST DATA
 lateinit var spawn: Location
 lateinit var event: Location
-const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1EmGbIe7ILFMao1YUwT3n54t-I9I6aAvj"
-const val texturePackHash = "342CFD6D505DA5CF52F0077C9C4B9BF3C30208B3"
+const val texturePackUrl = "https://drive.google.com/uc?export=download&id=11Aq30iVoVIfOPjtVTHnMflDFmP-gSbLu"
+const val texturePackHash = "07C53E4EEA456424391E34F57965D2ADF4F35C50"
 const val DropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
 const val dcLink = "https://discord.gg/qQtaYsDN6w"

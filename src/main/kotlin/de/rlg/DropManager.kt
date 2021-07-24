@@ -172,7 +172,6 @@ fun waveManager(chunk: Chunk) {
                                 }
                                 for (player in drop.participatingPlayer) {
                                     try {
-                                        player.stopSound("rlg.drop.musicfinal")
                                         player.stopSound("rlg.drop.music")
                                         player.playSound(drop.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.AMBIENT, 5f, 1f)
                                         when(drop.type){
@@ -213,12 +212,6 @@ fun waveManager(chunk: Chunk) {
 
 fun Drop.spawnWave() {
     val drop = this
-    if (drop.type >= 3 && drop.dropWaves.size == drop.wave + 1) {
-        for (player in drop.participatingPlayer) {
-            player.stopSound("rlg.drop.music")
-            player.playSound(location, "rlg.drop.musicfinal", 2f, 1f)
-        }
-    }
     drop.dropWaves[drop.wave]!!.forEach {
         try {
             Bukkit.getScheduler().runTask(INSTANCE, Runnable {

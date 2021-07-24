@@ -54,7 +54,7 @@ object CustomItems {
     ), 2)
 
     fun weatherStaff1(): ItemStack = defaultCustomItem(Material.WOODEN_HOE, "§r§l§7Wetter-Stab", arrayListOf(
-        "", "§fLeft-Click §1(20)§f:", "§7Beschwört an der Stelle einen Blitz", "",
+        "", "§fLeft-Click §1(40)§f:", "§7Beschwört an der Stelle einen Blitz", "",
         "§fRight-Click §1(30)§f:", "§7Schleudert die Gegner in dem Bereich hoch", "",
         "§7Immun gegen Blitze §1(1)", ""
     ), 3)
