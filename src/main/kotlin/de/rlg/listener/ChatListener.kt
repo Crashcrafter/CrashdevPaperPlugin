@@ -23,7 +23,9 @@ class ChatListener : Listener {
                 return
             }
             playerMessageMap.containsKey(player) -> {
-                playerMessageMap[player]!!.invoke(chatEvent, message)
+                if(playerMessageMap[player]!!.invoke(chatEvent, message)){
+                    player.removeMessageListener()
+                }
                 return
             }
         }
@@ -35,10 +37,9 @@ class ChatListener : Listener {
     }
 }
 
-val playerMessageMap = hashMapOf<Player, (AsyncChatEvent, String) -> Unit>()
+val playerMessageMap = hashMapOf<Player, (AsyncChatEvent, String) -> Boolean>()
 
-fun Player.addMessageListener(f: (AsyncChatEvent, String) -> Unit){
-    this.removeMessageListener()
+fun Player.addMessageListener(f: (AsyncChatEvent, String) -> Boolean){
     playerMessageMap[this] = f
 }
 

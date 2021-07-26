@@ -209,7 +209,7 @@ fun getDailyLore(player: Player): MutableList<String> {
         list.add("")
         list.add("§2Belohnung:")
         list.add("§a-3500 Credits")
-        list.add("§a-500 XP (coming soon!)")
+        list.add("§a-5000 XP")
         list.add("§a-Common Key")
         list.add("")
         if (!rlgPlayer.hasDaily) {
@@ -222,7 +222,7 @@ fun getDailyLore(player: Player): MutableList<String> {
         list.add("")
         list.add("§2Belohnung:")
         list.add("§a-3500 Credits")
-        list.add("§a-500 XP (coming soon!)")
+        list.add("§a-5000 XP")
         list.add("§a-Common Key")
     }
     return list
@@ -245,7 +245,7 @@ fun getWeeklyLore(player: Player): MutableList<String> {
         list.add("")
         list.add("§2Belohnung:")
         list.add("§a-20000 Credits")
-        list.add("§a-1000 XP (coming soon!)")
+        list.add("§a-10000 XP")
         list.add("§a-Common Key")
         list.add("")
         if (!rlgPlayer.hasWeekly) {
@@ -258,7 +258,7 @@ fun getWeeklyLore(player: Player): MutableList<String> {
         list.add("")
         list.add("§2Belohnung:")
         list.add("§a-15000 Credits")
-        list.add("§a-1000 XP (coming soon!)")
+        list.add("§a-10000 XP")
         list.add("§a-Common Key")
     }
     return list
@@ -384,7 +384,7 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
                 if(hascompleted) {
                     rlgPlayer.hasDaily = true
                     giveBalance(player, 3500, "Täglicher Bonus")
-                    rlgPlayer.changeXP(500)
+                    rlgPlayer.changeXP(5000)
                     player.inventory.addItem(genKey(1))
                     player.sendMessage("§2Du hast deinen täglichen Bonus erhalten!")
                     player.closeInventory()
@@ -403,7 +403,7 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
                 if(hascompleted) {
                     rlgPlayer.hasWeekly = true
                     giveBalance(player, 15000, "Täglicher Bonus")
-                    rlgPlayer.changeXP(1000)
+                    rlgPlayer.changeXP(10000)
                     player.inventory.addItem(genKey(1))
                     player.sendMessage("§2Du hast deinen wöchentlichen Bonus erhalten!")
                     player.closeInventory()

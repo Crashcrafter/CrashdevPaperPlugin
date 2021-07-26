@@ -2,7 +2,7 @@ name: RLGPaperPlugin
 main: de.rlg.Main
 version: 0.1
 description: Nix lol
-api-version: 1.16
+api-version: 1.17
 author: Crashcrafter_LP
 depend: [Votifier]
 
@@ -141,9 +141,7 @@ commands:
   guild:
     description: Guild Command
     usage: </command>
-  randomtp:
-    description: Random Tp
-    usage: /randomtp
+    aliases: [g]
 
 permissions:
   rlg.reloaddb:

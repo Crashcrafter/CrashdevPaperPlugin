@@ -35,7 +35,6 @@ class JoinListener : Listener{
         if(player.hasResourcePack()){
             player.sendMessage("§4Die Texturen des Server-Texturepack sind auf das Standard-Texturen ausgelegt!")
         }
-        player.updateScoreboard()
         joinEvent.joinMessage(Component.text("§a${player.name} ist erschienen!"))
         updateTabOfPlayers()
         player.isCustomNameVisible = true

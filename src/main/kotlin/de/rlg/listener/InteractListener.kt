@@ -6,6 +6,8 @@ import de.rlg.permission.changeAddedClaims
 import de.rlg.permission.chunks
 import de.rlg.permission.eventCancel
 import de.rlg.permission.isClaimed
+import de.rlg.player.rlgPlayer
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.ShulkerBox
@@ -146,10 +148,16 @@ class InteractListener : Listener {
             } catch (ignored: NullPointerException) {}
         } else if (e.rightClicked is WanderingTrader) {
             val shop = e.rightClicked as WanderingTrader
+            val player = e.player
+            val rlgPlayer = player.rlgPlayer()
             try {
                 if (shop.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING) == "blackmarket") {
                     e.isCancelled = true
-                    showTradingInventory(e.player, BlackMarketInventories.blackMarketOverview, "Schwarzmarkt")
+                    if(rlgPlayer.xpLevel >= 25){
+                        showTradingInventory(e.player, BlackMarketInventories.blackMarketOverview, "Schwarzmarkt")
+                    }else {
+                        player.sendActionBar(Component.text("§6Du benötigst Level 25, um auf den Schwarzmarkt zugreifen zu können!"))
+                    }
                     return
                 }
             } catch (ignored: NullPointerException) { }

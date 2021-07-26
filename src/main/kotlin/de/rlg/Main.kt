@@ -40,6 +40,6 @@ class Main : JavaPlugin(), PluginMessageListener {
     }
 
     override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray) {
-        println(channel)
+        println("Plugin detected: $channel")
     }
 }

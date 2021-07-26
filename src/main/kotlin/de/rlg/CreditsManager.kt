@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 var prices = HashMap<Material, HashMap<Int, Long>>()
@@ -172,13 +173,16 @@ fun sellItem(player: Player) {
     if (itemStack.hasItemMeta() && itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)) {
         return
     }
-    val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
+    val rlgPlayer = player.rlgPlayer()
+    val multiplier = rankData[rlgPlayer.rank]!!.shopMultiplier
     val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
-    val value = (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong()
+    val isNotCrypto = (itemStack.type == Material.STICK && cmd !in 1..5) || itemStack.type != Material.STICK
+    val value = if(isNotCrypto) (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong() else prices[itemStack.type]!![cmd]!! * itemStack.amount
     giveBalance(player, value, "Shop")
-    if((itemStack.type == Material.STICK && cmd !in 1..5) || itemStack.type != Material.STICK){
+    if(isNotCrypto){
         questCount(player, 12, value.toInt(), true)
         questCount(player, 8, value.toInt(), false)
+        rlgPlayer.changeXP(floor(value / 10.0).toLong())
     }
     player.inventory.removeItem(itemStack)
     player.closeInventory()
@@ -190,8 +194,8 @@ fun tradingInventory(player: Player) {
         if (player.inventory.itemInMainHand.type == Material.AIR) {
             val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
             overview.contents = TradingInventories.overview!!.contents.copyOf()
-            if(player.rlgPlayer().xpLevel < 15){
-                overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 15 benötigt"), 1, Pair("rlgAction", "crypto")))
+            if(player.rlgPlayer().xpLevel < 10){
+                overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 10 benötigt"), 1, Pair("rlgAction", "crypto")))
             }
             showTradingInventory(player, overview, "Shop")
             return
@@ -383,6 +387,7 @@ fun setupShop1(chest: Chest, sign: Sign, player: Player) {
     player.addMessageListener { asyncChatEvent, s ->
         setupShop2(player, s)
         asyncChatEvent.isCancelled = true
+        true
     }
 }
 
@@ -436,6 +441,7 @@ fun setupShop2(player: Player, msgPrice: String) {
     player.addMessageListener { asyncChatEvent, s ->
         setupShop3(player, s)
         asyncChatEvent.isCancelled = true
+        true
     }
 }
 

@@ -15,10 +15,13 @@ class GuildCommand : CommandExecutor, TabCompleter {
         val player = sender.asPlayer()
         val rlgPlayer = player.rlgPlayer()
         when(args.size){
+            0 -> {
+                return true
+            }
             1 -> {
                 when(args[0]){
                     "setup" -> guildSetup(player, "")
-                    "leave" -> rlgPlayer.removeFromGuild()
+                    "leave" -> rlgPlayer.removeFromGuild("${player.name} hat die Guild verlassen!")
                     "delete" -> rlgPlayer.deleteGuild()
                     "accept" -> {
                         if(inviteTargetMap.containsKey(player.uniqueId)){
@@ -39,7 +42,10 @@ class GuildCommand : CommandExecutor, TabCompleter {
                                     inviteTargetMap.remove(player.uniqueId)
                                     return true
                                 }
-                                else -> rlgPlayer.joinGuild(inviter.rlgPlayer().guildId)
+                                else -> {
+                                    inviteTargetMap.remove(player.uniqueId)
+                                    rlgPlayer.joinGuild(inviter.rlgPlayer().guildId)
+                                }
                             }
                         }else {
                             player.sendMessage("§4Du hast keine offenen Einladungen!")
@@ -53,6 +59,10 @@ class GuildCommand : CommandExecutor, TabCompleter {
                         }else {
                             player.sendMessage("§4Du hast keine offenen Einladungen!")
                         }
+                    }
+                    else -> {
+                        if(rlgPlayer.guildId == 0) return true
+                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "))
                     }
                 }
             }
@@ -85,8 +95,25 @@ class GuildCommand : CommandExecutor, TabCompleter {
                         }
                         inviteTargetMap[target.uniqueId] = player.uniqueId
                         target.sendMessage("§bDu wurdest von ${player.name} in die Guild ${rlgPlayer.guild()!!.name} eingeladen!\n\nDu kannst diese Einladung mit /guild accept annehmen oder mit /guild decline ablehnen.")
+                        player.sendMessage("§a${target.name} wurde zur Guild eingeladen!")
+                    }
+                    "kick" -> {
+                        val guild = rlgPlayer.guild() ?: return true
+                        if(guild.owner_uuid != player.uniqueId.toString()) return true
+                        if(!guild.member_names.contains(args[1])) return true
+                        val target = Bukkit.getPlayer(args[1])
+                        rlgPlayer.removeFromGuild("${args[1]} wurde aus der Guild gekickt!")
+                        target?.sendMessage("§cDu wurdest aus deiner Guild entfernt!")
+                    }
+                    else -> {
+                        if(rlgPlayer.guildId == 0) return true
+                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "))
                     }
                 }
+            }
+            else -> {
+                if(rlgPlayer.guildId == 0) return true
+                rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "))
             }
         }
         return true
@@ -102,13 +129,14 @@ class GuildCommand : CommandExecutor, TabCompleter {
         return when(args.size){
             1 -> {
                 val result = arrayListOf<String>()
-                try { if(player.rlgPlayer().guild()!!.owner_uuid == player.uniqueId.toString()) result.addAll(arrayListOf("delete", "invite")) else result.add("leave") }catch (ex: NullPointerException) {
+                try { if(player.rlgPlayer().guild()!!.owner_uuid == player.uniqueId.toString()) result.addAll(arrayListOf("delete", "invite", "kick")) else result.add("leave") }catch (ex: NullPointerException) {
                     result.addAll(arrayListOf("accept", "setup", "decline"))}
                 result
             }
             2 -> {
                 when(args[0]){
                     "setup" -> arrayListOf("cancel")
+                    "kick" -> player.rlgPlayer().guild()?.member_names
                     else -> null
                 }
             }

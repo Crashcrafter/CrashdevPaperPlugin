@@ -114,7 +114,6 @@ fun registerCommands(){
     INSTANCE.getCommand("unmute")!!.setExecutor(UnmuteCommand())
     INSTANCE.getCommand("crypto")!!.setExecutor(CryptoCommand())
     INSTANCE.getCommand("checkitem")!!.setExecutor(CheckItemCommand())
-    INSTANCE.getCommand("randomtp")!!.setExecutor(RandomTpCommand())
     INSTANCE.getCommand("guild")!!.setExecutor(GuildCommand())
     INSTANCE.getCommand("guild")!!.tabCompleter = GuildCommand()
 }

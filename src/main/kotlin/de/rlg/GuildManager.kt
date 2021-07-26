@@ -1,7 +1,6 @@
 package de.rlg
 
 import de.rlg.listener.addMessageListener
-import de.rlg.listener.removeMessageListener
 import de.rlg.player.RLGPlayer
 import de.rlg.player.rlgPlayer
 import org.bukkit.Bukkit
@@ -11,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import kotlin.collections.HashMap
 
-data class Guild(val name: String, val suffix: String, val owner_uuid: String, val owner_name: String, val member_names: MutableList<String>, val member_uuids: MutableList<String>)
+data class Guild(var id: Int, val name: String, val suffix: String, val owner_uuid: String, val owner_name: String, val member_names: MutableList<String>, val member_uuids: MutableList<String>)
 data class SetupGuild(var name: String, var suffix: String, val owner_uuid: String, val owner_name: String)
 
 private val guilds = HashMap<Int, Guild>()
@@ -31,7 +30,7 @@ fun RLGPlayer.guild(): Guild? {
     return guilds[this.guildId]!!
 }
 
-fun SetupGuild.finalize(): Guild = Guild(this.name, this.suffix, this.owner_uuid, this.owner_name, arrayListOf(this.owner_name), arrayListOf(this.owner_uuid))
+fun SetupGuild.finalize(): Guild = Guild(0, this.name, this.suffix, this.owner_uuid, this.owner_name, arrayListOf(this.owner_name), arrayListOf(this.owner_uuid))
 
 fun initGuilds(){
     transaction {
@@ -39,7 +38,7 @@ fun initGuilds(){
             val id = it[GuildTable.id].value
             val memberNames = it[GuildTable.member_names].split(" ").toMutableList()
             val memberUuids = it[GuildTable.member_uuids].split(" ").toMutableList()
-            guilds[id] = Guild(it[GuildTable.name], it[GuildTable.suffix], it[GuildTable.owner_uuid], it[GuildTable.owner_name], memberNames, memberUuids)
+            guilds[id] = Guild(id, it[GuildTable.name], it[GuildTable.suffix], it[GuildTable.owner_uuid], it[GuildTable.owner_name], memberNames, memberUuids)
         }
     }
 }
@@ -63,6 +62,7 @@ fun guildSetup(player: Player, msg: String){
         player.addMessageListener {event, message ->
             guildSetup(player, message)
             event.isCancelled = true
+            false
         }
         return
     }
@@ -79,6 +79,7 @@ fun guildSetup(player: Player, msg: String){
                     player.addMessageListener {event, message ->
                         guildSetup(player, message)
                         event.isCancelled = true
+                        true
                     }
                 }
             }
@@ -110,6 +111,7 @@ fun guildSetup(player: Player, msg: String){
                     it[member_names] = final.member_names.joinToString(" ")
                     it[member_uuids] = final.member_uuids.joinToString(" ")
                 }.value
+                final.id = id
                 guilds[id] = final
                 rlgPlayer.guildId = id
                 PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
@@ -125,9 +127,9 @@ fun guildSetup(player: Player, msg: String){
     }
 }
 
-fun RLGPlayer.removeFromGuild(){
+fun RLGPlayer.removeFromGuild(reason: String){
     val guildId = this.guildId
-    if(guildId != 0) return
+    if(guildId == 0) return
     val guild = this.guild()!!
     val uuid = this.player.uniqueId.toString()
     if(guild.owner_uuid == uuid){
@@ -136,15 +138,26 @@ fun RLGPlayer.removeFromGuild(){
     }
     guild.member_names.remove(this.player.name)
     guild.member_uuids.remove(uuid)
+    guild.saveMembers(guildId)
+    guild.sendMessage(reason)
+    this.guildId = 0
+    transaction {
+        PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
+            it[PlayersTable.guildId] = guild.id
+        }
+    }
+    this.setName()
+    updateTabOfPlayers()
+}
+
+fun Guild.saveMembers(guildId: Int){
+    val guild = this
     transaction {
         GuildTable.update(where = {GuildTable.id eq guildId}){
             it[member_names] = guild.member_names.joinToString(" ")
             it[member_uuids] = guild.member_uuids.joinToString(" ")
         }
     }
-    this.guildId = 0
-    this.setName()
-    updateTabOfPlayers()
 }
 
 fun RLGPlayer.deleteGuild(){
@@ -178,10 +191,26 @@ fun RLGPlayer.deleteGuild(){
 }
 
 fun RLGPlayer.joinGuild(id: Int) {
-    if(this.guildId != 0){
+    if(this.guildId == 0){
         this.guildId = id
         this.setName()
+        val guild = this.guild()!!
+        guild.sendMessage("§a${this.player.name} ist der Guild beigetreten!")
+        guild.member_names.add(this.player.name)
+        guild.member_uuids.add(this.player.uniqueId.toString())
+        transaction {
+            PlayersTable.update(where = {PlayersTable.uuid eq this@joinGuild.player.uniqueId.toString()}){
+                it[guildId] = id
+            }
+        }
+        guild.saveMembers(guildId)
     }else {
         this.player.sendMessage("§4Du bist bereits in einer Guild!")
+    }
+}
+
+fun Guild.sendMessage(message: String, sender: Player? = null){
+    this.member_uuids.forEach {
+        Bukkit.getPlayer(UUID.fromString(it))?.sendMessage("§8[§6${this.suffix}§8]§r ${sender?.name ?: ""}> $message")
     }
 }

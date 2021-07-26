@@ -12,10 +12,6 @@ class CheckItemCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
         val item = player.inventory.itemInMainHand
-        if(!item.hasItemMeta()){
-            player.sendMessage("§4Item hat keine Daten!")
-            return true
-        }
         if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)){
             val cheaterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)
             player.sendMessage("§6Das Item wurde von $cheaterName im Creative benutzt/erzeugt!")
