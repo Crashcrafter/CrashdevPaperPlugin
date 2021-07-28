@@ -36,10 +36,10 @@ fun setDrop(chunk: Chunk, givenType: Int? = null): Boolean {
         }
         val m: Material = Material.valueOf(dropType.glassPaneMaterial)
         if(dropType.spawnBeacon) {
-            val localy = y-29
+            val localy = y-dropType.beaconHeight
             if(localy < 0) return false
             world.getBlockAt(x, localy, z).type = Material.BEACON
-            for (i in 0..28) world.getBlockAt(x, localy + 1 + i, z).type = m
+            for (i in 0 until dropType.beaconHeight) world.getBlockAt(x, localy + 1 + i, z).type = m
             for (xPoint in x - 1..x + 1) {
                 for (zPoint in z - 1..z + 1) {
                     world.getBlockAt(xPoint, localy - 1, zPoint).type = Material.IRON_BLOCK
@@ -70,13 +70,14 @@ fun setDrop(chunk: Chunk, givenType: Int? = null): Boolean {
 }
 
 fun unsetDrop(chunk: Chunk, alsoLoot: Boolean) {
+    val drop = drops[chunk] ?: return
     val world = chunk.world
     val x = chunk.x * 16 + 8
     val z = chunk.z * 16 + 8
-    val y = world.getHighestBlockYAt(x, z) - 30
+    val y = world.getHighestBlockYAt(x, z) - (1 + drop.data.beaconHeight)
     val replaceBlock = Material.STONE
     world.getBlockAt(x, y, z).type = replaceBlock
-    for (i in 0..28) {
+    for (i in 0 until drop.data.beaconHeight) {
         world.getBlockAt(x, y + 1 + i, z).type = world.getBlockAt(x, y + 1 + i, z + 1).type
     }
     for (xPoint in x - 1..x + 1) {
@@ -85,14 +86,13 @@ fun unsetDrop(chunk: Chunk, alsoLoot: Boolean) {
         }
     }
     if (alsoLoot) {
-        val block = world.getBlockAt(x, y + 30, z)
+        val block = world.getBlockAt(x, y + (1 + drop.data.beaconHeight), z)
         if (block.type == Material.CHEST) {
             (block.state as Chest).blockInventory.clear()
             block.type = Material.AIR
         }
     }
     chunk.unClaim()
-    val drop = drops[chunk]!!
     drop.musicJobs.forEach {
         it.cancel()
     }
@@ -249,6 +249,7 @@ fun recoverDrop(chunk: Chunk) {
     println("Recover Drop " + type + " at " + chunk.x + "/" + chunk.z)
     val block1 = block.world.getBlockAt(x, y + 3, z)
     drops[chunk] = Drop(dropType, block1.location)
+    waveManager(chunk)
 }
 
 data class Drop(val data: DropObj, val location: Location, var wave: Int = 0, var started: Boolean = false,
@@ -267,7 +268,6 @@ fun getDropType(worldName: String): Int {
 }
 
 fun getDropType(worldName: String, water: Boolean): Int {
-    println("Get Type")
     val possibleTypes = mutableListOf<DropObj>()
     dropTypeMap.values.forEach {
         if(it.allowedWorlds.contains(worldName) && it.spawnInWater == water){
@@ -302,7 +302,7 @@ fun Player.canGenDrops(): Boolean {
 
 data class DropsSaveObj(val dropWardenName: String, val dropRange: Int, val drops: List<DropObj>)
 data class DropObj(val type: Int, val possibility: Int, val allowedWorlds: List<String>, val name: String, val spawnInWater: Boolean, val spawnUnderWater: Boolean,
-                   val spawnBeacon: Boolean, val glassPaneMaterial: String, val waves: HashMap<Int, List<String>>, val lootTable: List<LootTableItem>)
+                   val spawnBeacon: Boolean, val beaconHeight: Int, val glassPaneMaterial: String, val waves: HashMap<Int, List<String>>, val lootTable: List<LootTableItem>)
 
 val dropTypeMap = hashMapOf<Int, DropObj>()
 val dropLootTableMap = hashMapOf<Int, MutableList<LootTableItem>>()

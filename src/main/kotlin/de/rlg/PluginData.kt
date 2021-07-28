@@ -10,15 +10,17 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 //CONST DATA
 val warps = hashMapOf<String, Location>()
-const val texturePackUrl = "https://drive.google.com/uc?export=download&id=11hodrHTq9L9E4F2pn7QF9s-Jr0-z1IBk"
-const val texturePackHash = "6AA010DD8D1B373B98550F69E03503AC5BD5DEDA"
+const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1PE5Lynv4otTJwzzI_cuj3bYTYFnuJdJh"
+const val texturePackHash = "7C1C1A920C874DCE2A64911772F9F696053CF2EC"
 var dropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
 const val dcLink = "https://discord.gg/qQtaYsDN6w"
 var dropWardenName = "§4§lDrop Warden"
+val customRangeMap = hashMapOf(Material.IRON_SWORD to hashMapOf(1 to 6), Material.DIAMOND_SWORD to hashMapOf(1 to 6, 2 to 50), Material.NETHERITE_SWORD to hashMapOf(1 to 6))
 
 //VARIABLE DATA
 val amount_Sleeping: ArrayList<Player> = ArrayList()

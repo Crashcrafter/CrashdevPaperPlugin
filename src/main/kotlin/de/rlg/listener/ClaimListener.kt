@@ -55,11 +55,9 @@ class ClaimListener : Listener {
 
     @EventHandler
     fun onHit(e: EntityDamageByEntityEvent) {
-        if (e.damager is Player) {
-            if (heventCancel(e.damager.location.chunk, e.damager as Player)) {
-                e.isCancelled = true
-                return
-            }
+        if (e.damager is Player && heventCancel(e.damager.location.chunk, e.damager as Player)) {
+            e.isCancelled = true
+            return
         }
     }
 
@@ -137,6 +135,7 @@ class ClaimListener : Listener {
     fun onVehicleMove(e: VehicleEntityCollisionEvent) {
         if(e.entity is Player && eventCancel(e.vehicle.chunk, e.entity as Player)){
             e.isCollisionCancelled = true
+            e.isCancelled = true
         }
     }
 }

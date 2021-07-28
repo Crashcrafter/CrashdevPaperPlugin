@@ -72,7 +72,7 @@ object CustomItems {
     ), 5)
 
     fun excalibur(): ItemStack {
-        val itemStack = defaultCustomItem(Material.DIAMOND_SWORD, "Excalibur", arrayListOf())
+        val itemStack = defaultCustomItem(Material.DIAMOND_SWORD, "Excalibur", arrayListOf(), 2)
         itemStack.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 10000)
         return itemStack
     }

@@ -12,7 +12,6 @@ import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
@@ -125,7 +124,23 @@ private fun getToken(): String {
 val keysData = hashMapOf<Int, Key>()
 val lootTables = hashMapOf<Int, List<LootTableItem>>()
 
-data class Key(val id: Int, val displayName: String, val lootTable: List<LootTableItem>)
+data class Key(val id: Int, val name: String, val displayName: String, val crateName: String, val lootTable: List<LootTableItem>){
+    companion object {
+        fun byName(name: String): Key? {
+            val list = keysData.values.filter { it.name == name }
+            if(list.isEmpty()) return null
+            return list.first()
+        }
+
+        fun getNames(): List<String> {
+            val result = mutableListOf<String>()
+            keysData.forEach {
+                result.add(it.value.name)
+            }
+            return result
+        }
+    }
+}
 data class LootTableItem(val itemString: String, val probability: Int, val amount: Int = 1, val enchantments: HashMap<String, Int>? = null)
 
 fun loadLootTables(){

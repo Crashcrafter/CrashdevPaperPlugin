@@ -17,41 +17,23 @@ class ExpCommand : CommandExecutor, TabCompleter{
             if (args.size >= 2) {
                 val arg: String = args[0]
                 val target: Player = Bukkit.getPlayer(args[1])!!
-                if (arg.contentEquals("add")) {
-                    if (args.size <= 3) {
-                        player.sendMessage("§4Bitte gib eine Anzahl und einen Typ an")
-                        return true
-                    }
-                    val amount: Long = args[2].toLong()
-                    if (args[3].contentEquals("XP")) {
-                        target.rlgPlayer().changeXP(amount)
-                    } else if (args[3].contentEquals("Level")) {
-                        var finalexp: Long = 0
-                        val rlgPlayer = target.rlgPlayer()
-                        for (i in 0 until amount) {
-                            finalexp += getEXPForLevel(rlgPlayer.xpLevel + i.toInt())
-                        }
-                        rlgPlayer.changeXP(finalexp)
-                    }
-                    player.sendMessage("§2Dem Spieler wurden " + amount + " " + args[3] + " gegeben!")
-                } else if (arg.contentEquals("remove")) {
-                    if (args.size <= 3) {
-                        player.sendMessage("§4Bitte gib eine Anzahl und einen Typ an")
-                        return true
-                    }
-                    val amount: Long = args[2].toLong()
-                    if (args[3].contentEquals("XP")) {
-                        target.rlgPlayer().changeXP(-amount)
-                    } else if (args[3].contentEquals("Level")) {
-                        var finalexp: Long = 0
-                        val rlgPlayer = target.rlgPlayer()
-                        for (i in 1 until amount+1) {
-                            finalexp += getEXPForLevel(rlgPlayer.xpLevel - i.toInt())
-                        }
-                        rlgPlayer.changeXP(-finalexp)
-                    }
-                    player.sendMessage("§2Dem Spieler wurden " + amount + " " + args[3] + " entfernt!")
+                if (args.size <= 3) {
+                    player.sendMessage("§4Bitte gib eine Anzahl und einen Typ an")
+                    return true
                 }
+                val amount: Long = args[2].toLong()
+                val factor = if(arg == "remove") -1 else 1
+                if (args[3].contentEquals("XP")) {
+                    target.rlgPlayer().changeXP(amount * factor)
+                } else if (args[3].contentEquals("Level")) {
+                    var finalexp: Long = 0
+                    val rlgPlayer = target.rlgPlayer()
+                    for (i in 0 until amount) {
+                        finalexp += getEXPForLevel(rlgPlayer.xpLevel + (i.toInt() * factor) - if(factor == -1) 1 else 0)
+                    }
+                    rlgPlayer.changeXP(finalexp * factor)
+                }
+                player.sendMessage("§2Dem Spieler wurden " + (amount*factor) + " " + args[3] + " gegeben!")
             } else {
                 player.sendMessage("§4Unvollständiger Command")
             }
