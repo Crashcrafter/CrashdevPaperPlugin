@@ -1,15 +1,18 @@
 package de.rlg
 
 import de.rlg.items.CustomItems
-import de.rlg.permission.rank
 import de.rlg.permission.rankData
+import de.rlg.permission.ranks
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
+import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.command.CommandSender
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -32,7 +35,7 @@ fun Player.updateScoreboard(){
     val player = this
     val list: MutableList<String> = ArrayList()
     list.add("             ")
-    list.add("§6§lNEU§r: §5Level-System!")
+    list.add("§6§lRELAUNCH!§r")
     list.add("-------------------  ")
     list.add("§aDein Kontostand:")
     list.add("§6" + player.rlgPlayer().balance.withPoints() + " Credits")
@@ -71,7 +74,7 @@ fun Scoreboard.getServerTeams(){
         val team = this.registerNewTeam(it.name)
         team.setAllowFriendlyFire(true)
         team.setCanSeeFriendlyInvisibles(false)
-        team.prefix(Component.text("${rlgPlayer.rank().prefix}§r "))
+        team.prefix(Component.text("${rlgPlayer.rankData().prefix}§r "))
         if(rlgPlayer.guildId != 0){
             team.suffix(Component.text(" [§6${rlgPlayer.guild()!!.suffix}§r]"))
         }
@@ -80,15 +83,15 @@ fun Scoreboard.getServerTeams(){
 }
 
 fun sendModchatMessage(message: String, sender: Player){
+    val msg = "§2[Teamchat]§f ${sender.rlgPlayer().rankData().prefix} ${sender.name}> $message"
     moderator.forEach {
-        val msg = "§2[Modchat]§f ${rankData[sender.rlgPlayer().rank]!!.prefix} ${sender.name}> $message"
         it.sendMessage(msg)
     }
 }
 
 fun sendModchatMessage(message: String){
+    val msg = "§2[Teamchat] §fServer>§r $message"
     moderator.forEach {
-        val msg = "§2[Modchat] §fServer>§r $message"
         it.sendMessage(msg)
     }
 }
@@ -143,15 +146,12 @@ fun isSpace(inventory: Inventory, amount: Int): Boolean {
 fun getEXPForLevel(level: Int): Long = (15 + 7 * level).toDouble().pow(2.0).toLong()
 
 fun getKeysPerRank(rank: Int): String {
-    return when (rank) {
-        0 -> "0 0 0"
-        1 -> "2 0 0"
-        2 -> "5 2 0"
-        3 -> "3 4 1"
-        4 -> "8 3 3"
-        5 -> "15 10 10"
-        else -> "1 1 1"
+    val rankData = ranks[rank]!!
+    val result = StringBuilder()
+    for (i in 0..keysData.size){
+        result.append(rankData.weeklyKeys[i+1]).append(" ")
     }
+    return result.toString().removeSuffix(" ")
 }
 
 fun getBlockBySQLString(input: String): Block {
@@ -239,3 +239,26 @@ fun Long.withPoints(): String {
 }
 
 fun Int.withPoints(): String = this.toLong().withPoints()
+
+fun LootTableItem.toItemstack(): ItemStack {
+    val itemStack = itemStringToItem(this.itemString)
+    itemStack.amount = this.amount
+    this.enchantments?.forEach {
+        val enchantment = Enchantment.getByKey(NamespacedKey.fromString(it.key)!!)!!
+        itemStack.addUnsafeEnchantment(enchantment, it.value)
+    }
+    return itemStack
+}
+
+fun World.getHighestSolidBlockYAt(x: Int, z: Int): Int {
+    val initBlock = this.getHighestBlockAt(x, z)
+    var result = initBlock.y
+    do {
+        val nextBlock = this.getBlockAt(x, result, z)
+        if(nextBlock.type != Material.WATER && nextBlock.type != Material.LAVA) {
+            return result
+        }
+        result--
+    }while (result > 0)
+    return -1
+}

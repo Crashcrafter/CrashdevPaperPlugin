@@ -2,6 +2,7 @@ package de.rlg.player
 
 import de.rlg.*
 import de.rlg.permission.rankData
+import de.rlg.permission.ranks
 import kotlinx.coroutines.*
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
@@ -44,7 +45,6 @@ class RLGPlayer() {
     var disabledMovement = false
     var dropCoolDown by Delegates.notNull<Long>()
     var elytraCoolDown = System.currentTimeMillis() + 1000*30
-    var randomTpCoolDown = System.currentTimeMillis()
     var mutedUntil = System.currentTimeMillis()
     val playerLinkCounter = mutableListOf<Long>()
     val playerOffenseCounter = mutableListOf<Long>()
@@ -91,7 +91,7 @@ class RLGPlayer() {
         this.xpLevel = xpLevel
         this.xp = xp
         this.vxpLevel = vxpLevel
-        this.isMod = rankData[rank]!!.isMod
+        this.isMod = ranks[rank]!!.isMod
 
         val questsArray = questsString.split(" ")
         val questStatusArray = questsStatusString.split(" ")
@@ -110,6 +110,7 @@ class RLGPlayer() {
         this.setName()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun changeMana(amount: Int) {
         mana -= amount
         if (managen != null) {
@@ -270,9 +271,9 @@ class RLGPlayer() {
 
     fun setName(){
         val playerTextComponent = if(guildId == 0){
-            Component.text("${rankData[rank]!!.prefix} ${player.name}")
+            Component.text("${rankData().prefix} ${player.name}")
         }else {
-            Component.text("${rankData[rank]!!.prefix} ${player.name} §8[§6${this.guild()!!.suffix}§8]§r")
+            Component.text("${rankData().prefix} ${player.name} §8[§6${this.guild()!!.suffix}§8]§r")
         }
         player.playerListName(playerTextComponent)
         player.displayName(playerTextComponent)

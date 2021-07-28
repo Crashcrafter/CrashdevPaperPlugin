@@ -17,7 +17,6 @@ class JoinListener : Listener{
     fun onJoin(joinEvent: PlayerJoinEvent){
         val player = joinEvent.player
         val hostString = player.address.hostString
-        println(hostString)
         var count = 0
         Bukkit.getOnlinePlayers().forEach {
             if(it.address.hostString == hostString) {

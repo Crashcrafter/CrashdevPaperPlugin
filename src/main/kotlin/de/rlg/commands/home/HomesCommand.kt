@@ -1,7 +1,6 @@
 package de.rlg.commands.home
 
 import de.rlg.asPlayer
-import de.rlg.permission.rankData
 import de.rlg.player.RLGPlayer
 import de.rlg.player.rlgPlayer
 import org.bukkit.Bukkit
@@ -15,7 +14,7 @@ class HomesCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
         val rlgPlayer = player.rlgPlayer()
-        if (rankData[rlgPlayer.rank]!!.isMod && args.isNotEmpty()) {
+        if (rlgPlayer.isMod && args.isNotEmpty()) {
             val target: Player = Bukkit.getPlayer(args[0])!!
             val targetRlgPlayer = target.rlgPlayer()
             val msgBuilder = StringBuilder()

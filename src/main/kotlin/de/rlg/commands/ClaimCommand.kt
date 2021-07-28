@@ -1,7 +1,6 @@
 package de.rlg.commands
 
 import de.rlg.asPlayer
-import de.rlg.canGenDrops
 import de.rlg.permission.*
 import de.rlg.player.rlgPlayer
 import me.kbrewster.mojangapi.MojangAPI

@@ -195,9 +195,9 @@ fun RLGPlayer.joinGuild(id: Int) {
         this.guildId = id
         this.setName()
         val guild = this.guild()!!
-        guild.sendMessage("§a${this.player.name} ist der Guild beigetreten!")
         guild.member_names.add(this.player.name)
         guild.member_uuids.add(this.player.uniqueId.toString())
+        guild.sendMessage("§a${this.player.name} ist der Guild beigetreten!")
         transaction {
             PlayersTable.update(where = {PlayersTable.uuid eq this@joinGuild.player.uniqueId.toString()}){
                 it[guildId] = id

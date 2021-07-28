@@ -62,7 +62,7 @@ class GuildCommand : CommandExecutor, TabCompleter {
                     }
                     else -> {
                         if(rlgPlayer.guildId == 0) return true
-                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "))
+                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
                     }
                 }
             }
@@ -107,13 +107,13 @@ class GuildCommand : CommandExecutor, TabCompleter {
                     }
                     else -> {
                         if(rlgPlayer.guildId == 0) return true
-                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "))
+                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
                     }
                 }
             }
             else -> {
                 if(rlgPlayer.guildId == 0) return true
-                rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "))
+                rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
             }
         }
         return true

@@ -1,6 +1,6 @@
 package de.rlg
 
-import de.rlg.permission.rankData
+import de.rlg.permission.ranks
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Table
@@ -43,8 +43,8 @@ object KeyIndexTable : Table("keyindex"){
 object PlayersTable : Table("players"){
     val uuid = varchar("uuid", 36)
     val rank = integer("rank").default(0)
-    val remainingClaims = integer("remainingclaims").default(rankData[0]!!.claims)
-    val remainingHomes = integer("remaininghomes").default(rankData[0]!!.homes)
+    val remainingClaims = integer("remainingclaims").default(ranks[0]!!.claims)
+    val remainingHomes = integer("remaininghomes").default(ranks[0]!!.homes)
     val addedClaims = integer("addedClaims").default(0)
     val balance = long("balance").default(0)
     val questStatus = varchar("queststatus", 50).default("0 0 0 0 0 0 0 0")
@@ -64,28 +64,11 @@ object PortalTable : Table("portals"){
     val targetWorld = varchar("targetworld", 20)
 }
 
-object PricesTable : Table("prices"){
-    val itemId = varchar("itemid", 100)
-    val cmd = integer("cmd")
-    val credits = long("credits")
-}
-
 object ProcessedTable : Table("processed"){
     val uuid = varchar("uuid", 36)
     val lastTime = date("lasttime")
     val leftKeys = varchar("leftkeys", 20)
     override val primaryKey = PrimaryKey(uuid)
-}
-
-object RankTable : Table("ranks"){
-    val id = integer("id")
-    val prefix = varchar("prefix", 50)
-    val name = varchar("name", 50)
-    val claims = integer("claims")
-    val isMod = bool("isMod")
-    val homes = integer("homes")
-    val shopMultiplier = double("shopMultiplier")
-    override val primaryKey = PrimaryKey(id)
 }
 
 object ShopTable : Table("shops"){

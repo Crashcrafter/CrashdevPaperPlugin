@@ -1,8 +1,6 @@
 package de.rlg.commands.admin
 
-import de.rlg.PortalTable
-import de.rlg.asPlayer
-import de.rlg.toSQLString
+import de.rlg.*
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.command.Command
@@ -13,11 +11,6 @@ import org.bukkit.entity.Player
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class MultivCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -152,54 +145,15 @@ class MultivCommand : CommandExecutor, TabCompleter {
 }
 
 fun addWorld(worldName: String) {
-    val txtString = readTxtFile("worlds.txt")
-    val worlds = txtString.split(" ").toTypedArray()
-    try {
-        val writer = FileWriter(File("worlds.txt"))
-        for (id in worlds) {
-            val w = id.replace(" ", "")
-            if (!w.contentEquals("")) {
-                writer.write(w)
-                writer.write(" ")
-            }
-        }
-        writer.write(worldName)
-        writer.close()
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
+    val worlds = INSTANCE.config.getStringList("worlds")
+    worlds.add(worldName)
+    INSTANCE.saveConfig()
 }
 
 fun removeWorld(worldName: String) {
-    val txtString = readTxtFile("world.txt")
-    val worlds = txtString.split(" ").toTypedArray()
-    try {
-        val writer = FileWriter(File("world.txt"))
-        for (id in worlds) {
-            val w = id.replace(" ", "")
-            if (!w.contentEquals("") && !w.contentEquals(worldName)) {
-                writer.write(w)
-                writer.write(" ")
-            }
-        }
-        writer.close()
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
-}
-
-private fun readTxtFile(path: String): String {
-    val worldFile = File(path)
-    var txtString = ""
-    try {
-        if (!worldFile.exists()) {
-            worldFile.createNewFile()
-        }
-        txtString = String(Files.readAllBytes(Paths.get(path)))
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
-    return txtString
+    val worlds = INSTANCE.config.getStringList("worlds")
+    worlds.remove(worldName)
+    INSTANCE.saveConfig()
 }
 
 fun addPortal(block: Block, target: String) {

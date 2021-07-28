@@ -5,6 +5,7 @@ import de.rlg.asPlayer
 import de.rlg.permission.getRankByString
 import de.rlg.permission.givePerms
 import de.rlg.permission.rankData
+import de.rlg.permission.ranks
 import de.rlg.player.rlgPlayer
 import de.rlg.updateTabOfPlayers
 import me.kbrewster.mojangapi.MojangAPI
@@ -22,30 +23,27 @@ import org.jetbrains.exposed.sql.update
 class RankCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        val rlgPlayer = player.rlgPlayer()
-        if (rlgPlayer.isMod) {
+        if (player.isOp) {
             if (args[0].contentEquals("set")) {
-                val rank: Int = getRankByString(args[2])
-                if (rank <= rlgPlayer.rank) {
-                    val target: Player? = Bukkit.getPlayer(args[1])
-                    if (target == null) {
-                        val offlineTarget: OfflinePlayer = Bukkit.getOfflinePlayer(MojangAPI.getUUID(args[1]))
-                        if (player.isOp) {
-                            setRank(offlineTarget.uniqueId.toString(), rank)
-                            player.sendMessage("Der " + args[2] + "-Rank wurde an " + offlineTarget.name + " vergeben")
-                        }
-                    } else {
-                        if (target.rlgPlayer().rank <= rlgPlayer.rank) {
-                            target.sendMessage("Du hast den " + args[2] + "-Rank von " + player.name + " erhalten")
-                            player.sendMessage("Der " + args[2] + "-Rank wurde an " + target.name + " vergeben")
-                            setRank(target, rank)
-                        }
-                    }
+                val rank = getRankByString(args[2])
+                if(rank == null){
+                    player.sendMessage("§4Rank not found!")
+                    return true
+                }
+                val target: Player? = Bukkit.getPlayer(args[1])
+                if (target == null) {
+                    val offlineTarget: OfflinePlayer = Bukkit.getOfflinePlayer(MojangAPI.getUUID(args[1]))
+                    setRank(offlineTarget.uniqueId.toString(), rank.id)
+                    player.sendMessage("Der " + args[2] + "-Rank wurde an " + offlineTarget.name + " vergeben")
+                } else {
+                    target.sendMessage("Du hast den " + args[2] + "-Rank von " + player.name + " erhalten")
+                    player.sendMessage("Der " + args[2] + "-Rank wurde an " + target.name + " vergeben")
+                    setRank(target, rank.id)
                 }
             } else if (args[0].contentEquals("info")) {
                 try {
-                    val target: Player = Bukkit.getPlayer(args[1])!!
-                    player.sendMessage("Der Spieler " + target.name + " hat den " + rankData[target.rlgPlayer().rank]!!.name + "-Rank")
+                    val target: Player = Bukkit.getPlayer(args[1]) ?: player
+                    player.sendMessage("Der Spieler ${target.name} hat den ${target.rlgPlayer().rankData().name}-Rank")
                 }catch (ex: NullPointerException) {
                     player.sendMessage("§4Spieler ist nicht online!")
                 }
@@ -63,7 +61,7 @@ class RankCommand : CommandExecutor, TabCompleter {
         args: Array<out String>
     ): MutableList<String>? {
         val player1 = sender.asPlayer()
-        if (player1.rlgPlayer().isMod) {
+        if (player1.isOp) {
             if (args.size == 1) {
                 val list: MutableList<String> = ArrayList()
                 list.add("set")
@@ -72,8 +70,8 @@ class RankCommand : CommandExecutor, TabCompleter {
             } else if (args[0].equals("set", ignoreCase = true)) {
                 if (args.size == 3) {
                     val list: MutableList<String> = ArrayList()
-                    rankData.keys.forEach {
-                        list.add(rankData[it]!!.name)
+                    ranks.values.forEach {
+                        list.add(it.name)
                     }
                     return list
                 } else if (args.size == 2) {
@@ -109,8 +107,8 @@ fun setRank(player: Player, rank: Int) {
     val currentRank = rlgPlayer.rank
     val currentClaims = rlgPlayer.remainingClaims
     val currentHomes = rlgPlayer.remainingHomes
-    val newRemainingClaims = currentClaims + (rankData[rank]!!.claims - rankData[currentRank]!!.claims)
-    val newRemainingHomes = currentHomes + (rankData[rank]!!.homes - rankData[currentRank]!!.homes)
+    val newRemainingClaims = currentClaims + (ranks[rank]!!.claims - ranks[currentRank]!!.claims)
+    val newRemainingHomes = currentHomes + (ranks[rank]!!.homes - ranks[currentRank]!!.homes)
     transaction {
         PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
             it[remainingClaims] = newRemainingClaims
@@ -121,7 +119,7 @@ fun setRank(player: Player, rank: Int) {
     rlgPlayer.rank = rank
     rlgPlayer.remainingClaims = newRemainingClaims
     rlgPlayer.remainingHomes = newRemainingHomes
-    rlgPlayer.isMod = rankData[rank]!!.isMod
+    rlgPlayer.isMod = ranks[rank]!!.isMod
     rlgPlayer.setName()
     player.givePerms()
     updateTabOfPlayers()
@@ -133,8 +131,8 @@ fun setRank(uuid: String, rank: Int) {
         val currentRank = data[PlayersTable.rank]
         val currentClaims = data[PlayersTable.remainingClaims]
         val currentHomes = data[PlayersTable.remainingHomes]
-        val newRemainingClaims = currentClaims + (rankData[rank]!!.claims - rankData[currentRank]!!.claims)
-        val newRemainingHomes = currentHomes + (rankData[rank]!!.homes - rankData[currentRank]!!.homes)
+        val newRemainingClaims = currentClaims + (ranks[rank]!!.claims - ranks[currentRank]!!.claims)
+        val newRemainingHomes = currentHomes + (ranks[rank]!!.homes - ranks[currentRank]!!.homes)
         PlayersTable.update(where = {PlayersTable.uuid eq uuid}){
             it[remainingClaims] = newRemainingClaims
             it[remainingHomes] = newRemainingHomes

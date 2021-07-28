@@ -5,6 +5,7 @@ import de.rlg.commands.admin.removeKeyChest
 import de.rlg.commands.admin.removePortal
 import de.rlg.items.CustomItems
 import de.rlg.permission.eventCancel
+import de.rlg.permission.heventCancel
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Creeper
@@ -21,6 +22,7 @@ import org.bukkit.event.entity.*
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
 
@@ -54,14 +56,9 @@ class ClaimListener : Listener {
     @EventHandler
     fun onHit(e: EntityDamageByEntityEvent) {
         if (e.damager is Player) {
-            try {
-                if(e.entity.customName!! == dropName){
-                    e.isCancelled = false
-                    return
-                }
-            }catch (ex: NullPointerException){}
-            if (eventCancel(e.damager.location.chunk, e.damager as Player)) {
+            if (heventCancel(e.damager.location.chunk, e.damager as Player)) {
                 e.isCancelled = true
+                return
             }
         }
     }
@@ -133,6 +130,13 @@ class ClaimListener : Listener {
     fun onArmorStand(e: PlayerArmorStandManipulateEvent) {
         if (eventCancel(e.player.chunk, e.player)) {
             e.isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun onVehicleMove(e: VehicleEntityCollisionEvent) {
+        if(e.entity is Player && eventCancel(e.vehicle.chunk, e.entity as Player)){
+            e.isCollisionCancelled = true
         }
     }
 }

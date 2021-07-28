@@ -69,7 +69,8 @@ class KeyCommand : CommandExecutor, TabCompleter {
                 }
                 for(i in 0 until amount){
                     try {
-                        player.inventory.addItem(when(args[1]){
+                        val target = if(args.size == 4) Bukkit.getPlayer(args[3]) ?: player else player
+                        target.inventory.addItem(when(args[1]){
                             "common" -> genKey(1)
                             "epic" -> genKey(2)
                             "supreme" -> genKey(3)

@@ -1,5 +1,7 @@
 package de.rlg
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import de.rlg.commands.*
 import de.rlg.commands.admin.*
 import de.rlg.commands.home.*
@@ -25,26 +27,26 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.io.File
-import java.nio.file.Files
 
 fun initServer(){
     initDatabase()
-    loadSpawn()
-    loadEvent()
+    loadWarps()
 
     initQuests()
     initGuilds()
+    loadRanks()
     loadFromDb()
     fixDb()
 
     registerCustomItems()
-    initLootTables()
+    loadLootTables()
     initTradingInventories()
     loadWorlds()
-    initDrops()
+    loadDropTables()
     updateCreditScore()
     CraftingRecipes.initRecipes()
-    initEnchLevel()
+    loadMaxEnchantmentLevel()
+    loadPrices()
 
     registerCommands()
     registerEvents()
@@ -62,10 +64,6 @@ fun registerEvents(){
 }
 
 fun registerCommands(){
-    INSTANCE.getCommand("spawn")!!.setExecutor(SpawnCommand())
-    INSTANCE.getCommand("spawn")!!.tabCompleter = SpawnCommand()
-    INSTANCE.getCommand("event")!!.setExecutor(EventCommand())
-    INSTANCE.getCommand("event")!!.tabCompleter = SpawnCommand()
     INSTANCE.getCommand("ci")!!.setExecutor(CICommand())
     INSTANCE.getCommand("ci")!!.tabCompleter = CICommand()
     INSTANCE.getCommand("discord")!!.setExecutor(DiscordCommand())
@@ -116,6 +114,8 @@ fun registerCommands(){
     INSTANCE.getCommand("checkitem")!!.setExecutor(CheckItemCommand())
     INSTANCE.getCommand("guild")!!.setExecutor(GuildCommand())
     INSTANCE.getCommand("guild")!!.tabCompleter = GuildCommand()
+    INSTANCE.getCommand("warp")!!.setExecutor(WarpCommand())
+    INSTANCE.getCommand("warp")!!.tabCompleter = WarpCommand()
 }
 
 fun registerCustomItems(){
@@ -154,27 +154,19 @@ fun registerCustomItems(){
 }
 
 fun loadWorlds(){
-    val processedFile = File("worlds.txt")
-    if (!processedFile.exists()) {
-        processedFile.createNewFile()
+    val worlds = INSTANCE.config.getStringList("worlds")
+    if(worlds.isEmpty()){
+        worlds.add("event")
+        INSTANCE.config.set("worlds", worlds)
+        INSTANCE.saveConfig()
     }
-    val txtString = Files.readString(processedFile.toPath())
-    val worlds = txtString.split(" ")
-    for (world in worlds) {
-        val w = world.replace(" ", "")
-        if (!w.contentEquals("")) {
-            WorldCreator(w).createWorld()
-        }
+    worlds.forEach {
+        WorldCreator(it).createWorld()
     }
 }
 
 fun loadFromDb(){
     transaction {
-        rankData.clear()
-        RankTable.selectAll().forEach {
-            rankData[it[RankTable.id]] = RankObj(it[RankTable.prefix], it[RankTable.name], it[RankTable.claims], it[RankTable.isMod], it[RankTable.homes],
-                it[RankTable.shopMultiplier])
-        }
         chunks.clear()
         chunkList.clear()
         ChunkTable.selectAll().forEach {
@@ -202,15 +194,6 @@ fun loadFromDb(){
         KeyChestTable.selectAll().forEach {
             keyChests[getBlockBySQLString(it[KeyChestTable.chestPos])] = it[KeyChestTable.type]
         }
-        prices.clear()
-        PricesTable.selectAll().forEach {
-            val material = Material.valueOf(it[PricesTable.itemId])
-            if(!prices.containsKey(material)){
-                prices[material] = hashMapOf(it[PricesTable.cmd] to it[PricesTable.credits])
-            }else {
-                prices[material]!![it[PricesTable.cmd]] = it[PricesTable.credits]
-            }
-        }
         portals.clear()
         PortalTable.selectAll().forEach {
             portals[getBlockBySQLString(it[PortalTable.portalPos])] = it[PortalTable.targetWorld]
@@ -219,16 +202,33 @@ fun loadFromDb(){
     updateTabOfPlayers()
     clearPlayerData()
     Bukkit.getOnlinePlayers().forEach {
-        player -> run {
-            player.setResourcePack(texturePackUrl, texturePackHash)
-            player.load()
-            player.updateScoreboard()
-            val playerTextComponent = Component.text("${rankData[player.rlgPlayer().rank]!!.prefix} ${player.name}")
-            player.playerListName(playerTextComponent)
-            player.displayName(playerTextComponent)
-            player.customName(playerTextComponent)
-            player.isCustomNameVisible = true
+        it.setResourcePack(texturePackUrl, texturePackHash)
+        it.load()
+        it.updateScoreboard()
+        val playerTextComponent = Component.text("${it.rlgPlayer().rankData().prefix} ${it.name}")
+        it.playerListName(playerTextComponent)
+        it.displayName(playerTextComponent)
+        it.customName(playerTextComponent)
+        it.isCustomNameVisible = true
+    }
+}
+
+data class PricesSaveObj(val material: String, val cmd: Int, val price: Long)
+fun loadPrices(){
+    prices.clear()
+    val file = File(INSTANCE.dataFolder.path + "/prices.json")
+    if(file.exists()){
+        val pricesObjects = jacksonObjectMapper().readValue<List<PricesSaveObj>>(file)
+        pricesObjects.forEach {
+            val m = Material.valueOf(it.material)
+            if(!prices.containsKey(m)){
+                prices[m] = hashMapOf()
+            }
+            prices[m]!![it.cmd] = it.price
         }
+    }else {
+        file.createNewFile()
+        jacksonObjectMapper().writeValue(file, listOf<PricesSaveObj>())
     }
 }
 
@@ -238,15 +238,15 @@ fun fixDb(){
             val uuid = it[PlayersTable.uuid]
             val chunkAmount = ChunkTable.select(where = {ChunkTable.uuid eq uuid}).toList().size
             val homesAmount = HomepointTable.select(where = {HomepointTable.uuid eq uuid}).toList().size
-            val rank = it[PlayersTable.rank]
-            if(chunkAmount != (rankData[rank]!!.claims + it[PlayersTable.addedClaims]) - it[PlayersTable.remainingClaims]){
+            val rankData = ranks[it[PlayersTable.rank]]!!
+            if(chunkAmount != (rankData.claims + it[PlayersTable.addedClaims]) - it[PlayersTable.remainingClaims]){
                 PlayersTable.update(where = {PlayersTable.uuid eq uuid}){ it2 ->
-                    it2[remainingClaims] = rankData[rank]!!.claims + it[addedClaims] - chunkAmount
+                    it2[remainingClaims] = rankData.claims + it[addedClaims] - chunkAmount
                 }
             }
-            if(homesAmount != rankData[rank]!!.homes - it[PlayersTable.remainingHomes]){
+            if(homesAmount != rankData.homes - it[PlayersTable.remainingHomes]){
                 PlayersTable.update(where = {PlayersTable.uuid eq uuid}){ it2 ->
-                    it2[remainingHomes] = rankData[rank]!!.homes - homesAmount
+                    it2[remainingHomes] = rankData.homes - homesAmount
                 }
             }
         }

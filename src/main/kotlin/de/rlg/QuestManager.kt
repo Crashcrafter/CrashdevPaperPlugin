@@ -80,35 +80,34 @@ class Quest {
 }
 
 fun initQuests() {
-    dailyquests[1] = Quest(1, Reward(1000, 1250), "Ungewöhnlicher Sammler", 3, "Schließe 3 Ungewöhnliche Drops ab", true)
-    dailyquests[2] = Quest(2, Reward(625, 1250), "Monster Hunter", 100, "Töte 100 feindliche Mobs", true)
-    dailyquests[3] = Quest(3, Reward(750, 1500), "Killing Streak", 60, "Töte 60 Zombies", true)
-    dailyquests[4] = Quest(4, Reward(1000, 1000), "Supreme!", 1, "Absolviere einen Epic-Drop alleine", true)
-    dailyquests[5] = Quest(5, Reward(750, 1500), "Angler", 20, "Angle 20 mal Kabeljau(Cod)", true)
-    dailyquests[6] = Quest(6, Reward(1000, 1000), "Unboxing!", 3, "Öffne 3 Crates", true)
-    dailyquests[7] = Quest(7, Reward(1500, 2000), "Reisender", 10, "Absolviere 10 Drops", true)
-    dailyquests[8] = Quest(8, Reward(750, 1000), "Servervoter", 4, "Vote 4 mal für den Server(/vote)", true)
-    dailyquests[9] = Quest(9, Reward(1000, 1000), "Kopfjäger", 3, "Töte 3 andere Spieler", true)
-    dailyquests[10] = Quest(10, Reward(1000, 1000), "Epische Dropjäger", 2, "Absolviere 2 epische Drops", true)
-    dailyquests[11] = Quest(11, Reward(500, 750), "Namenangler", 1, "Angle einen Nametag", true)
-    dailyquests[12] = Quest(12, Reward(500, 1000), "Händler", 2500, "Verkaufe Items für 2.500 Credits an den Shop", true)
-    dailyquests[13] = Quest(13, Reward(500, 500), "Enchanter", 3, "Verzaubere 3 Items", true)
-    dailyquests[14] = Quest(14, Reward(250, 500), "Fleisch-Lieferant", 30, "Töte 30 Kühe", true)
-    dailyquests[15] = Quest(15, Reward(750, 1000), "Gewöhnlicher Sammler", 5, "Beende 5 gewöhnliche Drops", true)
-    dailyquests[16] = Quest(16, Reward(600, 1000), "Pillager-Jäger", 15, "Töte 15 Pillager", true)
-    dailyquests[17] = Quest(17, Reward(750, 1500), "Mana-Manufaktur", 1, "Stelle 1 Mana-Dust her", true)
+    dailyquests[1] = Quest(1, Reward(3000, 1250), "Ungewöhnlicher Sammler", 3, "Schließe 3 Ungewöhnliche Drops ab", true)
+    dailyquests[2] = Quest(2, Reward(1600, 1250), "Monster Hunter", 100, "Töte 100 feindliche Mobs", true)
+    dailyquests[3] = Quest(3, Reward(1750, 1500), "Killing Streak", 50, "Töte 50 Zombies", true)
+    dailyquests[4] = Quest(4, Reward(5000, 1000), "Supreme!", 1, "Absolviere einen Epic-Drop alleine", true)
+    dailyquests[5] = Quest(5, Reward(1750, 1500), "Angler", 10, "Angle 10 mal Kabeljau(Cod)", true)
+    dailyquests[6] = Quest(6, Reward(2500, 1000), "Unboxing!", 3, "Öffne 3 Crates", true)
+    dailyquests[7] = Quest(7, Reward(4500, 2000), "Reisender", 5, "Absolviere 5 Drops", true)
+    dailyquests[8] = Quest(8, Reward(2750, 1000), "Servervoter", 4, "Vote 4 mal für den Server(/vote)", true)
+    dailyquests[9] = Quest(9, Reward(3000, 1000), "Kopfjäger", 3, "Töte 3 andere Spieler", true)
+    dailyquests[10] = Quest(10, Reward(5000, 1000), "Epische Dropjäger", 2, "Absolviere 2 epische Drops", true)
+    dailyquests[11] = Quest(11, Reward(2500, 750), "Namenangler", 1, "Angle einen Nametag", true)
+    dailyquests[12] = Quest(12, Reward(1500, 1000), "Händler", 2500, "Verkaufe Items für 2.500 Credits an den Shop", true)
+    dailyquests[13] = Quest(13, Reward(1500, 500), "Enchanter", 3, "Verzaubere 3 Items", true)
+    dailyquests[14] = Quest(14, Reward(1250, 500), "Fleisch-Lieferant", 30, "Töte 30 Kühe", true)
+    dailyquests[15] = Quest(15, Reward(2250, 1000), "Gewöhnlicher Sammler", 5, "Beende 5 gewöhnliche Drops", true)
+    dailyquests[16] = Quest(16, Reward(1600, 1000), "Pillager-Jäger", 15, "Töte 15 Pillager", true)
     val is1 = ItemStack(Material.NAME_TAG)
     val im1 = is1.itemMeta
     im1.setCustomModelData(1)
     is1.itemMeta = im1
-    weeklyquests[1] = Quest(1, Reward(2500, 1000, is1), "Besiege das End!", 1, "Besiege den Enderdrache einmal", false)
+    weeklyquests[1] = Quest(1, Reward(7500, 2000, is1), "Besiege das End!", 1, "Besiege den Enderdrache einmal", false)
     weeklyquests[2] = Quest(2, Reward(2500, 1000), "Weg des Magiers", 1, "Crafte einen Zauberstab", false)
     weeklyquests[3] = Quest(3, Reward(5000, 5000, is1), "Weg zum Top-Voter", 20, "Vote 20-mal für den Server", false)
-    weeklyquests[4] = Quest(4, Reward(2500, 2000), "Verdorben", 1, "Töte den Wither einmal", false)
+    weeklyquests[4] = Quest(4, Reward(3500, 2000), "Verdorben", 1, "Töte den Wither einmal", false)
     weeklyquests[5] = Quest(5, Reward(5000, 4500, is1), "Drop-Sammler", 25, "Schließe 25 Drops ab", false)
-    weeklyquests[6] = Quest(6, Reward(2000, 1500), "Monsterjäger", 500, "Töte 500 Monster", false)
-    weeklyquests[7] = Quest(7, Reward(3000, 3000), "Held der Dörfer!", 5, "Gewinne 5 Raids", false)
-    weeklyquests[8] = Quest(8, Reward(2000, 2250), "Schlauer Händler", 12500, "Verdiene 12.500 Credits durch den Shop", false)
+    weeklyquests[6] = Quest(6, Reward(4000, 1500), "Monsterjäger", 500, "Töte 500 Monster", false)
+    weeklyquests[7] = Quest(7, Reward(5000, 3000), "Held der Dörfer!", 5, "Gewinne 5 Raids", false)
+    weeklyquests[8] = Quest(8, Reward(3000, 2750, is1), "Schlauer Händler", 25000, "Verdiene 25.000 Credits durch den Shop", false)
     val inventory = Bukkit.createInventory(null, 27, Component.text("Quests"))
     val itemStack = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
     val im = itemStack.itemMeta
@@ -168,7 +167,11 @@ fun getQuestLore(quest: Quest, canStart: Boolean): MutableList<String> {
     list.add("§a-" + quest.reward.xp + " XP")
     if (quest.reward.itemStack != null) {
         if (quest.reward.itemStack!!.itemMeta.hasCustomModelData()) {
-            list.add("§a-" + ciName(quest.reward.itemStack!!.type, quest.reward.itemStack!!.itemMeta.customModelData))
+            var name = ciName(quest.reward.itemStack!!.type, quest.reward.itemStack!!.itemMeta.customModelData)!!
+            while (name.startsWith("§")){
+                name = name.drop(2)
+            }
+            list.add("§a-$name")
         } else {
             list.add("§a-" + quest.reward.itemStack!!.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial())
         }
@@ -246,7 +249,7 @@ fun getWeeklyLore(player: Player): MutableList<String> {
         list.add("§2Belohnung:")
         list.add("§a-20000 Credits")
         list.add("§a-10000 XP")
-        list.add("§a-Common Key")
+        list.add("§a-Epic Key")
         list.add("")
         if (!rlgPlayer.hasWeekly) {
             list.add("§2Jetzt Belohnung abholen!")
@@ -259,7 +262,7 @@ fun getWeeklyLore(player: Player): MutableList<String> {
         list.add("§2Belohnung:")
         list.add("§a-15000 Credits")
         list.add("§a-10000 XP")
-        list.add("§a-Common Key")
+        list.add("§a-Epic Key")
     }
     return list
 }
@@ -402,9 +405,9 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
                 }
                 if(hascompleted) {
                     rlgPlayer.hasWeekly = true
-                    giveBalance(player, 15000, "Täglicher Bonus")
+                    giveBalance(player, 15000, "Wöchentlicher Bonus")
                     rlgPlayer.changeXP(10000)
-                    player.inventory.addItem(genKey(1))
+                    player.inventory.addItem(genKey(2))
                     player.sendMessage("§2Du hast deinen wöchentlichen Bonus erhalten!")
                     player.closeInventory()
                 }
@@ -421,8 +424,8 @@ fun dailyQuestCreation(player: Player) {
         rlgPlayer.hasDaily = false
     }
     qidUpdate(player, true)
-    rlgPlayer.changeXP(40)
-    giveBalance(player, 100, "Täglicher Login")
+    rlgPlayer.changeXP(100)
+    giveBalance(player, 500, "Täglicher Login")
 }
 
 fun qidUpdate(player: Player, onlyDaily: Boolean){

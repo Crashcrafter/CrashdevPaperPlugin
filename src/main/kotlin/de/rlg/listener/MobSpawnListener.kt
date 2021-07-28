@@ -1,6 +1,6 @@
 package de.rlg.listener
 
-import de.rlg.dropName
+import de.rlg.dropWardenName
 import de.rlg.permission.chunks
 import de.rlg.permission.isClaimed
 import org.bukkit.entity.EntityType
@@ -39,7 +39,7 @@ class MobSpawnListener : Listener {
             if(vex.location.chunk.isClaimed() && chunks[vex.location.chunk]!!.owner_uuid.length < 3){
                 vex.addPotionEffect(PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1, 0))
                 if (vex.entitySpawnReason == CreatureSpawnEvent.SpawnReason.DEFAULT) {
-                    vex.customName = dropName
+                    vex.customName = dropWardenName
                     vex.isCustomNameVisible = false
                 }
             }

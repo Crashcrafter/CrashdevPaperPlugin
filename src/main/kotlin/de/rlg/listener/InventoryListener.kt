@@ -53,7 +53,7 @@ class InventoryListener : Listener {
                     val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING)!!
                     val type: Int = keyChests[(e.inventory.holder as ShulkerBox).block]!!
                     if (getKeyType(token) == type) {
-                        createLottery(player, e.inventory, type)
+                        createNewLottery(player, e.inventory, type)
                         redeemKey(playerInventory, itemStack, token)
                     } else {
                         e.isCancelled = true

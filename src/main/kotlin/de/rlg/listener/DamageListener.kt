@@ -1,7 +1,7 @@
 package de.rlg.listener
 
-import de.rlg.dropName
 import de.rlg.permission.deventCancel
+import de.rlg.permission.eventCancel
 import de.rlg.player.rlgPlayer
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
@@ -12,20 +12,17 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.event.vehicle.VehicleDamageEvent
 
 class DamageListener : Listener {
 
     @EventHandler
     fun onEntityDamage(e: EntityDamageEvent) {
-        if (e.entity.type == EntityType.PLAYER) {
+        if (e.entityType == EntityType.PLAYER) {
             val player = e.entity as Player
-            if (e is EntityDamageByEntityEvent) {
-                if(e.damager is Player){
-                    player.rlgPlayer().lastDamage = System.currentTimeMillis() + (1000*10)
-                }
-                if (e.damager.isCustomNameVisible && e.damager.customName == dropName){
-                    return
-                }
+            val rlgPlayer = player.rlgPlayer()
+            if (e is EntityDamageByEntityEvent && e.damager is Player) {
+                rlgPlayer.lastDamage = System.currentTimeMillis() + (1000*10)
             }
             val chunk = player.location.chunk
             if (e.cause != EntityDamageEvent.DamageCause.VOID && deventCancel(chunk, player)) {
@@ -34,7 +31,6 @@ class DamageListener : Listener {
             }
             val cause = e.cause
             var itemStack = player.inventory.itemInMainHand
-            val rlgPlayer = player.rlgPlayer()
             if (rlgPlayer.mana >= 1) {
                 if (cause == EntityDamageEvent.DamageCause.POISON) {
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 1) {
@@ -88,9 +84,22 @@ class DamageListener : Listener {
                     }
                 }
             }
+            return
         } else if (e.entityType == EntityType.ENDER_DRAGON || e.entityType == EntityType.WITHER) {
             val damage = e.damage
             e.damage = damage / 2
+            return
+        }
+    }
+
+    @EventHandler
+    fun onVehicleDamageEvent(e: VehicleDamageEvent){
+        if(e.attacker is Player){
+            if(eventCancel(e.vehicle.chunk, e.attacker as Player)){
+                e.isCancelled = true
+            }
+        }else if(eventCancel(e.vehicle.chunk)){
+            e.isCancelled = true
         }
     }
 

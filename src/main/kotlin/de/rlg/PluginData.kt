@@ -12,14 +12,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 //CONST DATA
-lateinit var spawn: Location
-lateinit var event: Location
+val warps = hashMapOf<String, Location>()
 const val texturePackUrl = "https://drive.google.com/uc?export=download&id=11hodrHTq9L9E4F2pn7QF9s-Jr0-z1IBk"
 const val texturePackHash = "6AA010DD8D1B373B98550F69E03503AC5BD5DEDA"
-const val DropRange = 10000
+var dropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
 const val dcLink = "https://discord.gg/qQtaYsDN6w"
-const val dropName = "§4§lDrop Warden"
+var dropWardenName = "§4§lDrop Warden"
 
 //VARIABLE DATA
 val amount_Sleeping: ArrayList<Player> = ArrayList()
@@ -82,7 +81,7 @@ var basicmagicbook = arrayOf(
             "§nB | C | B§r B: Diamond\n" +
             "A | B | A C: End Crystal"),
     ("§l§nWelt§r\n\n" +
-            "Mana Shards und Elemente kannst du in der Welt in Drops finden. Momentan können Drops nur von X/Z -" + DropRange + " bis " + DropRange + " gefunden werden."),
+            "Mana Shards und Elemente kannst du in der Welt in Drops finden. Momentan können Drops nur von X/Z -" + dropRange + " bis " + dropRange + " gefunden werden."),
     ("§l§nZauberstäbe§r\n\n" +
             "§nElemente finden\n" +
             "§nFeuer§r\n" +

@@ -184,10 +184,20 @@ fun eventCancel(chunk: Chunk): Boolean = chunk.isClaimed()
 
 fun eventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
-    if(player.isOp && player.gameMode == GameMode.CREATIVE) return false
+    if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
     val chunkClass = chunks[chunk]!!
-    if(chunkClass.owner_uuid.length <= 3 && player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
+    if(chunkClass.owner_uuid.length <= 3) return true
+    if(chunkClass.owner_uuid == player.uniqueId.toString()) return false
+    if(chunkClass.shared.contains(player.uniqueId.toString())) return false
+    return true
+}
+
+fun heventCancel(chunk: Chunk, player: Player): Boolean {
+    if(!chunk.isClaimed()) return false
+    if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
+    val chunkClass = chunks[chunk]!!
     if(chunkClass.owner_uuid == "0") return true
+    if(chunkClass.owner_uuid.length <= 3) return false
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return false
     if(chunkClass.shared.contains(player.uniqueId.toString())) return false
     return true
@@ -197,9 +207,10 @@ fun deventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
     val chunkClass = chunks[chunk]!!
     if(chunkClass.owner_uuid == "0") return true
+    if(chunkClass.owner_uuid.length <= 3) return false
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
     if(chunkClass.shared.contains(player.uniqueId.toString())) return true
-    return false
+    return true
 }
 
 fun canBack(chunk: Chunk, player: Player): Boolean {

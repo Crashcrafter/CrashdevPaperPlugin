@@ -67,7 +67,7 @@ object CustomItems {
 
     fun waterStaff1(): ItemStack = defaultCustomItem(Material.WOODEN_HOE, "§r§l§1Wasser-Stab", arrayListOf(
         "", "§fLeft-Click in Luft §1(70)§f:", "§9Gibt dir ResitemStacktenz und erzeugt Wasser vor dir", "",
-        "§fRight-Click §1(15)§f:", "§9Platziert wo du hinschaust Wasser #WaterMLG", "",
+        "§fRight-Click §1(15)§f:", "§9Platziert wo du hinschaust Wasser", "",
         "§9Kann nicht ertrinken §1(1)", ""
     ), 5)
 
@@ -90,13 +90,13 @@ object CustomItems {
     }
 
     fun diaKatana(): ItemStack {
-        val itemStack = defaultCustomItem(Material.IRON_SWORD, "§b§l§oKatana", arrayListOf(), 1)
+        val itemStack = defaultCustomItem(Material.DIAMOND_SWORD, "§b§l§oKatana", arrayListOf(), 1)
         itemStack.addUnsafeEnchantment(Enchantment.SWEEPING_EDGE, 4)
         return itemStack
     }
 
     fun netherKatana(): ItemStack {
-        val itemStack = defaultCustomItem(Material.IRON_SWORD, "§8§l§oKatana", arrayListOf(), 1)
+        val itemStack = defaultCustomItem(Material.NETHERITE_SWORD, "§8§l§oKatana", arrayListOf(), 1)
         itemStack.addUnsafeEnchantment(Enchantment.SWEEPING_EDGE, 4)
         return itemStack
     }

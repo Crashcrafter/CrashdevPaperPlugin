@@ -1,6 +1,9 @@
 package de.rlg
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import de.rlg.items.CustomItems
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -20,77 +23,13 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.File
 import java.util.*
+import kotlin.collections.HashMap
 
 private const val allowedSymbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 val lotteryI: MutableList<Inventory> = ArrayList()
-
-fun createLottery(player: Player, inventory: Inventory, type: Int) {
-    allJobs.add(GlobalScope.launch {
-        lotteryI.add(inventory)
-        val resultSet = HashMap<Int, ItemStack>()
-        val planes = HashMap<Int, ItemStack>()
-        var items: List<Pair<ItemStack, ItemStack>> = listOf()
-        when (type) {
-            1 -> items = LOOTTABLES.Common.newloottable
-            2 -> items = LOOTTABLES.Epic.newloottable
-            3 -> items = LOOTTABLES.Supreme.newloottable
-            4 -> items = LOOTTABLES.Vote.newloottable
-            5 -> items = LOOTTABLES.Level.newloottable
-        }
-        val size = items.size
-        for (i in 9..59) {
-            val random = Random()
-            val chosen = random.nextInt(size)
-            resultSet[i] = items[chosen].first
-            planes[i] = items[chosen].second
-        }
-        var reward = resultSet[54]!!
-        if (reward.type == Material.NAME_TAG && reward.itemMeta.hasCustomModelData()) {
-            reward = genKey(reward.itemMeta.customModelData)
-        }
-        if (Bukkit.getOnlinePlayers().size < 12) {
-            for (h in 0 until resultSet.size - 9) {
-                for (i in 9..17) {
-                    inventory.setItem(i, resultSet[i + h])
-                    inventory.setItem(i - 9, planes[i + h])
-                    inventory.setItem(i + 9, planes[i + h])
-                }
-                delay(if(h<30)100 else 300)
-            }
-            delay(3000)
-        } else {
-            player.world.spawnEntity(player.location, EntityType.FIREWORK)
-        }
-        if (!reward.itemMeta.hasDisplayName()) {
-            player.sendMessage(
-                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " erhalten!"
-            )
-            println(
-                player.name + " hat " + reward.amount + " " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " erhalten!"
-            )
-        } else {
-            player.sendMessage(
-                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} ${(reward.itemMeta.displayName() as TextComponent).content()}§r§6 erhalten!"
-            )
-            println(player.name + " hat " + reward.amount + " " + (reward.itemMeta.displayName() as TextComponent).content() + "§r erhalten!")
-        }
-        player.inventory.addItem(reward)
-        inventory.clear()
-        lotteryI.remove(inventory)
-        questCount(player, 6, 1, true)
-        Bukkit.getScheduler().runTask(INSTANCE, Runnable {
-            val viewers = mutableListOf<HumanEntity>()
-            inventory.viewers.forEach {
-                viewers.add(it)
-            }
-            viewers.forEach {
-                it.closeInventory()
-            }
-        })
-    })
-}
 
 fun getPlane(possibility: Int): ItemStack {
     return when (possibility) {
@@ -113,16 +52,7 @@ fun genKey(type: Int): ItemStack {
     } while (tokenExists(token))
     lore.add(Component.text("Token: $token"))
     im.lore(lore)
-    im.displayName(Component.text(
-        when(type){
-            1 -> "§7§l§oCommon Key"
-            2 -> "§5§l§oEpic Key"
-            3 -> "§e§l§oSupreme Key"
-            4 -> "§4§l§oVote Key"
-            5 -> "§b§l§oLevel Key"
-            else -> ""
-        }
-    ))
+    im.displayName(Component.text(keysData[type]!!.displayName))
     im.setCustomModelData(type)
     im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING, token)
     itemStack.itemMeta = im
@@ -192,313 +122,111 @@ private fun getToken(): String {
     return token.toString()
 }
 
-class LOOTTABLES {
-    object Common {
-        var newloottable: MutableList<Pair<ItemStack, ItemStack>> = ArrayList()
-        fun setupCommon() {
-            newloottable.add(Pair(CustomItems.defaultCustomItem(Material.NAME_TAG, "§5§l§oEpic Key", arrayListOf(), 2), getPlane(1)))
-            val is0 = ItemStack(Material.DIAMOND_PICKAXE)
-            is0.addEnchantment(Enchantment.DIG_SPEED, 5)
-            is0.addEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 3)
-            is0.addEnchantment(Enchantment.DURABILITY, 3)
-            newloottable.add(Pair(is0, getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.GOLDEN_APPLE), getPlane(1)))
-            val is1 = ItemStack(Material.IRON_CHESTPLATE)
-            is1.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3)
-            newloottable.add(Pair(is1, getPlane(1)))
-            val is2 = ItemStack(Material.IRON_LEGGINGS)
-            is2.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3)
-            newloottable.add(Pair(is2, getPlane(1)))
-            val is3 = ItemStack(Material.IRON_BOOTS)
-            is3.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3)
-            newloottable.add(Pair(is3, getPlane(1)))
-            val is4 = ItemStack(Material.IRON_HELMET)
-            is4.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3)
-            newloottable.add(Pair(is4, getPlane(1)))
-            newloottable.add(Pair(CustomItems.ironKatana(), getPlane(1)))
-            Epic.newloottable.add(Pair(CustomItems.nano(), getPlane(1)))
-            for (i in 0..1) {
-                newloottable.add(Pair(ItemStack(Material.EXPERIENCE_BOTTLE, 15), getPlane(2)))
-                val is5 = ItemStack(Material.BOW)
-                is5.addEnchantment(Enchantment.ARROW_DAMAGE, 1)
-                newloottable.add(Pair(is5, getPlane(2)))
-                val is6 = ItemStack(Material.FISHING_ROD)
-                is6.addEnchantment(Enchantment.LURE, 2)
-                newloottable.add(Pair(is6, getPlane(2)))
-                val is7 = ItemStack(Material.STONE_AXE)
-                is7.addEnchantment(Enchantment.DIG_SPEED, 4)
-                newloottable.add(Pair(is7, getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.HEART_OF_THE_SEA), getPlane(2)))
-                newloottable.add(Pair(CustomItems.throwableSmallFireBall(), getPlane(2)))
-            }
-            for (i in 0..2) {
-                newloottable.add(Pair(ItemStack(Material.SLIME_BALL, 7), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.EMERALD, 5), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.DIAMOND, 5), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.PURPLE_SHULKER_BOX), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.ENCHANTING_TABLE), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.ENDER_PEARL, 5), getPlane(3)))
-            }
-            for (i in 0..3) {
-                newloottable.add(Pair(ItemStack(Material.CROSSBOW), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.LAPIS_LAZULI, 15), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.GLOWSTONE_DUST, 16), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.TURTLE_HELMET), getPlane(4)))
-            }
-            for (i in 0..4) {
-                newloottable.add(Pair(ItemStack(Material.REDSTONE, 32), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.OBSIDIAN, 10), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 32), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.WHITE_CONCRETE, 64), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.WHITE_TERRACOTTA, 64), getPlane(5)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(8), getPlane(5)))
-            }
-        }
-    }
+val keysData = hashMapOf<Int, Key>()
+val lootTables = hashMapOf<Int, List<LootTableItem>>()
 
-    object Epic {
-        var newloottable: MutableList<Pair<ItemStack, ItemStack>> = ArrayList()
-        fun setupEpic() {
-            newloottable.add(Pair(CustomItems.defaultCustomItem(Material.NAME_TAG, "§e§l§oSupreme Key", arrayListOf(), 3), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.SPAWNER), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.VILLAGER_SPAWN_EGG), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.END_PORTAL_FRAME), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.BEACON), getPlane(1)))
-            newloottable.add(Pair(CustomItems.diaKatana(), getPlane(1)))
-            newloottable.add(Pair(CustomItems.nano().asQuantity(8), getPlane(1)))
-            newloottable.add(Pair(CustomItems.additionalClaim(), getPlane(1)))
-            for (i in 0..1) {
-                newloottable.add(Pair(ItemStack(Material.CHICKEN_SPAWN_EGG), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.COW_SPAWN_EGG), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.PIG_SPAWN_EGG), getPlane(2)))
-                val is0 = ItemStack(Material.DIAMOND_PICKAXE)
-                is0.addEnchantment(Enchantment.DIG_SPEED, 5)
-                is0.addEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 3)
-                is0.addEnchantment(Enchantment.DURABILITY, 3)
-                newloottable.add(Pair(is0, getPlane(2)))
-                val itemStack = ItemStack(Material.ENCHANTED_BOOK)
-                val im = itemStack.itemMeta
-                im.addEnchant(Enchantment.MENDING, 1, true)
-                itemStack.itemMeta = im
-                newloottable.add(Pair(itemStack, getPlane(2)))
-                val is1 = ItemStack(Material.DIAMOND_SWORD)
-                is1.addEnchantment(Enchantment.DAMAGE_ALL, 4)
-                is1.addEnchantment(Enchantment.SWEEPING_EDGE, 3)
-                is1.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 3)
-                newloottable.add(Pair(is1, getPlane(2)))
-                val is2 = ItemStack(Material.DIAMOND_CHESTPLATE)
-                is2.addEnchantment(Enchantment.DURABILITY, 1)
-                is2.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 5)
-                newloottable.add(Pair(is2, getPlane(2)))
-                val is3 = ItemStack(Material.DIAMOND_LEGGINGS)
-                is3.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 5)
-                newloottable.add(Pair(is3, getPlane(2)))
-                val is4 = ItemStack(Material.DIAMOND_BOOTS)
-                is4.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2)
-                is4.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 5)
-                newloottable.add(Pair(is4, getPlane(2)))
-                val is5 = ItemStack(Material.DIAMOND_HELMET)
-                is5.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 5)
-                newloottable.add(Pair(is5, getPlane(2)))
-                newloottable.add(Pair(CustomItems.throwableSmallFireBall(), getPlane(2)))
-            }
-            for (i in 0..2) {
-                newloottable.add(Pair(ItemStack(Material.ENCHANTED_GOLDEN_APPLE), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.EXPERIENCE_BOTTLE, 32), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.ENCHANTED_GOLDEN_APPLE), getPlane(3)))
-                val itemStack = ItemStack(Material.IRON_PICKAXE)
-                itemStack.addEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 2)
-                itemStack.addEnchantment(Enchantment.DURABILITY, 2)
-                newloottable.add(Pair(itemStack, getPlane(3)))
-            }
-            for (i in 0..3) {
-                newloottable.add(Pair(ItemStack(Material.GOLDEN_APPLE), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.DIAMOND, 32), getPlane(4)))
-                val itemStack = ItemStack(Material.IRON_LEGGINGS)
-                itemStack.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                newloottable.add(Pair(itemStack, getPlane(4)))
-                val is1 = ItemStack(Material.IRON_CHESTPLATE)
-                is1.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                newloottable.add(Pair(is1, getPlane(4)))
-                val is2 = ItemStack(Material.IRON_BOOTS)
-                is2.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                newloottable.add(Pair(is2, getPlane(4)))
-                val is3 = ItemStack(Material.IRON_HELMET)
-                is3.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                newloottable.add(Pair(is3, getPlane(4)))
-                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(32), getPlane(4)))
-            }
-            for (i in 0..4) {
-                newloottable.add(Pair(ItemStack(Material.SEA_LANTERN, 64), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 64), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.GOLDEN_CARROT, 64), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.SLIME_BALL, 32), getPlane(5)))
-                newloottable.add(Pair(CustomItems.throwableSmallFireBall().asQuantity(3), getPlane(5)))
-                newloottable.add(Pair(CustomItems.nano().asQuantity(1), getPlane(5)))
-            }
-        }
-    }
+data class Key(val id: Int, val displayName: String, val lootTable: List<LootTableItem>)
+data class LootTableItem(val itemString: String, val probability: Int, val amount: Int = 1, val enchantments: HashMap<String, Int>? = null)
 
-    object Supreme {
-        var newloottable: MutableList<Pair<ItemStack, ItemStack>> = ArrayList()
-        fun setupSupreme() {
-            run {
-                val itemStack = ItemStack(Material.ELYTRA)
-                itemStack.addUnsafeEnchantment(Enchantment.DURABILITY, 4)
-                newloottable.add(Pair(itemStack, getPlane(1)))
-                val is1 = ItemStack(Material.TRIDENT)
-                is1.addEnchantment(Enchantment.LOYALTY, 3)
-                is1.addUnsafeEnchantment(Enchantment.DURABILITY, 4)
-                is1.addEnchantment(Enchantment.IMPALING, 5)
-                is1.addEnchantment(Enchantment.CHANNELING, 1)
-                newloottable.add(Pair(is1, getPlane(1)))
-                val is2 = ItemStack(Material.DIAMOND_PICKAXE)
-                is2.addEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 3)
-                is2.addEnchantment(Enchantment.DIG_SPEED, 5)
-                is2.addUnsafeEnchantment(Enchantment.DURABILITY, 4)
-                is2.addEnchantment(Enchantment.MENDING, 1)
-                newloottable.add(Pair(is2, getPlane(1)))
-                val is3 = ItemStack(Material.NETHERITE_BOOTS)
-                is3.addEnchantment(Enchantment.DURABILITY, 3)
-                is3.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                is3.addEnchantment(Enchantment.DEPTH_STRIDER, 3)
-                newloottable.add(Pair(is3, getPlane(1)))
-                val is4 = ItemStack(Material.NETHERITE_HELMET)
-                is4.addEnchantment(Enchantment.DURABILITY, 3)
-                is4.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                is4.addEnchantment(Enchantment.WATER_WORKER, 1)
-                newloottable.add(Pair(is4, getPlane(1)))
-                val is5 = ItemStack(Material.NETHERITE_LEGGINGS)
-                is5.addEnchantment(Enchantment.DURABILITY, 3)
-                is5.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                newloottable.add(Pair(is5, getPlane(1)))
-                val is6 = ItemStack(Material.NETHERITE_CHESTPLATE)
-                is6.addEnchantment(Enchantment.DURABILITY, 3)
-                is6.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4)
-                newloottable.add(Pair(is6, getPlane(1)))
-                newloottable.add(Pair(CustomItems.netherKatana(), getPlane(1)))
-                newloottable.add(Pair(CustomItems.litecoin(), getPlane(1)))
+fun loadLootTables(){
+    val file = File(INSTANCE.dataFolder.path + "/keys.json")
+    if(file.exists()){
+        val keys = jacksonObjectMapper().readValue<List<Key>>(file)
+        keys.forEach { key ->
+            keysData[key.id] = key
+            val lootTable = mutableListOf<LootTableItem>()
+            key.lootTable.forEach {
+                for(i in 0..it.probability){
+                    lootTable.add(it)
+                }
             }
-            for (i in 0..1) {
-                val itemStack = ItemStack(Material.DIAMOND_SWORD)
-                itemStack.addEnchantment(Enchantment.DAMAGE_ALL, 4)
-                itemStack.addEnchantment(Enchantment.SWEEPING_EDGE, 3)
-                itemStack.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 3)
-                newloottable.add(Pair(itemStack, getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 3), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.VILLAGER_SPAWN_EGG), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.SPAWNER), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.END_PORTAL_FRAME, 3), getPlane(2)))
-                newloottable.add(Pair(CustomItems.additionalClaim(), getPlane(2)))
-            }
-            for (i in 0..2) {
-                val is0 = ItemStack(Material.TRIDENT)
-                is0.addEnchantment(Enchantment.RIPTIDE, 3)
-                is0.addEnchantment(Enchantment.DURABILITY, 3)
-                newloottable.add(Pair(is0, getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.PIG_SPAWN_EGG), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.COW_SPAWN_EGG), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.CHICKEN_SPAWN_EGG), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.END_CRYSTAL, 2), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.BEACON, 3), getPlane(3)))
-                newloottable.add(Pair(ItemStack(Material.EXPERIENCE_BOTTLE, 64), getPlane(3)))
-            }
-            for (i in 0..3) {
-                newloottable.add(Pair(ItemStack(Material.NETHER_STAR), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 64), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.FIREWORK_ROCKET, 32), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.EMERALD, 32), getPlane(4)))
-                newloottable.add(Pair(CustomItems.nano().asQuantity(3), getPlane(4)))
-            }
-            for (i in 0..4) {
-                val is0 = ItemStack(Material.ENCHANTED_BOOK)
-                val im0 = is0.itemMeta
-                im0.addEnchant(Enchantment.MENDING, 1, true)
-                is0.itemMeta = im0
-                newloottable.add(Pair(is0, getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.DIAMOND, 20), getPlane(5)))
-                newloottable.add(Pair(CustomItems.throwableSmallFireBall().asQuantity(4), getPlane(5)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(5)))
-                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(64), getPlane(5)))
-            }
+            lootTables[key.id] = lootTable
         }
-    }
-
-    object Vote {
-        var newloottable: MutableList<Pair<ItemStack, ItemStack>> = ArrayList()
-        fun setupVote() {
-            newloottable.add(Pair(CustomItems.defaultCustomItem(Material.NAME_TAG, "§7§l§oCommon Key", arrayListOf(), 1), getPlane(1)))
-            newloottable.add(Pair(CustomItems.ironKatana(), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.DIAMOND, 4), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 15), getPlane(1)))
-            newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 30), getPlane(1)))
-            for (i in 0..1) {
-                newloottable.add(Pair(ItemStack(Material.GOLD_INGOT, 10), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 15), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.ENDER_PEARL, 3), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.EMERALD, 12), getPlane(2)))
-                newloottable.add(Pair(CustomItems.nano().asQuantity(2), getPlane(5)))
-            }
-            for (i in 0..2) {
-                newloottable.add(Pair(ItemStack(Material.DIAMOND_SWORD), getPlane(3)))
-                newloottable.add(Pair(CustomItems.throwableSmallFireBall(), getPlane(3)))
-                newloottable.add(Pair(CustomItems.throwableSmallFireBall().asQuantity(2), getPlane(3)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(12), getPlane(3)))
-            }
-            for (i in 0..3) {
-                newloottable.add(Pair(ItemStack(Material.GUNPOWDER, 9), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.FIREWORK_ROCKET, 7), getPlane(4)))
-                newloottable.add(Pair(ItemStack(Material.COAL, 15), getPlane(4)))
-                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(15), getPlane(4)))
-            }
-            for (i in 0..4) {
-                newloottable.add(Pair(ItemStack(Material.MAGMA_CREAM, 16), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.GOLD_INGOT, 5), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.IRON_ORE, 6), getPlane(5)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(6), getPlane(5)))
-                newloottable.add(Pair(CustomItems.nano().asQuantity(1), getPlane(5)))
-                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(5), getPlane(5)))
-            }
-        }
-    }
-
-    object Level {
-        var newloottable: MutableList<Pair<ItemStack, ItemStack>> = ArrayList()
-        fun setupLevel() {
-            newloottable.add(Pair(CustomItems.defaultCustomItem(Material.NAME_TAG, "§7§l§oCommon Key", arrayListOf(), 1), getPlane(1)))
-            newloottable.add(Pair(CustomItems.diaKatana(), getPlane(1)))
-            newloottable.add(Pair(CustomItems.manaShard().asQuantity(2), getPlane(1)))
-            newloottable.add(Pair(CustomItems.litecoin(), getPlane(1)))
-            newloottable.add(Pair(CustomItems.throwableMediumFireBall(), getPlane(1)))
-            for(i in 0..1) {
-                newloottable.add(Pair(CustomItems.throwableSmallFireBall().asQuantity(4), getPlane(2)))
-                newloottable.add(Pair(CustomItems.manaShard(), getPlane(2)))
-                newloottable.add(Pair(ItemStack(Material.END_CRYSTAL), getPlane(2)))
-                newloottable.add(Pair(CustomItems.additionalClaim(), getPlane(2)))
-            }
-            for(i in 0..2) {
-                newloottable.add(Pair(CustomItems.nano().asQuantity(3), getPlane(3)))
-                newloottable.add(Pair(CustomItems.ironKatana(), getPlane(3)))
-                newloottable.add(Pair(CustomItems.ironKatana(), getPlane(3)))
-            }
-            for(i in 0..3) {
-                newloottable.add(Pair(CustomItems.dogecoin().asQuantity(12), getPlane(4)))
-                newloottable.add(Pair(CustomItems.nano(), getPlane(4)))
-                newloottable.add(Pair(CustomItems.mudBall().asQuantity(16), getPlane(4)))
-            }
-            for (i in 0..4) {
-                newloottable.add(Pair(ItemStack(Material.DIAMOND, 4), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.IRON_INGOT, 16), getPlane(5)))
-                newloottable.add(Pair(ItemStack(Material.COPPER_INGOT, 16), getPlane(5)))
-            }
-        }
+    }else {
+        file.createNewFile()
+        jacksonObjectMapper().writeValue(file, listOf<Key>())
     }
 }
 
-fun initLootTables() {
-    LOOTTABLES.Common.setupCommon()
-    LOOTTABLES.Epic.setupEpic()
-    LOOTTABLES.Supreme.setupSupreme()
-    LOOTTABLES.Vote.setupVote()
-    LOOTTABLES.Level.setupLevel()
+@OptIn(DelicateCoroutinesApi::class)
+fun createNewLottery(player: Player, inventory: Inventory, type: Int) {
+    allJobs.add(GlobalScope.launch {
+        lotteryI.add(inventory)
+        val resultSet = HashMap<Int, ItemStack>()
+        val planes = HashMap<Int, ItemStack>()
+        val items = lootTables[type]!!
+        val size = items.size
+        for (i in 9..59) {
+            val random = Random()
+            val chosen = random.nextInt(size)
+            val item = items[chosen]
+            val itemStack = item.toItemstack()
+            resultSet[i] = itemStack
+            planes[i] = getPlane(item.probability)
+        }
+        var reward = resultSet[54]!!
+        if (reward.type == Material.NAME_TAG && reward.itemMeta.hasCustomModelData()) {
+            reward = genKey(reward.itemMeta.customModelData)
+        }
+        if (Bukkit.getOnlinePlayers().size < 20) {
+            for (h in 0 until resultSet.size - 9) {
+                for (i in 9..17) {
+                    inventory.setItem(i, resultSet[i + h])
+                    inventory.setItem(i - 9, planes[i + h])
+                    inventory.setItem(i + 9, planes[i + h])
+                }
+                delay(if(h<30)100 else 300)
+            }
+            delay(3000)
+        } else {
+            player.world.spawnEntity(player.location, EntityType.FIREWORK)
+        }
+        if (!reward.itemMeta.hasDisplayName()) {
+            player.sendMessage(
+                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " erhalten!"
+            )
+            println(
+                player.name + " hat " + reward.amount + " " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " erhalten!"
+            )
+        } else {
+            player.sendMessage(
+                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} ${(reward.itemMeta.displayName() as TextComponent).content()}§r§6 erhalten!"
+            )
+            println(player.name + " hat " + reward.amount + " " + (reward.itemMeta.displayName() as TextComponent).content() + "§r erhalten!")
+        }
+        player.inventory.addItem(reward)
+        inventory.clear()
+        lotteryI.remove(inventory)
+        questCount(player, 6, 1, true)
+        Bukkit.getScheduler().runTask(INSTANCE, Runnable {
+            val viewers = mutableListOf<HumanEntity>()
+            inventory.viewers.forEach {
+                viewers.add(it)
+            }
+            viewers.forEach {
+                it.closeInventory()
+            }
+        })
+    })
+}
+
+fun itemStringToItem(input: String): ItemStack{
+    return when{
+        input.startsWith("mc:") -> {
+            val item = input.removePrefix("mc:").uppercase()
+            ItemStack(Material.valueOf(item))
+        }
+        input.startsWith("ci:") -> {
+            val item = input.removePrefix("ci:")
+            customItemsMap[item]!!
+        }
+        input.startsWith("key:") -> {
+            val keyId = input.removePrefix("key:").toInt()
+            CustomItems.defaultCustomItem(Material.NAME_TAG, keysData[keyId]!!.displayName, mutableListOf(), keyId)
+        }
+        else -> {
+            println("Could not find $input, good job DasIschBims#1248")
+            CustomItems.defaultCustomItem(Material.DIRT, "Item not found: $input", mutableListOf())
+        }
+    }
 }

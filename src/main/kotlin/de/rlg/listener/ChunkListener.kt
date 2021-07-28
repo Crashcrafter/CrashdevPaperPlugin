@@ -13,16 +13,14 @@ class ChunkListener : Listener {
     fun onChunkLoad(e: PlayerChunkLoadEvent) {
         val player = e.player
         if (player.canGenDrops()) {
-            val random = Random()
-            player.rlgPlayer().dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+Random().nextInt(10))
-            val possibility = random.nextInt(2500)
+            val possibility = Random().nextInt(250)
             if (possibility == 100) {
-                val block = e.chunk.getBlock(0, 0, 0)
-                val range: Int = DropRange
-                if (block.x > -range && block.x < range && block.z > -range && block.z < range) {
-                    val type: Int = getDropType()
-                    setDrop(e.chunk, type)
-                    println("Set Drop for " + player.name + ", Type=" + type + ",Chunk:" + block.chunk.x + "/" + block.chunk.z)
+                val chunk = e.chunk
+                val block = chunk.getBlock(0, 0, 0)
+                if (block.x > -dropRange && block.x < dropRange && block.z > -dropRange && block.z < dropRange) {
+                    if(setDrop(chunk)){
+                        player.rlgPlayer().dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+Random().nextInt(10))
+                    }
                 }
             }
         }

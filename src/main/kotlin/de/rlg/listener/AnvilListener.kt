@@ -1,13 +1,17 @@
 package de.rlg.listener
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import de.rlg.INSTANCE
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.BookMeta
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
+import java.io.File
 
 class AnvilListener : Listener {
 
@@ -30,21 +34,24 @@ class AnvilListener : Listener {
 
 val maxEnchLevel = HashMap<Enchantment, Int>()
 
-fun initEnchLevel(){
-    maxEnchLevel[Enchantment.SWEEPING_EDGE] = 5
-    maxEnchLevel[Enchantment.DAMAGE_ALL] = 7
-    maxEnchLevel[Enchantment.DAMAGE_UNDEAD] = 7
-    maxEnchLevel[Enchantment.DAMAGE_ARTHROPODS] = 7
-    maxEnchLevel[Enchantment.PROTECTION_FALL] = 5
-    maxEnchLevel[Enchantment.PROTECTION_EXPLOSIONS] = 5
-    maxEnchLevel[Enchantment.PROTECTION_FIRE] = 5
-    maxEnchLevel[Enchantment.PROTECTION_PROJECTILE] = 5
-    maxEnchLevel[Enchantment.DIG_SPEED] = 6
-    maxEnchLevel[Enchantment.THORNS] = 6
-    maxEnchLevel[Enchantment.FIRE_ASPECT] = 3
-    maxEnchLevel[Enchantment.ARROW_DAMAGE] = 6
-    maxEnchLevel[Enchantment.ARROW_KNOCKBACK] = 3
-    maxEnchLevel[Enchantment.KNOCKBACK] = 3
+data class EnchantmentSaveObj(val key: String, val level: Int)
+fun loadMaxEnchantmentLevel(){
+    val file = File(INSTANCE.dataFolder.path + "/enchantments.json")
+    if(file.exists()){
+        val enchantments = jacksonObjectMapper().readValue<List<EnchantmentSaveObj>>(File(INSTANCE.dataFolder.path + "/enchantments.json"))
+        enchantments.forEach {
+            try {
+                maxEnchLevel[Enchantment.getByKey(NamespacedKey.fromString(it.key))!!] = it.level
+            }catch (ex: NullPointerException){}
+        }
+    }else {
+        file.createNewFile()
+        val default = mutableListOf<EnchantmentSaveObj>()
+        Enchantment.values().forEach {
+            default.add(EnchantmentSaveObj(it.key.asString(), it.maxLevel))
+        }
+        jacksonObjectMapper().writeValue(file, default.toList())
+    }
 }
 
 fun ItemStack.getEnchLevel(enchantment: Enchantment): Int {

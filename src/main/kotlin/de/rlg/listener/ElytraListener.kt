@@ -1,7 +1,7 @@
 package de.rlg.listener
 
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent
-import de.rlg.DropRange
+import de.rlg.dropRange
 import de.rlg.player.rlgPlayer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -17,7 +17,7 @@ class ElytraListener : Listener {
         if (rlgPlayer.elytraCoolDown <= System.currentTimeMillis() || player.isOp) {
             rlgPlayer.elytraCoolDown = System.currentTimeMillis() + 1000 * 45
             val location = player.location
-            val range: Int = DropRange
+            val range: Int = dropRange
             if (location.z < -range || location.z > range || location.x < -range || location.x > range) {
                 e.isCancelled = true
             }
@@ -33,7 +33,7 @@ class ElytraListener : Listener {
         if (rlgPlayer.elytraCoolDown <= System.currentTimeMillis() || player.isOp) {
             rlgPlayer.elytraCoolDown = System.currentTimeMillis() + 1000 * 45
             val location = player.location
-            val range: Int = DropRange
+            val range: Int = dropRange
             if (location.z < -range || location.z > range || location.x < -range || location.x > range) {
                 player.rlgPlayer().disabledMovement = true
             }

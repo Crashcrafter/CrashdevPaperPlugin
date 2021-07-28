@@ -37,8 +37,6 @@ class TempbanCommand : CommandExecutor, TabCompleter {
             }
             tempbanOnlineUser(target, "Du wurdest gebannt wegen $reason\nDauer: $time ${args[2]}", date)
             player.sendMessage("Der Spieler " + args[0] + " wurde für " + time + " " + args[2] + " gebannt")
-        } else {
-            player.sendMessage("§4You dont have the permission to do that!")
         }
         return true
     }

@@ -174,7 +174,7 @@ fun sellItem(player: Player) {
         return
     }
     val rlgPlayer = player.rlgPlayer()
-    val multiplier = rankData[rlgPlayer.rank]!!.shopMultiplier
+    val multiplier = rlgPlayer.rankData().shopMultiplier
     val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
     val isNotCrypto = (itemStack.type == Material.STICK && cmd !in 1..5) || itemStack.type != Material.STICK
     val value = if(isNotCrypto) (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong() else prices[itemStack.type]!![cmd]!! * itemStack.amount
@@ -190,11 +190,12 @@ fun sellItem(player: Player) {
 }
 
 fun tradingInventory(player: Player) {
+    val rlgPlayer = player.rlgPlayer()
     try {
         if (player.inventory.itemInMainHand.type == Material.AIR) {
             val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
             overview.contents = TradingInventories.overview!!.contents.copyOf()
-            if(player.rlgPlayer().xpLevel < 10){
+            if(rlgPlayer.xpLevel < 10){
                 overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 10 benötigt"), 1, Pair("rlgAction", "crypto")))
             }
             showTradingInventory(player, overview, "Shop")
@@ -202,7 +203,8 @@ fun tradingInventory(player: Player) {
         }
     } catch (e: NullPointerException) {return}
     val isGiven = player.inventory.itemInMainHand
-    val multiplier = rankData[player.rlgPlayer().rank]!!.shopMultiplier
+    if(isGiven.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)) return
+    val multiplier = rlgPlayer.rankData().shopMultiplier
     val cmd = if(!isGiven.itemMeta.hasCustomModelData()) 0 else isGiven.itemMeta.customModelData
     val price: Long = try {
         (prices[isGiven.type]!![cmd]!!.toLong() * isGiven.amount * (if((isGiven.type == Material.STICK && cmd !in 1..5) || isGiven.type != Material.STICK) multiplier else 1.0)).toLong()

@@ -2,7 +2,7 @@ package de.rlg.player
 
 import de.rlg.*
 import de.rlg.permission.givePerms
-import de.rlg.permission.rankData
+import de.rlg.permission.ranks
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.jetbrains.exposed.sql.insert
@@ -60,10 +60,11 @@ fun Player.load(){
                 it[uuid] = player.uniqueId.toString()
             }
             val rlgPlayer = RLGPlayer(
-                player, 0, rankData[0]!!.claims, HashMap(), rankData[0]!!.homes, 0,
+                player, 0, ranks[0]!!.claims, HashMap(), ranks[0]!!.homes, 0,
                 "1 2 3 1 2 3", "0 0 0 0 0 0 0 0", "0 0 0 0 0 0", 0, 0, 0, 0
             )
             PlayerData[player] = rlgPlayer
+            player.teleport(warps.values.first())
             player.givePerms()
         }
     }

@@ -8,6 +8,7 @@ import de.rlg.permission.eventCancel
 import de.rlg.permission.isClaimed
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.ShulkerBox
@@ -41,48 +42,36 @@ class InteractListener : Listener {
                 e.isCancelled = true
                 return
             }
-        } else {
-            if (e.hasBlock()) {
-                if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET) {
-                    val chunk = Objects.requireNonNull(block)!!.chunk
-                    if (chunk.isClaimed()) {
-                        val uuid: String = chunks[chunk]!!.owner_uuid
-                        if (uuid.length <= 3 && !uuid.contentEquals("0") && block!!.type == Material.CHEST) {
-                            waveManager(chunk)
-                            return
-                        }
-                    }
-                    if (eventCancel(chunk, player)) {
-                        e.isCancelled = true
-                        return
-                    }
-                } else {
-                    val chunk = Objects.requireNonNull(block)!!.chunk
-                    if (eventCancel(chunk, player)) {
-                        e.isCancelled = true
-                        return
-                    }
+        } else if (e.hasBlock()) {
+            val chunk = Objects.requireNonNull(block)!!.chunk
+            if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET && chunk.isClaimed()) {
+                val uuid: String = chunks[chunk]!!.owner_uuid
+                if (uuid.length <= 3 && !uuid.contentEquals("0") && block!!.type == Material.CHEST) {
+                    waveManager(chunk)
+                    if(player.gameMode == GameMode.SURVIVAL) e.isCancelled = true
+                    return
                 }
-                if (e.action == Action.RIGHT_CLICK_BLOCK && block!!.state is Sign) {
-                    val sign = block.state as Sign
-                    if (signs.containsKey(sign.block)) {
-                        signClickHandler(player, sign)
-                        return
-                    } else if (player.isSneaking) {
-                        if (!eventCancel(block.chunk, player)) {
-                            sign.isEditable = true
-                            player.openSign((block.state as Sign))
-                            return
-                        }
-                    }
+                else if (eventCancel(chunk, player)) {
+                    e.isCancelled = true
+                    return
                 }
-            }
-        }
-        try {
-            if (player.inventory.itemInMainHand.type == Material.FISHING_ROD && e.clickedBlock!!.type == Material.NOTE_BLOCK) {
+            } else if (eventCancel(chunk, player)) {
+                e.isCancelled = true
+                return
+            } else if (e.action == Action.RIGHT_CLICK_BLOCK && block!!.state is Sign) {
+                val sign = block.state as Sign
+                if (signs.containsKey(sign.block)) {
+                    signClickHandler(player, sign)
+                    return
+                } else if (player.isSneaking && !eventCancel(block.chunk, player)) {
+                    sign.isEditable = true
+                    player.openSign((block.state as Sign))
+                    return
+                }
+            }else if (player.inventory.itemInMainHand.type == Material.FISHING_ROD && e.clickedBlock!!.type == Material.NOTE_BLOCK) {
                 addAFKCounter(player)
             }
-        } catch (ignored: NullPointerException) { }
+        }
         val itemStack = player.inventory.itemInMainHand
         if (itemStack.hasItemMeta() && itemStack.itemMeta.hasCustomModelData()) {
             when(itemStack.type) {
@@ -116,7 +105,7 @@ class InteractListener : Listener {
                 }
                 Material.STICK -> {
                     val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgItemData"), PersistentDataType.STRING) ?: return
-                    if(data == "addClaim"){
+                    if(data == "addClaim" && !itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
                         e.isCancelled = true
                         changeAddedClaims(player, 1)
                         player.inventory.itemInMainHand.amount--

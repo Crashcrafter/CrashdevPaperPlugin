@@ -7,9 +7,6 @@ author: Crashcrafter_LP
 depend: [Votifier]
 
 commands:
-  spawn:
-    description: Teleport to spawn
-    usage: /spawn
   back:
     description: Back to Death point
     usage: /back
@@ -90,9 +87,6 @@ commands:
     description: Kann Welten erstellen/benutzen
     usage: </command>
     permission: rlg.multiv
-  event:
-    description: Zum Event tp
-    usage: /event
   drop:
     description: Drop-Befehle
     usage: </command>
@@ -142,6 +136,10 @@ commands:
     description: Guild Command
     usage: </command>
     aliases: [g]
+  warp:
+    description: Warp Command
+    usage: </command>
+    aliases: [w]
 
 permissions:
   rlg.reloaddb:
