@@ -24,8 +24,6 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                 }else {
                     chunk.claim(player)
                 }
-            } else {
-                player.sendMessage("§4Du kannst erst 1 Minute nach dem Joinen auf dem Server claimen!")
             }
         } else if (args[0].equals("info", ignoreCase = true)) {
             if(!chunk.isClaimed()){
@@ -34,7 +32,7 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                 )
                 return true
             }
-            val chunkClass = chunks[chunk]!!
+            val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
             player.sendMessage(
                 "§6Dieser Chunk gehört ${chunkClass.name}\nDu kannst noch ${getRemainingClaims(player.uniqueId.toString())} Chunks claimen"
             )
@@ -44,7 +42,7 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                     player.sendMessage("§aClaim wurde entfernt!")
                     chunk.unClaim()
                 } else if (!player.world.name.contentEquals("shops")) {
-                    if (chunks[chunk]!!.owner_uuid == player.uniqueId.toString()) {
+                    if (chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid == player.uniqueId.toString()) {
                         player.sendMessage("§aClaim wurde entfernt!")
                         chunk.unClaim()
                     }
@@ -164,22 +162,24 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                 } else if (args[1].contentEquals("remove")) {
                     val list: MutableList<String> = ArrayList()
                     val chunk = player.location.chunk
-                    for (chunkClass in chunkList) {
-                        if (chunkClass.x == chunk.x) {
-                            if (chunkClass.z == chunk.z) {
-                                for (uuid in chunkClass.shared) {
-                                    for (player1 in Bukkit.getOnlinePlayers()) {
-                                        if (player1.uniqueId.toString().contentEquals(uuid)) {
-                                            list.add(player1.name)
+                    for (chunkClassWorlds in chunks.values) {
+                        for(chunkClass in chunkClassWorlds.values){
+                            if (chunkClass.x == chunk.x) {
+                                if (chunkClass.z == chunk.z) {
+                                    for (uuid in chunkClass.shared) {
+                                        for (player1 in Bukkit.getOnlinePlayers()) {
+                                            if (player1.uniqueId.toString().contentEquals(uuid)) {
+                                                list.add(player1.name)
+                                            }
+                                        }
+                                        for (player1 in Bukkit.getOfflinePlayers()) {
+                                            if (player1.uniqueId.toString().contentEquals(uuid)) {
+                                                list.add(player1.name!!)
+                                            }
                                         }
                                     }
-                                    for (player1 in Bukkit.getOfflinePlayers()) {
-                                        if (player1.uniqueId.toString().contentEquals(uuid)) {
-                                            list.add(player1.name!!)
-                                        }
-                                    }
+                                    break
                                 }
-                                break
                             }
                         }
                     }

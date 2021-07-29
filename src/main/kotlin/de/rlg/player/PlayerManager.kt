@@ -64,7 +64,7 @@ fun Player.load(){
                 "1 2 3 1 2 3", "0 0 0 0 0 0 0 0", "0 0 0 0 0 0", 0, 0, 0, 0
             )
             PlayerData[player] = rlgPlayer
-            player.teleport(warps.values.first())
+            player.teleport(warps["spawn"]!!)
             player.givePerms()
         }
     }

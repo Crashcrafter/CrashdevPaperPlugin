@@ -18,6 +18,7 @@ import de.rlg.player.load
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.Material
 import org.bukkit.WorldCreator
 import org.bukkit.block.Chest
@@ -168,13 +169,15 @@ fun loadWorlds(){
 fun loadFromDb(){
     transaction {
         chunks.clear()
-        chunkList.clear()
         ChunkTable.selectAll().forEach {
-            val chunk = Bukkit.getWorld(it[ChunkTable.world])!!.getChunkAt(it[ChunkTable.x], it[ChunkTable.z])
+            val chunkKey = Chunk.getChunkKey(it[ChunkTable.x], it[ChunkTable.z])
             val chunkClass = ChunkClass(it[ChunkTable.x], it[ChunkTable.z], it[ChunkTable.world], it[ChunkTable.uuid], it[ChunkTable.name],
                 it[ChunkTable.shared].split(" ").toMutableList())
-            chunks[chunk] = chunkClass
-            chunkList.add(chunkClass)
+            if(chunks.containsKey(chunkKey)){
+                chunks[chunkKey]!![chunkClass.world] = chunkClass
+            }else {
+                chunks[chunkKey] = hashMapOf(chunkClass.world to chunkClass)
+            }
         }
         shops.clear()
         ShopTable.selectAll().forEach {

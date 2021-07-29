@@ -51,7 +51,7 @@ class InteractListener : Listener {
         } else if (e.hasBlock()) {
             val chunk = Objects.requireNonNull(block)!!.chunk
             if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET && chunk.isClaimed()) {
-                val uuid: String = chunks[chunk]!!.owner_uuid
+                val uuid: String = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
                 if (uuid.length <= 3 && !uuid.contentEquals("0") && block!!.type == Material.CHEST) {
                     waveManager(chunk)
                     if(player.gameMode == GameMode.SURVIVAL) e.isCancelled = true

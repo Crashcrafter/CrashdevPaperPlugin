@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Scoreboard
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.pow
 
 fun CommandSender.asPlayer() : Player = if (this is Player) this else throw Exception("Only a player can execute that command!")
@@ -261,4 +262,12 @@ fun World.getHighestSolidBlockYAt(x: Int, z: Int): Int {
         result--
     }while (result > 0)
     return -1
+}
+
+fun HashMap<Int,Int>.copy(): HashMap<Int,Int> {
+    val result = hashMapOf<Int, Int>()
+    this.forEach {
+        result[it.key] = it.value
+    }
+    return result
 }

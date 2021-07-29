@@ -9,6 +9,6 @@ class RespawnListener : Listener {
 
     @EventHandler
     fun onRespawn(respawnEvent: PlayerRespawnEvent){
-        respawnEvent.respawnLocation = warps.values.first()
+        respawnEvent.respawnLocation = warps["spawn"]!!
     }
 }

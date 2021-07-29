@@ -116,8 +116,8 @@ fun waveManager(chunk: Chunk) {
         return
     }
     if (!drop.started) {
-        if (chunks.containsKey(chunk)) {
-            val chunkClass: ChunkClass = chunks[chunk]!!
+        if (chunks.containsKey(chunk.chunkKey)) {
+            val chunkClass: ChunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
             if (chunkClass.owner_uuid.contentEquals("0")) {
                 drops.remove(chunk)
                 return
@@ -226,8 +226,8 @@ fun Drop.spawnWave() {
 }
 
 fun recoverDrop(chunk: Chunk) {
-    if (chunks.containsKey(chunk)) {
-        val chunkClass: ChunkClass = chunks[chunk]!!
+    if (chunks.containsKey(chunk.chunkKey)) {
+        val chunkClass: ChunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
         if (chunkClass.owner_uuid.contentEquals("0")) {
             drops.remove(chunk)
             return

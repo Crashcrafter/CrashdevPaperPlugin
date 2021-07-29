@@ -17,7 +17,7 @@ class SetHomeCommand : CommandExecutor {
             val rlgPlayer = player.rlgPlayer()
             if (!rlgPlayer.homes.containsKey(keyword)) {
                 if(chunk.isClaimed()){
-                    if(chunks[chunk]!!.owner_uuid == player.uniqueId.toString())rlgPlayer.setHome(keyword) else player.sendMessage("§4Du kannst nicht in fremden Chunks Homepoints setzen!")
+                    if(chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid == player.uniqueId.toString())rlgPlayer.setHome(keyword) else player.sendMessage("§4Du kannst nicht in fremden Chunks Homepoints setzen!")
                 }else rlgPlayer.setHome(keyword)
             } else {
                 player.sendMessage("§4Ein Home mit diesem Namen existiert schon")

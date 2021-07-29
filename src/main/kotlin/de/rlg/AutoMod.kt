@@ -133,6 +133,7 @@ val offenses = listOf(
 //endregion
 
 fun checkMessage(message: String, player: Player): Boolean {
+    if(player.isOp) return false
     for (domain in domainEndings) {
         if (message.contains(domain)) {
             addLinkSend(player)
@@ -142,7 +143,7 @@ fun checkMessage(message: String, player: Player): Boolean {
         }
     }
     for (offense in offenses) {
-        if (message.contains(offense)) {
+        if (message.contains(" $offense")) {
             addOffense(player)
             player.sendMessage("§4EY, nicht beleidigen!")
             println("§4" + player.name + " hat versucht zu beleidigen")

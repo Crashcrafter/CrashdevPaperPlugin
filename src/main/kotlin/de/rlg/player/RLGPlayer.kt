@@ -25,8 +25,7 @@ class RLGPlayer() {
     var homes: HashMap<String, Block> = HashMap()
     var remainingHomes by Delegates.notNull<Int>()
     var balance by Delegates.notNull<Long>()
-    private var leftWeeklyKeys by Delegates.notNull<String>()
-    private var hasWeeklyKeys by Delegates.notNull<Boolean>()
+    private val weeklyKeys = HashMap<Int, Int>()
     var xpLevel by Delegates.notNull<Int>()
     var xp by Delegates.notNull<Long>()
     var vxpLevel by Delegates.notNull<Int>()
@@ -58,8 +57,8 @@ class RLGPlayer() {
         this.homes = homes
         this.remainingHomes = remainingHomes
         this.balance = balance
-        var weeklyStatusString = "0 0 0"
-        if(rank != 0){
+        var weeklyStatusString = ""
+        if(rankData().weeklyKeys.isNotEmpty()){
             transaction {
                 val statusQuery = ProcessedTable.select(where = { ProcessedTable.uuid eq player.uniqueId.toString()})
                 when {
@@ -86,8 +85,14 @@ class RLGPlayer() {
                 }
             }
         }
-        this.leftWeeklyKeys = weeklyStatusString
-        this.hasWeeklyKeys = weeklyStatusString == "0 0 0"
+        val weeklyKeysArgs = weeklyStatusString.split(" ")
+        keysData.keys.forEach {
+            weeklyKeys[it] = try {
+                weeklyKeysArgs[it-1].toInt()
+            }catch (ex: Exception){
+                0
+            }
+        }
         this.xpLevel = xpLevel
         this.xp = xp
         this.vxpLevel = vxpLevel
@@ -187,61 +192,41 @@ class RLGPlayer() {
     }
 
     fun weeklyKeys() {
-        if(rank == 0) {
+        if(rankData().weeklyKeys.isEmpty()) {
             player.sendMessage("§cDu kannst keine wöchentlichen Keys claimen!")
             return
         }
-        if(leftWeeklyKeys == "0 0 0") {
+        if(weeklyKeys.isEmpty()) {
             player.sendMessage("§cDu hast schon alle wöchentlichen Keys bekommen!")
             return
         }
         val playerInv: Inventory = player.inventory
-        val keys = leftWeeklyKeys.split(" ").toTypedArray()
-        println(player.name + " is getting his Keys: " + leftWeeklyKeys)
-        var common = keys[0].toInt()
-        val commonv = common
-        for (i in 0 until commonv) {
-            if (isSpace(playerInv, 1)) {
-                playerInv.addItem(genKey(1))
-                common--
-            } else {
-                changeLeftKeys(common, keys[1].toInt(), keys[2].toInt())
-                return
+        val weeklyKeysCopy = weeklyKeys.copy()
+        weeklyKeysCopy.forEach {
+            println("${it.key} to ${it.value}")
+            for(i in 0 until it.value){
+                if(isSpace(playerInv, 1)){
+                    playerInv.addItem(genKey(it.key))
+                    weeklyKeys[it.key] = weeklyKeys[it.key]!!-1
+                    if(weeklyKeys[it.key]!! == 0){
+                        weeklyKeys.remove(it.key)
+                        break
+                    }
+                }else return@forEach
             }
         }
-        var epic = keys[1].toInt()
-        val epicv = epic
-        for (i in 0 until epicv) {
-            if (isSpace(playerInv, 1)) {
-                playerInv.addItem(genKey(2))
-                epic--
-            } else {
-                changeLeftKeys(common, epic, keys[2].toInt())
-                return
-            }
-        }
-        var supreme = keys[2].toInt()
-        val supremev = supreme
-        for (i in 0 until supremev) {
-            if (isSpace(playerInv, 1)) {
-                playerInv.addItem(genKey(3))
-                supreme--
-            } else {
-                changeLeftKeys(common, epic, supreme)
-                return
-            }
-        }
-        println(player.name + " hat alle Keys bekommen")
-        changeLeftKeys(common, epic, supreme)
+        if(weeklyKeys.isEmpty()) println(player.name + " hat alle Keys bekommen")
+        changeLeftKeys()
     }
 
-    private fun changeLeftKeys(common: Int, epic: Int, supreme: Int) {
-        leftWeeklyKeys = "$common $epic $supreme"
-        player.sendMessage(if(leftWeeklyKeys != "0 0 0") "§6Du hast einen Teil deiner wöchentlichen Keys erhalten!\nUm die Restlichen zu erhalten, musst du Platz im Inventar haben und neu joinen!"
-        else "§aDu hast alle wöchentlichen Keys erhalten!")
+    private fun changeLeftKeys() {
+        val leftWeeklyKeys = StringBuilder()
+        keysData.forEach {
+            leftWeeklyKeys.append(weeklyKeys[it.key] ?: 0).append(" ")
+        }
         transaction {
             ProcessedTable.update(where = {ProcessedTable.uuid eq player.uniqueId.toString()}){
-                it[leftKeys] = leftWeeklyKeys
+                it[leftKeys] = leftWeeklyKeys.toString().removeSuffix(" ")
                 it[lastTime] = LocalDate.now()
             }
         }

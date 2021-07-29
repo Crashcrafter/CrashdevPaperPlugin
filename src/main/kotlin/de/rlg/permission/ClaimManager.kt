@@ -11,11 +11,11 @@ import org.bukkit.entity.Player
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
+import kotlin.collections.HashMap
 
 data class ChunkClass(val x: Int, val z: Int, val world: String, val owner_uuid: String,val name: String, val shared: MutableList<String>)
 
-val chunkList: ArrayList<ChunkClass> = ArrayList()
-val chunks: HashMap<Chunk, ChunkClass> = HashMap()
+val chunks: HashMap<Long, HashMap<String, ChunkClass>> = HashMap()
 
 fun removeAllClaims(player: Player) {
     transaction {
@@ -25,7 +25,7 @@ fun removeAllClaims(player: Player) {
     }
 }
 
-fun Chunk.isClaimed(): Boolean = chunks.containsKey(this)
+fun Chunk.isClaimed(): Boolean = chunks.containsKey(this.chunkKey) && chunks[this.chunkKey]!!.containsKey(this.world.name)
 
 fun Chunk.claim(uuid: String, name: String, player: Player?): Boolean {
     val chunk = this
@@ -41,10 +41,13 @@ fun Chunk.claim(uuid: String, name: String, player: Player?): Boolean {
             }
         }
         val chunkClass = ChunkClass(chunk.x, chunk.z, chunk.world.name, uuid, name, ArrayList())
-        chunks[chunk] = chunkClass
-        chunkList.add(chunkClass)
+        if(chunks.containsKey(chunk.chunkKey)){
+            chunks[chunk.chunkKey]!![chunkClass.world] = chunkClass
+        }else {
+            chunks[chunk.chunkKey] = hashMapOf(chunkClass.world to chunkClass)
+        }
         player?.sendMessage("§2Der Chunk wurde geclaimt!")
-    }else player?.sendMessage("§4Der Chunk gehört ${chunks[chunk]!!.name}!")
+    }else player?.sendMessage("§4Der Chunk gehört ${chunks[chunk.chunkKey]!![chunk.world.name]!!.name}!")
     return false
 }
 
@@ -54,7 +57,7 @@ fun Chunk.unClaim() {
         ChunkTable.deleteWhere {
             ChunkTable.x eq chunk.x and(ChunkTable.z eq chunk.z and(ChunkTable.world eq chunk.world.name))
         }
-        val ownerUuid = chunks[chunk]!!.owner_uuid
+        val ownerUuid = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
         if(ownerUuid.length > 2){
             PlayersTable.update(where = {PlayersTable.uuid eq ownerUuid}){
                 it[remainingClaims] = getRemainingClaims(ownerUuid) + 1
@@ -64,8 +67,10 @@ fun Chunk.unClaim() {
                 owner.rlgPlayer().remainingClaims++
             }
         }
-        chunkList.remove(chunks[chunk])
-        chunks.remove(chunk)
+        chunks[chunkKey]!!.remove(world.name)
+        if(chunks[chunkKey]!!.size == 0){
+            chunks.remove(chunkKey)
+        }
     }
 }
 
@@ -111,7 +116,7 @@ fun Chunk.grantChunkAccess(uuid: String, executor: Player?) {
         executor?.sendMessage("§4Der Chunk is nicht geclaimt!")
         return
     }
-    val chunkClass = chunks[chunk]!!
+    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
     if(executor != null && (chunkClass.owner_uuid != executor.uniqueId.toString() || executor.isOp)){
         executor.sendMessage("§4Dir gehört der Chunk nicht!")
         return
@@ -138,7 +143,7 @@ fun Chunk.revokeChunkAccess(uuid: String, executor: Player?){
         executor?.sendMessage("§4Der Chunk is nicht geclaimt!")
         return
     }
-    val chunkClass = chunks[chunk]!!
+    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
     if(executor != null && (chunkClass.owner_uuid != executor.uniqueId.toString() || executor.isOp)){
         executor.sendMessage("§4Dir gehört der Chunk nicht!")
         return
@@ -153,7 +158,7 @@ fun Chunk.revokeChunkAccess(uuid: String, executor: Player?){
         sharedArray.remove(uuid)
         chunkClass.shared.remove(uuid)
         updateChunkShared(chunk, sharedArray)
-        executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk gewärt!")
+        executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk entfernt!")
     }
 }
 
@@ -185,7 +190,7 @@ fun eventCancel(chunk: Chunk): Boolean = chunk.isClaimed()
 fun eventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
     if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
-    val chunkClass = chunks[chunk]!!
+    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
     if(chunkClass.owner_uuid.length <= 3) return true
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return false
     if(chunkClass.shared.contains(player.uniqueId.toString())) return false
@@ -195,7 +200,7 @@ fun eventCancel(chunk: Chunk, player: Player): Boolean {
 fun heventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
     if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
-    val chunkClass = chunks[chunk]!!
+    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
     if(chunkClass.owner_uuid == "0") return true
     if(chunkClass.owner_uuid.length <= 3) return false
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return false
@@ -205,7 +210,7 @@ fun heventCancel(chunk: Chunk, player: Player): Boolean {
 
 fun deventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
-    val chunkClass = chunks[chunk]!!
+    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
     if(chunkClass.owner_uuid == "0") return true
     if(chunkClass.owner_uuid.length <= 3) return false
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
@@ -215,7 +220,7 @@ fun deventCancel(chunk: Chunk, player: Player): Boolean {
 
 fun canBack(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return true
-    val chunkClass = chunks[chunk]!!
+    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
     val guild = player.rlgPlayer().guild()
     if(guild != null && guild.member_uuids.contains(chunkClass.owner_uuid)) return true
