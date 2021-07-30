@@ -83,7 +83,7 @@ fun initQuests() {
     dailyquests[1] = Quest(1, Reward(3000, 1250), "Ungewöhnlicher Sammler", 3, "Schließe 3 Ungewöhnliche Drops ab", true)
     dailyquests[2] = Quest(2, Reward(1600, 1250), "Monster Hunter", 100, "Töte 100 feindliche Mobs", true)
     dailyquests[3] = Quest(3, Reward(1750, 1500), "Killing Streak", 50, "Töte 50 Zombies", true)
-    dailyquests[4] = Quest(4, Reward(5000, 1000), "Supreme!", 1, "Absolviere einen Epic-Drop alleine", true)
+    dailyquests[4] = Quest(4, Reward(5000, 1000), "Epic!", 1, "Absolviere einen Epic-Drop alleine", true)
     dailyquests[5] = Quest(5, Reward(1750, 1500), "Angler", 10, "Angle 10 mal Kabeljau(Cod)", true)
     dailyquests[6] = Quest(6, Reward(2500, 1000), "Unboxing!", 3, "Öffne 3 Crates", true)
     dailyquests[7] = Quest(7, Reward(4500, 2000), "Reisender", 5, "Absolviere 5 Drops", true)

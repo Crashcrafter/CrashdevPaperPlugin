@@ -5,6 +5,7 @@ import de.rlg.permission.canBack
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
@@ -41,7 +42,13 @@ class DeathListener : Listener {
                     player.name
                 ).append(" wusste nicht, dass Feuer brennen kann")
                 DamageCause.DRAGON_BREATH -> deathMessage.append(player.name).append(" wurde vom Drachen bespuckt")
-                DamageCause.VOID -> deathMessage.append(player.name).append(" wurde vom Void verschlungen")
+                DamageCause.VOID -> {
+                    if(player.world.environment == World.Environment.THE_END){
+                        deathMessage.append(player.name).append(" hat die Enderperle zu kurz geworfen")
+                    }else {
+                        deathMessage.append(player.name).append(" wurde vom Void verschlungen")
+                    }
+                }
                 DamageCause.WITHER -> deathMessage.append(player.name).append(" hat den schwarzen Tod erlitten")
                 DamageCause.SUFFOCATION -> deathMessage.append(player.name).append(" ist erstickt")
                 DamageCause.LAVA -> deathMessage.append(player.name)
@@ -159,8 +166,8 @@ class DeathListener : Listener {
         } else if(e.entity.killer != null) {
             val player = e.entity.killer!!
             when(type) {
-                EntityType.ZOMBIE, EntityType.SKELETON, EntityType.CREEPER, EntityType.SPIDER, EntityType.CAVE_SPIDER -> {
-                    if (type == EntityType.ZOMBIE) {
+                EntityType.ZOMBIE, EntityType.SKELETON, EntityType.CREEPER, EntityType.SPIDER, EntityType.CAVE_SPIDER, EntityType.HUSK, EntityType.ENDERMAN, EntityType.ZOMBIE_VILLAGER -> {
+                    if (type == EntityType.ZOMBIE || type == EntityType.HUSK || type == EntityType.ZOMBIE_VILLAGER) {
                         questCount(player, 3, 1, true)
                     }
                     questCount(player, 2, 1, true)
