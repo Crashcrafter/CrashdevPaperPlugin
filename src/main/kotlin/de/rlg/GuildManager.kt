@@ -49,8 +49,8 @@ fun guildSetup(player: Player, msg: String){
         player.sendMessage("§4Du bist schon in einer Guild!")
         return
     }
-    if(rlgPlayer.balance < 25000){
-        player.sendMessage("§4Du benötigst 25.000 Credits, um eine Guild zu gründen!\nDu musst das Setup von vorne anfangen!")
+    if(rlgPlayer.balance < 50000){
+        player.sendMessage("§4Du benötigst 50.000 Credits, um eine Guild zu gründen!\nDu musst das Setup von vorne anfangen!")
         guildSetupProgress.remove(player)
         return
     }

@@ -27,7 +27,7 @@ fun removeAllClaims(player: Player) {
 
 fun Chunk.isClaimed(): Boolean = chunks.containsKey(this.chunkKey) && chunks[this.chunkKey]!!.containsKey(this.world.name)
 
-fun Chunk.claim(uuid: String, name: String, player: Player?): Boolean {
+fun Chunk.claim(uuid: String, name: String, player: Player? = null): Boolean {
     val chunk = this
     if(!chunk.isClaimed()){
         transaction {
@@ -39,7 +39,13 @@ fun Chunk.claim(uuid: String, name: String, player: Player?): Boolean {
                 it[x] = chunk.x
                 it[z] = chunk.z
             }
+            if(player != null){
+                PlayersTable.update(where = {PlayersTable.uuid eq uuid}){
+                    it[remainingClaims] = getRemainingClaims(uuid)
+                }
+            }
         }
+        if(player != null) player.rlgPlayer().remainingClaims--
         val chunkClass = ChunkClass(chunk.x, chunk.z, chunk.world.name, uuid, name, ArrayList())
         if(chunks.containsKey(chunk.chunkKey)){
             chunks[chunk.chunkKey]!![chunkClass.world] = chunkClass
@@ -57,20 +63,22 @@ fun Chunk.unClaim() {
         ChunkTable.deleteWhere {
             ChunkTable.x eq chunk.x and(ChunkTable.z eq chunk.z and(ChunkTable.world eq chunk.world.name))
         }
-        val ownerUuid = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
-        if(ownerUuid.length > 2){
-            PlayersTable.update(where = {PlayersTable.uuid eq ownerUuid}){
-                it[remainingClaims] = getRemainingClaims(ownerUuid) + 1
+        try {
+            val ownerUuid = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
+            if(ownerUuid.length > 3){
+                PlayersTable.update(where = {PlayersTable.uuid eq ownerUuid}){
+                    it[remainingClaims] = getRemainingClaims(ownerUuid) + 1
+                }
+                val owner = Bukkit.getPlayer(UUID.fromString(ownerUuid))
+                if(owner != null) {
+                    owner.rlgPlayer().remainingClaims++
+                }
             }
-            val owner = Bukkit.getPlayer(UUID.fromString(ownerUuid))
-            if(owner != null) {
-                owner.rlgPlayer().remainingClaims++
+            chunks[chunkKey]!!.remove(world.name)
+            if(chunks[chunkKey]!!.size == 0){
+                chunks.remove(chunkKey)
             }
-        }
-        chunks[chunkKey]!!.remove(world.name)
-        if(chunks[chunkKey]!!.size == 0){
-            chunks.remove(chunkKey)
-        }
+        }catch (ex: NullPointerException){}
     }
 }
 

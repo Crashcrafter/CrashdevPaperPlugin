@@ -1,8 +1,10 @@
 package de.rlg.listener
 
+import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent
 import de.rlg.INSTANCE
-import de.rlg.items.CraftingRecipes
+import de.rlg.getItem
 import de.rlg.questCount
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -10,6 +12,9 @@ import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.inventory.CraftingInventory
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.persistence.PersistentDataType
 
 class CraftingListener : Listener {
@@ -24,55 +29,54 @@ class CraftingListener : Listener {
                 return
             }
         }
-        if (e.recipe.result.hasItemMeta()) {
-            if (e.recipe.result.itemMeta.hasCustomModelData()) {
-                val inHand = e.whoClicked.inventory.itemInMainHand
-                val modeldata = e.recipe.result.itemMeta.customModelData
-                val material = e.recipe.result.type
-                val craftinginv = e.inventory.matrix
-                if (inHand.type == Material.WRITTEN_BOOK && inHand.itemMeta.hasCustomModelData()) {
-                    var deny = false
-                    when (material) {
-                        Material.GOLD_NUGGET -> if (modeldata == 2) {
-                            if (!CraftingRecipes.isManaDustRecipe(craftinginv)) {
-                                deny = true
-                            }
-                        } else if (modeldata == 3) {
-                            if (!CraftingRecipes.isManaCrystalRecipe(craftinginv)) {
-                                deny = true
-                            }
-                        }
-                        Material.WOODEN_HOE -> {
-                            if (!CraftingRecipes.isStaff1Recipe(craftinginv)) {
-                                deny = true
-                            }
-                            questCount(e.whoClicked as Player, 2, 1, false)
-                        }
-                        else -> {
-                        }
-                    }
-                    if (deny) {
-                        e.result = Event.Result.DENY
-                        e.isCancelled = true
-                        e.whoClicked.sendMessage("§4Das ist nicht das richtige Rezept!")
-                        e.whoClicked.closeInventory()
-                        return
-                    } else {
-                        if (material == Material.GOLD_INGOT && modeldata == 2) {
-                            questCount(e.whoClicked as Player, 17, 1, true)
-                        }
-                    }
-                } else {
-                    e.whoClicked.sendMessage("§4Du brauchst das Basiswissen-Magie-Buch in der Hand, um Mana zu craften!")
-                    e.result = Event.Result.DENY
-                    e.isCancelled = true
-                }
+        if (e.recipe.result.hasItemMeta() && e.recipe.result.itemMeta.hasCustomModelData()) {
+            val modeldata = e.recipe.result.itemMeta.customModelData
+            val material = e.recipe.result.type
+            if (material == Material.WOODEN_HOE && modeldata in 1..5) {
+                questCount(e.whoClicked as Player, 2, 1, false)
             }
         }
         if(e.inventory.result != null){
             val item = e.inventory.result!!
             val im = item.itemMeta
             im.persistentDataContainer.set(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING, (e.whoClicked as Player).name)
+        }
+    }
+
+    @EventHandler
+    fun onRecipe(e: PlayerRecipeBookClickEvent){
+        val craftingInv = e.player.openInventory.topInventory as CraftingInventory
+        val recipe = Bukkit.getRecipe(e.recipe)!!
+        if(!recipe.result.hasItemMeta() || !recipe.result.itemMeta.hasCustomModelData()){
+            return
+        }
+        if(recipe is ShapedRecipe){
+            val ingredients = recipe.ingredientMap
+            val result = mutableListOf<ItemStack?>()
+            recipe.shape.forEach { shape ->
+                shape.forEach {
+                    result.add(ingredients[it])
+                }
+            }
+            val player = e.player
+            var hasAnyItem = false
+            craftingInv.contents.forEach {
+                player.inventory.addItem(it)
+            }
+            craftingInv.clear()
+            result.indices.forEach { index ->
+                val item = result[index]
+                if(item != null){
+                    val playerItem = player.inventory.getItem(item)
+                    if(playerItem != null){
+                        playerItem.amount--
+                        craftingInv.setItem(index+1, item)
+                        hasAnyItem = true
+                    }
+                }
+            }
+            e.isCancelled = hasAnyItem
+            return
         }
     }
 }

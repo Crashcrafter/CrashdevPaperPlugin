@@ -16,6 +16,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Scoreboard
 import java.util.*
@@ -131,18 +132,7 @@ fun removeItems(inventory: Inventory, type: Material, itemAmount: Int, cmd: Int)
     }
 }
 
-fun isSpace(inventory: Inventory, amount: Int): Boolean {
-    var count = 0
-    for (itemStack in inventory.contents) {
-        if (itemStack == null) {
-            count++
-        }
-        if (count == amount) {
-            return true
-        }
-    }
-    return false
-}
+fun isSpace(inventory: Inventory): Boolean = inventory.firstEmpty() != -1
 
 fun getEXPForLevel(level: Int): Long = (15 + 7 * level).toDouble().pow(2.0).toLong()
 
@@ -150,7 +140,7 @@ fun getKeysPerRank(rank: Int): String {
     val rankData = ranks[rank]!!
     val result = StringBuilder()
     for (i in 0..keysData.size){
-        result.append(rankData.weeklyKeys[i+1]).append(" ")
+        result.append(rankData.weeklyKeys[i+1] ?: 0).append(" ")
     }
     return result.toString().removeSuffix(" ")
 }
@@ -214,17 +204,6 @@ fun getCryptoPrice(input: String): Long {
     }
 }
 
-fun getCryptoItem(input: String): ItemStack {
-    return when(input) {
-        "bitcoin" -> CustomItems.bitcoin()
-        "ethereum" -> CustomItems.ethereum()
-        "litecoin" -> CustomItems.litecoin()
-        "nano" -> CustomItems.nano()
-        "dogecoin" -> CustomItems.dogecoin()
-        else -> throw NullPointerException()
-    }
-}
-
 fun Long.withPoints(): String {
     val asString = this.toString()
     val builder = StringBuilder()
@@ -246,7 +225,11 @@ fun LootTableItem.toItemstack(): ItemStack {
     itemStack.amount = this.amount
     this.enchantments?.forEach {
         val enchantment = Enchantment.getByKey(NamespacedKey.fromString(it.key)!!)!!
-        itemStack.addUnsafeEnchantment(enchantment, it.value)
+        if(itemStack.type == Material.ENCHANTED_BOOK){
+            (itemStack.itemMeta as EnchantmentStorageMeta).addStoredEnchant(enchantment, it.value, true)
+        }else {
+            itemStack.addUnsafeEnchantment(enchantment, it.value)
+        }
     }
     return itemStack
 }
@@ -270,4 +253,14 @@ fun HashMap<Int,Int>.copy(): HashMap<Int,Int> {
         result[it.key] = it.value
     }
     return result
+}
+
+fun Inventory.getItem(itemStack: ItemStack): ItemStack? {
+    this.contents.forEach {
+        if(it != null && it.type == itemStack.type && if (itemStack.hasItemMeta() && itemStack.itemMeta.hasCustomModelData())
+                try {it.itemMeta.customModelData == itemStack.itemMeta.customModelData}catch (ex:Exception){false} else true){
+            return it
+        }
+    }
+    return null
 }

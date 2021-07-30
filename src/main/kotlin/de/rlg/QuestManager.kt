@@ -307,15 +307,15 @@ fun showAvailableQuests(player: Player) {
             cloned.setItem(11 + i, quest.getQuestRole())
         }
     }
-    cloned.setItem(20, CustomItems.defaultCustomItem(Material.PAPER, "§eTäglicher Bonus", getDailyLore(player), 1, Pair("rlgAction", "daily")))
-    cloned.setItem(24, CustomItems.defaultCustomItem(Material.PAPER, "§eWöchentlicher Bonus", getWeeklyLore(player), 1, Pair("rlgAction", "weekly")))
+    cloned.setItem(20, CustomItems.defaultCustomItem(Material.PAPER, "§eTäglicher Bonus", getDailyLore(player), 1, hashMapOf("rlgAction" to "daily")))
+    cloned.setItem(24, CustomItems.defaultCustomItem(Material.PAPER, "§eWöchentlicher Bonus", getWeeklyLore(player), 1, hashMapOf("rlgAction" to "weekly")))
     player.closeInventory()
     questinventories.add(cloned)
     player.openInventory(cloned)
 }
 
 fun Quest.getQuestRole() : ItemStack = CustomItems.defaultCustomItem(Material.PAPER, "§e" + this.name, getQuestLore(this, true),
-    1, Pair("rlgAction", "${this.status} ${this.qid} ${this.isDaily}"))
+    1, hashMapOf("rlgAction" to "${this.status} ${this.qid} ${this.isDaily}"))
 
 fun showQuests(player: Player) {
     val rlgPlayer = player.rlgPlayer()

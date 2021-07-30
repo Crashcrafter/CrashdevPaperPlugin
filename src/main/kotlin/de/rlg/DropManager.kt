@@ -59,7 +59,7 @@ fun setDrop(chunk: Chunk, givenType: Int? = null): Boolean {
                 try { inventory.setItem(slot + i * 2, itemStack) } catch (ignored: Exception) { }
             }
             drops[chunk] = Drop(dropType, block.location)
-            chunk.claim((type+1).toString(), "Server-Team", null)
+            chunk.claim((type+1).toString(), "Server-Team")
             println("Set ${dropType.name} Drop, Type=" + type + ",Chunk:" + block.chunk.x + "/" + block.chunk.z)
             return true
         }
@@ -226,30 +226,23 @@ fun Drop.spawnWave() {
 }
 
 fun recoverDrop(chunk: Chunk) {
-    if (chunks.containsKey(chunk.chunkKey)) {
+    if (chunks.containsKey(chunk.chunkKey) && chunks[chunk.chunkKey]!!.containsKey(chunk.world.name)) {
         val chunkClass: ChunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
         if (chunkClass.owner_uuid.contentEquals("0")) {
             drops.remove(chunk)
             return
         }
+        val x = chunk.x * 16 + 8
+        val z = chunk.z * 16 + 8
+        val y = chunk.world.getHighestBlockYAt(x, z) - 2
+        val block = chunk.world.getBlockAt(x, y, z)
+        val type = chunkClass.owner_uuid.toInt()-1
+        val dropType = dropTypeMap[type]!!
+        println("Recover Drop " + type + " at " + chunk.x + "/" + chunk.z)
+        val block1 = block.world.getBlockAt(x, y + 3, z)
+        drops[chunk] = Drop(dropType, block1.location)
+        waveManager(chunk)
     }
-    val x = chunk.x * 16 + 8
-    val z = chunk.z * 16 + 8
-    val y = chunk.world.getHighestBlockYAt(x, z) - 2
-    val block = chunk.world.getBlockAt(x, y, z)
-    val type = when (block.type) {
-        Material.GRAY_STAINED_GLASS -> 0
-        Material.LIGHT_BLUE_STAINED_GLASS -> 1
-        Material.BLUE_STAINED_GLASS -> 2
-        Material.PURPLE_STAINED_GLASS -> 3
-        Material.YELLOW_STAINED_GLASS -> 4
-        else -> -1
-    }
-    val dropType = dropTypeMap[type]!!
-    println("Recover Drop " + type + " at " + chunk.x + "/" + chunk.z)
-    val block1 = block.world.getBlockAt(x, y + 3, z)
-    drops[chunk] = Drop(dropType, block1.location)
-    waveManager(chunk)
 }
 
 data class Drop(val data: DropObj, val location: Location, var wave: Int = 0, var started: Boolean = false,

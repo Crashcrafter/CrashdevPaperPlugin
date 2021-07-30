@@ -86,7 +86,6 @@ class InteractListener : Listener {
                 Material.WRITTEN_BOOK -> {
                     val bm = itemStack.itemMeta as BookMeta
                     bm.pages(when(bm.customModelData){
-                        1 -> basicmagicbook.toMutableList().toComponentList()
                         2 -> beginnerbook.toMutableList().toComponentList()
                         else -> bm.pages()
                     })
@@ -123,7 +122,7 @@ class InteractListener : Listener {
                     return
                 }
             }
-            if(customRangeMap.containsKey(type) && customRangeMap[type]!!.containsKey(cmd)){
+            if(customRangeMap.containsKey(type) && customRangeMap[type]!!.containsKey(cmd) && e.action == Action.LEFT_CLICK_AIR){
                 val range = customRangeMap[type]!![cmd]!!
                 val target = player.getTargetEntity(range, false)
                 if(target != null && target is LivingEntity){

@@ -184,7 +184,7 @@ class RLGPlayer() {
     private fun levelUp(){
         xpLevel++
         if(xpLevel > vxpLevel){
-            if(isSpace(player.inventory, 1)){
+            if(isSpace(player.inventory)){
                 player.inventory.addItem(genKey(5))
                 vxpLevel++
             }
@@ -203,9 +203,8 @@ class RLGPlayer() {
         val playerInv: Inventory = player.inventory
         val weeklyKeysCopy = weeklyKeys.copy()
         weeklyKeysCopy.forEach {
-            println("${it.key} to ${it.value}")
             for(i in 0 until it.value){
-                if(isSpace(playerInv, 1)){
+                if(isSpace(playerInv)){
                     playerInv.addItem(genKey(it.key))
                     weeklyKeys[it.key] = weeklyKeys[it.key]!!-1
                     if(weeklyKeys[it.key]!! == 0){
@@ -215,7 +214,7 @@ class RLGPlayer() {
                 }else return@forEach
             }
         }
-        if(weeklyKeys.isEmpty()) println(player.name + " hat alle Keys bekommen")
+        if(weeklyKeys.size == 0) println(player.name + " hat alle Keys bekommen")
         changeLeftKeys()
     }
 

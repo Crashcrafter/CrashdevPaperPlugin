@@ -11,8 +11,9 @@ class BackCommand : CommandExecutor {
         val player = sender.asPlayer()
         val rlgPlayer = player.rlgPlayer()
         if (rlgPlayer.deathPos != null) {
-            delayedTeleport(player, rlgPlayer.deathPos!!)
-            rlgPlayer.deathPos = null
+            delayedTeleport(player, rlgPlayer.deathPos!!){
+                rlgPlayer.deathPos = null
+            }
         } else {
             player.sendMessage("§4Du bist nicht gestorben oder hast /back schon benutzt!")
         }

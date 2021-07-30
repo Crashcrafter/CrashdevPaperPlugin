@@ -5,10 +5,12 @@ import de.rlg.*
 import de.rlg.player.load
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.inventory.*
 import kotlin.collections.ArrayList
 
 class JoinListener : Listener{
@@ -18,6 +20,21 @@ class JoinListener : Listener{
         val player = joinEvent.player
         val hostString = player.address.hostString
         var count = 0
+        Bukkit.recipeIterator().iterator().forEach {
+            val namespacedKey = when(it){
+                is ShapedRecipe -> it.key
+                is FurnaceRecipe -> it.key
+                is BlastingRecipe -> it.key
+                is CampfireRecipe -> it.key
+                is ShapelessRecipe -> it.key
+                is SmokingRecipe -> it.key
+                is StonecuttingRecipe -> it.key
+                else -> null
+            }
+            if(namespacedKey != null && !player.hasDiscoveredRecipe(namespacedKey)){
+                player.discoverRecipe(namespacedKey)
+            }
+        }
         Bukkit.getOnlinePlayers().forEach {
             if(it.address.hostString == hostString) {
                 count++

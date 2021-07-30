@@ -1,13 +1,10 @@
 package de.rlg.listener
 
 import de.rlg.*
-import de.rlg.items.CustomItems
 import de.rlg.permission.canBack
-import de.rlg.permission.isClaimed
 import de.rlg.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
@@ -17,7 +14,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import java.util.*
 
@@ -122,7 +118,7 @@ class DeathListener : Listener {
         if(deathMessage.toString() != "§4"){
             deathEvent.deathMessage(Component.text(deathMessage.toString()))
         }else {
-            deathEvent.deathMessage(Component.text("§4").append(deathEvent.deathMessage()!!))
+            deathEvent.deathMessage(Component.text("§4${deathEvent.deathMessage}"))
         }
         player.inventory.armorContents.forEach {
             try {
@@ -172,7 +168,7 @@ class DeathListener : Listener {
                 }
                 EntityType.ENDER_DRAGON -> {
                     questCount(player, 1, 1, false)
-                    e.drops.add(CustomItems.dragonScale().asQuantity(Random().nextInt(3)-1))
+                    e.drops.add(customItemsMap["dragon_scale"]!!.asQuantity(Random().nextInt(3)-1))
                 }
                 EntityType.COW -> questCount(player, 14, 1, true)
                 EntityType.WITHER -> questCount(player, 4, 1, false)

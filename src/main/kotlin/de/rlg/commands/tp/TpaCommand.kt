@@ -40,7 +40,7 @@ You have 5 minutes to respond."""
                 override fun run() {
                     targetMap.remove(senderP.uniqueId)
                 }
-            }.runTaskLaterAsynchronously(INSTANCE, 6000L)
+            }.runTaskLaterAsynchronously(INSTANCE, 1200L)
         } else {
             sender.sendMessage(ChatColor.RED.toString() + "Invalid synax!")
         }

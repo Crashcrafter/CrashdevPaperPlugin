@@ -24,8 +24,7 @@ class VoteListener : Listener {
             INSTANCE.config.set("Votes." + player.uniqueId.toString() + "." + player.name, votes + 1)
             INSTANCE.saveConfig()
             player.sendMessage("§2Vielen Dank für das Voten!\nDu hast einen Vote Key erhalten!")
-            Bukkit.getScheduler().runTask(INSTANCE,
-                Runnable { player.world.spawnEntity(player.location, EntityType.FIREWORK) })
+            Bukkit.getScheduler().runTask(INSTANCE, Runnable { player.world.spawnEntity(player.location, EntityType.FIREWORK) })
             questCount(player, 8, 1, true)
             questCount(player, 3, 1, false)
         } catch (ex: NullPointerException) {

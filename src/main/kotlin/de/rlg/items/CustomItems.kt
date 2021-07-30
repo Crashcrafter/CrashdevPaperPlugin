@@ -1,7 +1,6 @@
 package de.rlg.items
 
 import de.rlg.INSTANCE
-import de.rlg.basicmagicbook
 import de.rlg.beginnerbook
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
@@ -12,7 +11,7 @@ import org.bukkit.inventory.meta.BookMeta
 import org.bukkit.persistence.PersistentDataType
 
 object CustomItems {
-    fun defaultCustomItem(m: Material, displayName: String, lore: MutableList<String>, cmd: Int=0, data: Pair<String, String>?=null): ItemStack{
+    fun defaultCustomItem(m: Material, displayName: String, lore: MutableList<String>, cmd: Int=0, data: HashMap<String, String>?=null): ItemStack{
         val itemStack = ItemStack(m)
         val itemMeta = itemStack.itemMeta
         itemMeta.displayName(Component.text(displayName))
@@ -22,7 +21,9 @@ object CustomItems {
         }
         itemMeta.lore(componentArray)
         itemMeta.setCustomModelData(cmd)
-        if(data != null) itemMeta.persistentDataContainer.set(NamespacedKey(INSTANCE, data.first), PersistentDataType.STRING, data.second)
+        data?.forEach {
+            itemMeta.persistentDataContainer.set(NamespacedKey(INSTANCE, it.key), PersistentDataType.STRING, it.value)
+        }
         itemStack.itemMeta = itemMeta
         return itemStack
     }
@@ -112,23 +113,23 @@ object CustomItems {
     fun nano(): ItemStack = defaultCustomItem(Material.STICK, "§bNano", arrayListOf(), 5)
 
     fun throwableSmallFireBall(): ItemStack = defaultCustomItem(Material.FIRE_CHARGE, "§6Small Fireball", arrayListOf("§7Rechtsclick zum Schießen"), 0,
-    Pair("rlgItemData", "throwSmallFireball"))
+    hashMapOf("rlgItemData" to "throwSmallFireball"))
 
     fun throwableMediumFireBall(): ItemStack = defaultCustomItem(Material.FIRE_CHARGE, "§cMedium Fireball", arrayListOf("§7Rechtsclick zum Schießen"), 0,
-    Pair("rlgItemData", "throwMediumFireball"))
+    hashMapOf("rlgItemData" to "throwMediumFireball"))
 
     fun throwableBigFireBall(): ItemStack = defaultCustomItem(Material.FIRE_CHARGE, "§4Big Fireball", arrayListOf("§7Rechtsclick zum Schießen"), 0,
-    Pair("rlgItemData", "throwBigFireball"))
+    hashMapOf("rlgItemData" to "throwBigFireball"))
 
     fun mudBall(): ItemStack = defaultCustomItem(Material.SNOWBALL, "§6Mudball", arrayListOf("§7Rechtsclick zum Werfen", "", "§7Verlangsamt Gegner"), 1,
-    Pair("rlgItemData", "mudBall"))
+    hashMapOf("rlgItemData" to "mudBall"))
 
     fun additionalClaim(): ItemStack = defaultCustomItem(Material.STICK, "§2+1 Claim", arrayListOf("§7Rechtsclick, um einen zusätzlichen Claim zu erhalten!"), 6,
-    Pair("rlgItemData", "addClaim"))
+    hashMapOf("rlgItemData" to "addClaim"))
 
     fun dragonScale(): ItemStack = defaultCustomItem(Material.STICK, "§5Drachenschuppe", arrayListOf(), 7)
 
-    private fun bookCustomItem(title: String, author: String, pages: Array<String>, cmd: Int=0): ItemStack {
+    fun bookCustomItem(title: String, author: String, pages: Array<String>, cmd: Int=0): ItemStack {
         val itemStack = ItemStack(Material.WRITTEN_BOOK)
         val bm = itemStack.itemMeta as BookMeta
         bm.displayName(Component.text(title))
@@ -143,8 +144,6 @@ object CustomItems {
         itemStack.itemMeta = bm
         return itemStack
     }
-
-    fun magicBook(): ItemStack = bookCustomItem("Basiswissen Magie", "Magieorden", basicmagicbook, 1)
 
     fun beginnerBook(): ItemStack = bookCustomItem("Beginner-Guide", "Server Team", beginnerbook, 2)
 }

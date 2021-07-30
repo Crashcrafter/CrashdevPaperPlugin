@@ -3,7 +3,6 @@ package de.rlg.listener
 import de.rlg.*
 import de.rlg.commands.admin.removeKeyChest
 import de.rlg.commands.admin.removePortal
-import de.rlg.items.CustomItems
 import de.rlg.permission.eventCancel
 import de.rlg.permission.heventCancel
 import org.bukkit.Material
@@ -100,7 +99,7 @@ class ClaimListener : Listener {
                 val data = player.inventory.itemInMainHand.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgItemData"), PersistentDataType.STRING)
                 if(data == "mudBall") {
                     e.entity.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING, "mudBall")
-                    (e.entity as Snowball).item = CustomItems.mudBall()
+                    (e.entity as Snowball).item = customItemsMap["mud_ball"]!!
                 }
             }
             if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET) {

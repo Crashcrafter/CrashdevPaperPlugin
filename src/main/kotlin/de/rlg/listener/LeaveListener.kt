@@ -17,7 +17,8 @@ class LeaveListener : Listener {
         val player: Player = leaveEvent.player
         try {
             if(player.rlgPlayer().lastDamage!! <= System.currentTimeMillis()){
-                player.damage(100.0)
+                println("Combat Logging by ${player.name}")
+            //player.damage(100.0)
             }
         }catch (ex: Exception) {}
         amount_Sleeping.remove(player)

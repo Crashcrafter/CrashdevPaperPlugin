@@ -83,6 +83,7 @@ fun setWarp(key: String, location: Location){
 fun deleteWarp(key: String){
     warps.remove(key)
     INSTANCE.config.set("warps.$key", null)
+    INSTANCE.saveConfig()
 }
 
 fun loadWarps(){
@@ -93,10 +94,11 @@ fun loadWarps(){
 }
 
 @OptIn(DelicateCoroutinesApi::class)
-fun delayedTeleport(player: Player, location: Location){
+fun delayedTeleport(player: Player, location: Location, after: (()->Unit)? = null){
     if(player.isOp){
         player.teleport(location)
         player.sendMessage("§2Du wurdest teleportiert!")
+        after?.invoke()
         return
     }
     val rlgPlayer = player.rlgPlayer()
@@ -122,6 +124,7 @@ fun delayedTeleport(player: Player, location: Location){
                 Bukkit.getScheduler().runTask(INSTANCE, Runnable {
                     player.teleport(location)
                     player.sendMessage("§2Du wurdest teleportiert!")
+                    after?.invoke()
                 })
                 break
             }

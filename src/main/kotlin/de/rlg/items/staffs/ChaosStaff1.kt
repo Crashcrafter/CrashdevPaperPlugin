@@ -1,8 +1,9 @@
 package de.rlg.items.staffs
 
 import de.rlg.allJobs
-import de.rlg.permission.isClaimed
+import de.rlg.permission.eventCancel
 import de.rlg.player.rlgPlayer
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ object ChaosStaff1 {
     private var spell1Cooldown = HashMap<Player, Long>()
     private var spell2Cooldown = HashMap<Player, Long>()
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun handleClick(e: PlayerInteractEvent) {
         val player = e.player
         val rlgPlayer = player.rlgPlayer()
@@ -26,10 +28,7 @@ object ChaosStaff1 {
         when (action) {
             Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> try {
                 if (mana >= 30) {
-                    if (spell1Cooldown.containsKey(player) && spell1Cooldown[player]!! <= System.currentTimeMillis() || !spell1Cooldown.containsKey(
-                            player
-                        )
-                    ) {
+                    if (spell1Cooldown.containsKey(player) && spell1Cooldown[player]!! <= System.currentTimeMillis() || !spell1Cooldown.containsKey(player)) {
                         spell1Cooldown.remove(player)
                         rlgPlayer.changeMana(30)
                         player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 405, 3))
@@ -44,14 +43,11 @@ object ChaosStaff1 {
             }
             Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> try {
                 if (mana >= 75) {
-                    if (spell2Cooldown.containsKey(player) && spell2Cooldown[player]!! <= System.currentTimeMillis() || !spell2Cooldown.containsKey(
-                            player
-                        )
-                    ) {
+                    if (spell2Cooldown.containsKey(player) && spell2Cooldown[player]!! <= System.currentTimeMillis() || !spell2Cooldown.containsKey(player)) {
                         spell2Cooldown.remove(player)
                         val block = Objects.requireNonNull(player.rayTraceBlocks(25.0))!!
                             .hitBlock!!
-                        if (!block.chunk.isClaimed()) {
+                        if (!eventCancel(block.chunk, player)) {
                             val world = block.world
                             val location = block.location
                             val entities = world.getNearbyLivingEntities(location, 5.0)

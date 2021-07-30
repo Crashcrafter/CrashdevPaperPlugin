@@ -75,7 +75,7 @@ fun ItemStack.applyEnchantment(enchantment: Enchantment, is1: ItemStack, is2: It
     val ench2 = is2.getEnchLevel(enchantment)
     val resultLevel = when {
         ench1 == ench2 -> {
-            if(ench1 < maxEnchLevel[enchantment]?:enchantment.maxLevel) {
+            if(ench1 < (maxEnchLevel[enchantment] ?: enchantment.maxLevel)) {
                 ench1+1
             }else {
                 ench1
