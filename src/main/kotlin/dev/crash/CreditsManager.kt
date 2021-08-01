@@ -109,11 +109,13 @@ fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
         return false
     }
     playerRlgPlayer.balance -= amount
-    player.sendMessage(amount.withPoints() + " Credits wurden an " + target.name + " gesendet")
+    val onePercent = amount/100
+    val newAmount = amount - onePercent
+    player.sendMessage("${newAmount.withPoints()} Credits wurden an " + target.name + " gesendet")
     player.changeCredits(playerRlgPlayer.balance)
     val targetRlgPlayer = target.rlgPlayer()
-    targetRlgPlayer.balance += amount
-    target.sendMessage("Du hast " + amount.withPoints() + " Credits von " + player.name + " erhalten")
+    targetRlgPlayer.balance += newAmount
+    target.sendMessage("Du hast " + newAmount.withPoints() + " Credits von " + player.name + " erhalten")
     target.changeCredits(targetRlgPlayer.balance)
     player.updateScoreboard()
     target.updateScoreboard()

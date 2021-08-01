@@ -3,6 +3,7 @@ package dev.crash.commands.home
 import dev.crash.asPlayer
 import dev.crash.permission.chunks
 import dev.crash.permission.isClaimed
+import dev.crash.permission.rankData
 import dev.crash.player.rlgPlayer
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -15,12 +16,16 @@ class SetHomeCommand : CommandExecutor {
         if (args.isNotEmpty()) {
             val keyword: String = args[0]
             val rlgPlayer = player.rlgPlayer()
-            if (!rlgPlayer.homes.containsKey(keyword)) {
-                if(chunk.isClaimed()){
-                    if(chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid == player.uniqueId.toString())rlgPlayer.setHome(keyword) else player.sendMessage("§4Du kannst nicht in fremden Chunks Homepoints setzen!")
-                }else rlgPlayer.setHome(keyword)
-            } else {
-                player.sendMessage("§4Ein Home mit diesem Namen existiert schon")
+            if(rlgPlayer.remainingHomes > 0){
+                if (!rlgPlayer.homes.containsKey(keyword)) {
+                    if(chunk.isClaimed()){
+                        if(chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid == player.uniqueId.toString())rlgPlayer.setHome(keyword) else player.sendMessage("§4Du kannst nicht in fremden Chunks Homepoints setzen!")
+                    }else rlgPlayer.setHome(keyword)
+                } else {
+                    player.sendMessage("§4Ein Home mit diesem Namen existiert schon")
+                }
+            }else {
+                player.sendMessage("§4Du kannst keine Homes mehr setzen")
             }
         } else {
             player.sendMessage("§4Bitte gib einen Namen ein")

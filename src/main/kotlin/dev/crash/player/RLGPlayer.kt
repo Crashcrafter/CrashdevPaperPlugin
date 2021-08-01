@@ -237,6 +237,7 @@ class RLGPlayer() {
             }
         }
         homes[keyWord] = playerPos
+        remainingHomes--
         player.sendMessage("§2Dein Homepoint $keyWord wurde gesetzt!")
     }
 
@@ -246,6 +247,7 @@ class RLGPlayer() {
                 HomepointTable.uuid eq player.uniqueId.toString() and(HomepointTable.keyword eq keyWord)
             }
         }
+        remainingHomes++
         player.sendMessage("§2Dein Homepoint $keyWord wurde entfernt!")
     }
 
