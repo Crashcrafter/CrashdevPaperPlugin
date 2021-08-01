@@ -31,9 +31,9 @@ internal fun initServer(){
     initQuests()
     initGuilds()
     loadRanks()
+    loadLootTables()
     loadFromDb()
     CustomItems.loadItems()
-    loadLootTables()
     initTradingInventories()
     loadWorlds()
     loadDropTables()
@@ -141,8 +141,15 @@ internal fun loadFromDb(){
             keyChests[getBlockByPositionString(it[KeyChestTable.chestPos])] = it[KeyChestTable.type]
         }
         portals.clear()
-        PortalTable.selectAll().forEach {
-            portals[getBlockByPositionString(it[PortalTable.portalPos])] = it[PortalTable.targetWorld]
+        val file = File(INSTANCE.dataFolder.path + "/portals.json")
+        if(file.exists()){
+            val portalMap = jacksonObjectMapper().readValue<HashMap<String, String>>(file)
+            portalMap.forEach {
+                portals[getBlockByPositionString(it.key)] = it.value
+            }
+        }else {
+            file.createNewFile()
+            jacksonObjectMapper().writeValue(file, hashMapOf<String, String>())
         }
     }
     updateTabOfPlayers()

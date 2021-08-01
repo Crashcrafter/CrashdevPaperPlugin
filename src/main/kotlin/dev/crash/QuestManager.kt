@@ -422,6 +422,7 @@ fun dailyQuestCreation(player: Player) {
         rlgPlayer.hasDaily = false
     }
     rlgPlayer.changeXP(100)
+    rlgPlayer.lastDailyQuest = System.currentTimeMillis()
     giveBalance(player, 500, "Täglicher Login")
 }
 
@@ -458,6 +459,7 @@ fun weeklyQuestCreation(player: Player) {
             rlgPlayer.quests[i] = Quest(randomid, player.uniqueId.toString(), false, 0, 0)
         }
     }
+    rlgPlayer.lastWeeklyQuest = System.currentTimeMillis()
     rlgPlayer.hasDaily = false
     rlgPlayer.hasWeekly = false
     player.updateScoreboard()

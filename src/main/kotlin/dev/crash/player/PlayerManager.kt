@@ -55,6 +55,9 @@ internal fun Player.load(){
         if(Instant.ofEpochMilli(saveObj.lastKeys).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
             player.sendMessage("§2Du kannst mit /weekly deine wöchentlichen Keys abholen!")
         }
+        if(rlgPlayer.quests.size < 6){
+            weeklyQuestCreation(player)
+        }
     }else {
         saveFile.createNewFile()
         val playerSaveData = PlayerSaveData(player.uniqueId.toString(), 0, ranks[0]!!.claims, mutableListOf(), ranks[0]!!.homes, 0, 0, 0,

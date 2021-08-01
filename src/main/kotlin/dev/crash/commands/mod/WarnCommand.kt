@@ -1,6 +1,7 @@
 package dev.crash.commands.mod
 
 import dev.crash.*
+import dev.crash.player.rlgPlayer
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -22,10 +23,10 @@ class WarnCommand : CommandExecutor, TabCompleter {
                 mod.sendMessage("Der Spieler " + args[1] + " wurde wegen " + reason + " gewarnt!")
                 if (target != null) {
                     target.sendMessage("Du wurdest wegen " + reason + "gewarnt!")
-                    warnPlayer(target, sb.toString(), mod.name)
+                    target.rlgPlayer().warn(sb.toString(), mod.name)
                 }
             } else if (args[0].contentEquals("list")) {
-                val list: String = getWarns(target!!)
+                val list: String = target!!.rlgPlayer().getWarnsString()
                 mod.sendMessage(
                     """
                 ${target.name}'s Warnungen:
@@ -38,7 +39,7 @@ class WarnCommand : CommandExecutor, TabCompleter {
                         mod.sendMessage("§4Der Spieler wurde nicht gefunden!")
                         return true
                     }
-                    removeAllWarns(target)
+                    target.rlgPlayer().removeAllWarns()
                     mod.sendMessage("§2Alle Warnungen wurden entfernt")
                 } else {
                     val number: Int = args[2].toInt()

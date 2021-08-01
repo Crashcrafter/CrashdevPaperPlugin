@@ -15,7 +15,7 @@ class UnmuteCommand : CommandExecutor {
             try {
                 val target = Bukkit.getPlayer(args[0])!!
                 player.sendMessage("§2Spieler wurde entmuted!")
-                target.unmute()
+                target.rlgPlayer().unmute()
             }catch (ex: ArrayIndexOutOfBoundsException){
                 player.sendMessage("§4Du musst einen Spieler angeben!")
                 return true

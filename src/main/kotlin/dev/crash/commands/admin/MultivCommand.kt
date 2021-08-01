@@ -1,5 +1,7 @@
 package dev.crash.commands.admin
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.*
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -11,6 +13,7 @@ import org.bukkit.entity.Player
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.File
 
 class MultivCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -157,18 +160,20 @@ fun removeWorld(worldName: String) {
 }
 
 fun addPortal(block: Block, target: String) {
-    transaction {
-        PortalTable.insert {
-            it[targetWorld] = target
-            it[portalPos] = block.toPositionString()
-        }
-    }
+    portals[block] = target
+    savePortals()
 }
 
 fun removePortal(block: Block) {
-    transaction {
-        PortalTable.deleteWhere {
-            PortalTable.portalPos eq block.toPositionString()
-        }
+    portals.remove(block)
+    savePortals()
+}
+
+internal fun savePortals(){
+    val file = File(INSTANCE.dataFolder.path + "/keys.json")
+    val portalMap = hashMapOf<String, String>()
+    portals.forEach {
+        portalMap[it.key.toPositionString()] = it.value
     }
+    jacksonObjectMapper().writeValue(file, portalMap)
 }

@@ -2,6 +2,7 @@ package dev.crash.commands.mod
 
 import dev.crash.asPlayer
 import dev.crash.mute
+import dev.crash.player.rlgPlayer
 import dev.crash.timeMultiplierFromString
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -21,7 +22,7 @@ class MuteCommand : CommandExecutor, TabCompleter {
             if(target.isOp) return true
             val time = args[1].toLong()
             val timeMultiplier:Long = timeMultiplierFromString(args[2])
-            target.mute(time*timeMultiplier)
+            target.rlgPlayer().mute(time*timeMultiplier)
         }
         return true
     }

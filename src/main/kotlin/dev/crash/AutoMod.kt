@@ -1,5 +1,7 @@
 package dev.crash
 
+import dev.crash.player.RLGPlayer
+import dev.crash.player.Warn
 import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.BanList
@@ -7,7 +9,6 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
@@ -175,13 +176,13 @@ fun addLinkSend(player: Player) {
     rlgPlayer.playerLinkCounter.checkCounter()
     if (rlgPlayer.playerLinkCounter.size >= 3) {
         tempbanOnlineUser(player, "Du wurdest gebannt wegen Senden von Links!\nDauer: 3 Tage", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
-    }else warnPlayer(player, "Senden von Links")
+    }else rlgPlayer.warn( "Senden von Links", "Automod")
 }
 
 fun addOffense(player: Player) {
     val rlgPlayer = player.rlgPlayer()
     rlgPlayer.playerOffenseCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
-    warnPlayer(player, "Beleidigung")
+    rlgPlayer.warn("Beleidigung", "Automod")
     rlgPlayer.playerOffenseCounter.checkCounter()
     if (rlgPlayer.playerOffenseCounter.size >= 3) {
         tempbanOnlineUser(player, "Du wurdest gebannt wegen Beleidigung im Chat!\nDauer: 3 Tage", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
@@ -212,29 +213,15 @@ private fun MutableList<Long>.checkCounter(){
     }
 }
 
-fun warnPlayer(player: Player, reason: String) = warnPlayer(player, reason, "AutoMod")
-
-fun warnPlayer(player: Player, reason: String, modName: String){
+fun RLGPlayer.warn(reason: String, modName: String){
     if(player.isOp) return
     player.sendMessage("Du wurdest wegen $reason gewarnt!")
-    transaction {
-        WarnTable.insert {
-            it[uuid] = player.uniqueId.toString()
-            it[WarnTable.modName] = modName
-            it[time] = Instant.now()
-            it[WarnTable.reason] = reason
-            it[name] = player.name
-        }
-    }
-    player.checkWarns()
+    warns.add(Warn(reason, modName, System.currentTimeMillis()))
+    checkWarns()
 }
 
-fun removeAllWarns(player: Player) {
-    transaction {
-        WarnTable.deleteWhere {
-            WarnTable.uuid eq player.uniqueId.toString()
-        }
-    }
+fun RLGPlayer.removeAllWarns(){
+    this.warns = mutableListOf()
 }
 
 fun removeWarn(player: Player, number: Int) {
@@ -255,7 +242,7 @@ fun removeWarn(player: Player, number: Int) {
     }
 }
 
-fun getWarns(player: Player): String {
+fun RLGPlayer.getWarnsString(): String {
     val warnList = StringBuilder()
     transaction {
         var i = 0
@@ -268,26 +255,23 @@ fun getWarns(player: Player): String {
     return warnList.toString()
 }
 
-fun Player.mute(seconds: Long) {
-    this.sendMessage("§4Du wurdest temporär gemuted!")
-    this.rlgPlayer().mutedUntil = System.currentTimeMillis()+(seconds*1000)
+fun RLGPlayer.mute(seconds: Long) {
+    player.sendMessage("§4Du wurdest temporär gemuted!")
+    mutedUntil = System.currentTimeMillis()+(seconds*1000)
 }
 
-fun Player.unmute() {
-    this.sendMessage("§2Du wurdest entmuted!")
-    this.rlgPlayer().mutedUntil = System.currentTimeMillis()
+fun RLGPlayer.unmute() {
+    player.sendMessage("§2Du wurdest entmuted!")
+    mutedUntil = System.currentTimeMillis()
 }
 
-fun Player.checkWarns(){
-    val player = this
-    transaction {
-        var lastWeekWarnings = 0
-        val lastWeekTime = Instant.now().minus(7, ChronoUnit.DAYS)
-        WarnTable.select(where = {WarnTable.uuid eq player.uniqueId.toString()}).forEach {
-            if(it[WarnTable.time].isAfter(lastWeekTime)){
-                lastWeekWarnings++
-            }
+fun RLGPlayer.checkWarns(){
+    val rlgPlayer = this
+    var lastWeekWarnings = 0
+    warns.forEach {
+        if(Instant.ofEpochMilli(it.time).isAfter(Instant.now().minus(7, ChronoUnit.DAYS))){
+            lastWeekWarnings++
         }
-        if(lastWeekWarnings > 5) tempbanOnlineUser(player, "Too many Infractions", Date.from(Instant.now().plus(3, ChronoUnit.DAYS)))
     }
+    if(lastWeekWarnings > 5) tempbanOnlineUser(rlgPlayer.player, "Too many Infractions", Date.from(Instant.now().plus(3, ChronoUnit.DAYS)))
 }

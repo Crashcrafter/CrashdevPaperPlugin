@@ -34,19 +34,6 @@ object KeyIndexTable : Table("keyindex"){
     override val primaryKey = PrimaryKey(token)
 }
 
-object PortalTable : Table("portals"){
-    val portalPos = text("portalPos")
-    val targetWorld = varchar("targetworld", 20)
-}
-
-object WarnTable : Table("warns"){
-    val uuid = varchar("uuid", 36)
-    val name = varchar("name", 100)
-    val reason = text("reason")
-    val modName = varchar("modname", 100)
-    val time = timestamp("time")
-}
-
 object GuildTable : IntIdTable("guilds"){
     val suffix = varchar("suffix", 4)
     val name = varchar("name", 20)
@@ -56,6 +43,8 @@ object GuildTable : IntIdTable("guilds"){
     val member_uuids = text("member_uuids")
     val created = timestamp("created").default(Instant.now())
 }
+
+//Removed
 
 object PlayersTable : Table("players"){
     val uuid = varchar("uuid", 36)
@@ -87,4 +76,12 @@ object HomepointTable : Table("homepoints"){
     val uuid = varchar("uuid", 36)
     val keyword = varchar("keyword", 40)
     val homePos = text("homePos")
+}
+
+object WarnTable : Table("warns"){
+    val uuid = varchar("uuid", 36)
+    val name = varchar("name", 100)
+    val reason = text("reason")
+    val modName = varchar("modname", 100)
+    val time = timestamp("time")
 }
