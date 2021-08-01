@@ -18,6 +18,10 @@ data class ChunkClass(val x: Int, val z: Int, val world: String, val owner_uuid:
 
 val chunks: HashMap<Long, HashMap<String, ChunkClass>> = HashMap()
 
+fun Chunk.chunkData(): ChunkClass? {
+    return chunks[this.chunkKey]?.get(this.world.name)
+}
+
 fun removeAllClaims(player: Player) {
     transaction {
         ChunkTable.deleteWhere {
