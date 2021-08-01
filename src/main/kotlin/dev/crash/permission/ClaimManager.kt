@@ -91,7 +91,23 @@ fun getRemainingClaims(uuid: String): Int {
 }
 
 fun changeAddedClaims(player: Player, amount: Int){
-    player.rlgPlayer().remainingClaims += amount
+    val rlgPlayer = player.rlgPlayer()
+    rlgPlayer.remainingClaims += amount
+    rlgPlayer.addedClaims += amount
+}
+
+fun changeAddedHomes(player: Player, amount: Int){
+    val rlgPlayer = player.rlgPlayer()
+    rlgPlayer.remainingHomes += amount
+    rlgPlayer.addedHomes += amount
+}
+
+fun changeAddedHomes(uuid: String, amount: Int) {
+    modifyPlayerData(uuid){
+        it.remainingHomes += amount
+        it.addedHomes += amount
+        it
+    }
 }
 
 fun changeAddedClaims(uuid: String, amount: Int) {

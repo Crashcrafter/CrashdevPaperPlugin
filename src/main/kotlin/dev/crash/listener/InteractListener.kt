@@ -2,10 +2,7 @@ package dev.crash.listener
 
 import dev.crash.*
 import dev.crash.items.staffs.*
-import dev.crash.permission.changeAddedClaims
-import dev.crash.permission.chunks
-import dev.crash.permission.eventCancel
-import dev.crash.permission.isClaimed
+import dev.crash.permission.*
 import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -108,11 +105,22 @@ class InteractListener : Listener {
                 }
                 Material.STICK -> {
                     val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgItemData"), PersistentDataType.STRING) ?: return
-                    if(data == "addClaim" && !itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
-                        e.isCancelled = true
-                        changeAddedClaims(player, 1)
-                        player.inventory.itemInMainHand.amount--
-                        player.sendMessage("§2Herzlichen Glückwunsch! §6Du hast einen zusätzlichen Claim erhalten!")
+                    if(itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
+                       return
+                    }
+                    when(data){
+                        "addClaim" -> {
+                            e.isCancelled = true
+                            changeAddedClaims(player, 1)
+                            player.inventory.itemInMainHand.amount--
+                            player.sendMessage("§2Herzlichen Glückwunsch! §6Du hast einen zusätzlichen Claim erhalten!")
+                        }
+                        "addHome" -> {
+                            e.isCancelled = true
+                            changeAddedHomes(player, 1)
+                            player.inventory.itemInMainHand.amount--
+                            player.sendMessage("§2Herzlichen Glückwunsch! §6Du hast einen zusätzlichen Homepoint erhalten!")
+                        }
                     }
                     return
                 }

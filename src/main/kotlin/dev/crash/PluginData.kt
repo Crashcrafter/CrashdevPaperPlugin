@@ -14,8 +14,8 @@ import kotlin.collections.HashMap
 
 //CONST DATA
 val warps = hashMapOf<String, Location>()
-const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1PE5Lynv4otTJwzzI_cuj3bYTYFnuJdJh"
-const val texturePackHash = "7C1C1A920C874DCE2A64911772F9F696053CF2EC"
+const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1coCcIPR-ZbC3oKF7F8st0alr1sd6_WYi"
+const val texturePackHash = "356B369F80A1CFF49BE7B40685975D349F3CBD36"
 var dropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
 const val dcLink = "https://discord.gg/qQtaYsDN6w"

@@ -121,6 +121,9 @@ internal fun Player.load(){
         }else if(Instant.ofEpochMilli(rlgPlayer.lastDailyQuest).isBefore(Instant.now().minus(1, ChronoUnit.DAYS))){
             dailyQuestCreation(player)
         }
+        if(rlgPlayer.quests.size < 6){
+            weeklyQuestCreation(player)
+        }
         player.givePerms()
     }
 }

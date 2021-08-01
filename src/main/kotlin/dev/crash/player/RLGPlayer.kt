@@ -71,6 +71,12 @@ class RLGPlayer {
         this.xpLevel = saveObj.xpLevel
         this.xp = saveObj.xp
         this.vxpLevel = saveObj.vxpLevel
+        while(xpLevel > vxpLevel){
+            if(isSpace(player.inventory)){
+                player.inventory.addItem(genKey(5))
+                vxpLevel++
+            }else break
+        }
         this.isMod = ranks[rank]!!.isMod
         saveObj.quests.forEach {
             this.quests.add(Quest(it.qid, player.uniqueId.toString(), it.isDaily, it.status, it.progress))
@@ -156,11 +162,11 @@ class RLGPlayer {
 
     private fun levelUp(){
         xpLevel++
-        if(xpLevel > vxpLevel){
+        while(xpLevel > vxpLevel){
             if(isSpace(player.inventory)){
                 player.inventory.addItem(genKey(5))
                 vxpLevel++
-            }
+            }else break
         }
     }
 

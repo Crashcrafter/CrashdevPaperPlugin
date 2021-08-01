@@ -453,17 +453,9 @@ fun weeklyQuestCreation(player: Player) {
         }
         weeklyChosen.add(randomid)
         if (rlgPlayer.quests.size <= i) {
-            rlgPlayer.quests.add(
-                i, Quest(
-                    randomid, player.uniqueId.toString(), false,
-                    0, 0
-                )
-            )
+            rlgPlayer.quests.add(i, Quest(randomid, player.uniqueId.toString(), false, 0, 0))
         } else {
-            rlgPlayer.quests[i] = Quest(
-                randomid, player.uniqueId.toString(), false,
-                0, 0
-            )
+            rlgPlayer.quests[i] = Quest(randomid, player.uniqueId.toString(), false, 0, 0)
         }
     }
     rlgPlayer.hasDaily = false
