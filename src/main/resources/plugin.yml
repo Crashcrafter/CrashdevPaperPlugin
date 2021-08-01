@@ -1,5 +1,5 @@
 name: RLGPaperPlugin
-main: de.rlg.Main
+main: dev.crash.Main
 version: 0.1
 description: Nix lol
 api-version: 1.17
