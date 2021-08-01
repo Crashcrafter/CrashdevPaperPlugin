@@ -41,7 +41,11 @@ fun Chunk.claim(uuid: String, name: String, player: Player? = null): Boolean {
                 it[z] = chunk.z
             }
         }
-        if(player != null) player.rlgPlayer().remainingClaims--
+        if(player != null) {
+            val rlgPlayer = player.rlgPlayer()
+            rlgPlayer.remainingClaims--
+            rlgPlayer.chunks.add("${chunk.world.name}:${chunk.chunkKey}")
+        }
         val chunkClass = ChunkClass(chunk.x, chunk.z, chunk.world.name, uuid, name, ArrayList())
         if(chunks.containsKey(chunk.chunkKey)){
             chunks[chunk.chunkKey]!![chunkClass.world] = chunkClass
@@ -118,7 +122,7 @@ fun Chunk.changeChunkAccess(uuid: String, grant: Boolean, executor: Player?){
     transaction {
         val shared = ChunkTable.select(where = {ChunkTable.x eq chunk.x and(ChunkTable.z eq chunk.z and(ChunkTable.world eq chunk.world.name))}).first()[ChunkTable.shared]
         val sharedArray = shared.split(" ").toMutableList()
-        if(!sharedArray.contains(uuid)){
+        if(!grant && !sharedArray.contains(uuid)){
             executor?.sendMessage("§4Der Spieler hat keinen Zugriff auf diesen Chunk!")
             return@transaction
         }

@@ -432,10 +432,12 @@ private fun createDailyQuest(i: Int, player: Player, dailyChosen:MutableList<Int
         randomid = random.nextInt(dailyquests.size) + 1
     }
     dailyChosen.add(randomid)
-    player.rlgPlayer().quests[i] = Quest(
-        randomid, player.uniqueId.toString(), true,
-        0, 0
-    )
+    val rlgPlayer = player.rlgPlayer()
+    if(rlgPlayer.quests.size <= i){
+        rlgPlayer.quests.add(i, Quest(randomid, player.uniqueId.toString(), true, 0, 0))
+    }else {
+        rlgPlayer.quests[i] = Quest(randomid, player.uniqueId.toString(), true, 0, 0)
+    }
     return randomid
 }
 

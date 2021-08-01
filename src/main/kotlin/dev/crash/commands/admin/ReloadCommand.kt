@@ -1,7 +1,6 @@
 package dev.crash.commands.admin
 
 import dev.crash.asPlayer
-import dev.crash.fixDb
 import dev.crash.loadFromDb
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -12,7 +11,6 @@ class ReloadCommand : CommandExecutor {
         val player = sender.asPlayer()
         if(!player.hasPermission("rlg.reloaddb")) return true
         loadFromDb()
-        fixDb()
         sender.sendMessage("§2DB Reloaded!")
         return true
     }

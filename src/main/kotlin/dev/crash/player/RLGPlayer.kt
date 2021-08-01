@@ -37,7 +37,7 @@ class RLGPlayer {
     var managen: Job? = null
     var lastDailyQuest by Delegates.notNull<Long>()
     var lastWeeklyQuest by Delegates.notNull<Long>()
-    var quests :ArrayList<Quest> = ArrayList()
+    var quests :MutableList<Quest> = mutableListOf()
     var hasDaily by Delegates.notNull<Boolean>()
     var hasWeekly by Delegates.notNull<Boolean>()
     var deathPos: Location? = null
@@ -48,7 +48,8 @@ class RLGPlayer {
     val playerLinkCounter = mutableListOf<Long>()
     val playerOffenseCounter = mutableListOf<Long>()
     val playerAfkCounter = mutableListOf<Long>()
-    var warns = listOf<Warn>()
+    var warns = mutableListOf<Warn>()
+    var chunks = mutableListOf<String>()
 
     constructor(player: Player) {
         val saveFile = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
@@ -74,13 +75,17 @@ class RLGPlayer {
         saveObj.quests.forEach {
             this.quests.add(Quest(it.qid, player.uniqueId.toString(), it.isDaily, it.status, it.progress))
         }
+        this.lastDailyQuest = saveObj.lastDailyQuest
+        this.lastWeeklyQuest = saveObj.lastWeeklyQuest
         this.hasDaily = saveObj.hasDaily
         this.hasWeekly = saveObj.hasWeekly
         this.dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+ Random().nextInt(10))
         this.guildId = saveObj.guildId
-        this.warns = saveObj.warns
+        this.warns = saveObj.warns.toMutableList()
+        this.chunks = saveObj.chunks.toMutableList()
         changeMana(0)
         this.setName()
+        check()
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -220,10 +225,20 @@ class RLGPlayer {
         homes.forEach {
             homeList[it.key] = it.value.toPositionString()
         }
-        val playerSaveObj = PlayerSaveData(uuid, rank, remainingClaims, listOf(), remainingHomes, addedClaims, addedHomes, balance, questList,
-            hasDaily, hasWeekly, lastDailyQuest, lastWeeklyQuest, xpLevel, xp, vxpLevel, guildId, lastKeys, weeklyKeys, homeList, listOf())
+        val playerSaveObj = PlayerSaveData(uuid, rank, remainingClaims, mutableListOf(), remainingHomes, addedClaims, addedHomes, balance, questList,
+            hasDaily, hasWeekly, lastDailyQuest, lastWeeklyQuest, xpLevel, xp, vxpLevel, guildId, lastKeys, weeklyKeys, homeList, warns, chunks)
         val file = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
         if(!file.exists()) file.createNewFile()
         jacksonObjectMapper().writeValue(file, playerSaveObj)
+    }
+
+    fun check(){
+        if(rankData().claims + addedClaims - chunks.size != remainingClaims){
+            remainingClaims = rankData().claims + addedClaims - chunks.size
+        }
+        if(rankData().homes + addedHomes - homes.size != remainingHomes){
+            remainingHomes = rankData().homes + addedHomes - homes.size
+        }
+        save()
     }
 }
