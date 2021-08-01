@@ -1,5 +1,6 @@
 package dev.crash.player
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.*
@@ -38,7 +39,11 @@ internal fun Player.load(){
     if(PlayerData.containsKey(player)) return
     val saveFile = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
     if(saveFile.exists()){
-        val saveObj = jacksonObjectMapper().readValue<PlayerSaveData>(saveFile)
+        val saveObj: PlayerSaveData = try {
+            jacksonObjectMapper().readValue(saveFile)
+        }catch (ex: MismatchedInputException){
+            jacksonObjectMapper().readValue(File("${INSTANCE.dataFolder.path}/playerBackup/${player.uniqueId}.json"))
+        }
         val homes = hashMapOf<String, Block>()
         saveObj.homepoints.forEach {
             homes[it.key] = getBlockByPositionString(it.value)

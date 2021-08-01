@@ -43,7 +43,7 @@ class WarnCommand : CommandExecutor, TabCompleter {
                     mod.sendMessage("§2Alle Warnungen wurden entfernt")
                 } else {
                     val number: Int = args[2].toInt()
-                    removeWarn(target!!, number)
+                    target!!.rlgPlayer().removeWarn(number)
                     mod.sendMessage("Warnung Nummer $number wurde entfernt")
                 }
             }

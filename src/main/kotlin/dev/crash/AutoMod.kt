@@ -7,10 +7,6 @@ import net.kyori.adventure.text.Component
 import org.bukkit.BanList
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -224,33 +220,17 @@ fun RLGPlayer.removeAllWarns(){
     this.warns = mutableListOf()
 }
 
-fun removeWarn(player: Player, number: Int) {
-    transaction {
-        var i = 0
-        var warnDate: Instant? = null
-        WarnTable.select(where = {WarnTable.uuid eq player.uniqueId.toString()}).forEach {
-            if(i == number) {
-                warnDate = it[WarnTable.time]
-            }
-            i++
-        }
-        if(warnDate != null){
-            WarnTable.deleteWhere {
-                WarnTable.uuid eq player.uniqueId.toString() and(WarnTable.time eq warnDate!!)
-            }
-        }
-    }
+fun RLGPlayer.removeWarn(number: Int) {
+    warns.removeAt(number)
 }
 
 fun RLGPlayer.getWarnsString(): String {
     val warnList = StringBuilder()
-    transaction {
-        var i = 0
-        WarnTable.select(where = {WarnTable.uuid eq player.uniqueId.toString()}).forEach{
-            warnList.append(i).append(": [").append(it[WarnTable.time]).append("]: ").append(it[WarnTable.reason])
-                .append(" von ").append(it[WarnTable.modName]).append("\n")
-            i++
-        }
+    var i = 0
+    warns.forEach {
+        warnList.append(i).append(": ").append(it.reason)
+            .append(" von ").append(it.modName).append("\n")
+        i++
     }
     return warnList.toString()
 }

@@ -77,11 +77,3 @@ object HomepointTable : Table("homepoints"){
     val keyword = varchar("keyword", 40)
     val homePos = text("homePos")
 }
-
-object WarnTable : Table("warns"){
-    val uuid = varchar("uuid", 36)
-    val name = varchar("name", 100)
-    val reason = text("reason")
-    val modName = varchar("modname", 100)
-    val time = timestamp("time")
-}

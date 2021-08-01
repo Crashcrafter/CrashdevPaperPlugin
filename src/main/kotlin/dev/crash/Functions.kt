@@ -1,6 +1,5 @@
 package dev.crash
 
-import dev.crash.items.CustomItems
 import dev.crash.permission.rankData
 import dev.crash.permission.ranks
 import dev.crash.player.rlgPlayer
@@ -19,9 +18,13 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Scoreboard
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.math.pow
+
 
 fun CommandSender.asPlayer() : Player = if (this is Player) this else throw Exception("Only a player can execute that command!")
 
@@ -263,4 +266,33 @@ fun Inventory.getItem(itemStack: ItemStack): ItemStack? {
         }
     }
     return null
+}
+
+fun copyDirectory(sourceDirectory: File, destinationDirectory: File) {
+    if (!destinationDirectory.exists()) {
+        destinationDirectory.mkdir()
+    }
+    for (f in sourceDirectory.list()!!) {
+        copyDirectoryCompatibityMode(File(sourceDirectory, f), File(destinationDirectory, f))
+    }
+}
+
+private fun copyDirectoryCompatibityMode(source: File, destination: File) {
+    if (source.isDirectory) {
+        copyDirectory(source, destination)
+    } else {
+        copyFile(source, destination)
+    }
+}
+
+private fun copyFile(sourceFile: File, destinationFile: File) {
+    FileInputStream(sourceFile).use { `in` ->
+        FileOutputStream(destinationFile).use { out ->
+            val buf = ByteArray(1024)
+            var length: Int
+            while (`in`.read(buf).also { length = it } > 0) {
+                out.write(buf, 0, length)
+            }
+        }
+    }
 }
