@@ -18,20 +18,20 @@ import dev.crash.player.load
 import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.*
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.io.File
 
 internal fun initServer(){
+    if(!File(INSTANCE.dataFolder.path + "/player/").exists()){
+        File(INSTANCE.dataFolder.path + "/player/").mkdir()
+    }
     initDatabase()
     loadWarps()
     initQuests()
     initGuilds()
     loadRanks()
     loadFromDb()
-    fixDb()
     CustomItems.loadItems()
     loadLootTables()
     initTradingInventories()
@@ -175,26 +175,5 @@ internal fun loadPrices(){
     }else {
         file.createNewFile()
         jacksonObjectMapper().writeValue(file, listOf<PricesSaveObj>())
-    }
-}
-
-internal fun fixDb(){
-    transaction {
-        PlayersTable.selectAll().forEach {
-            val uuid = it[PlayersTable.uuid]
-            val chunkAmount = ChunkTable.select(where = {ChunkTable.uuid eq uuid}).toList().size
-            val homesAmount = HomepointTable.select(where = {HomepointTable.uuid eq uuid}).toList().size
-            val rankData = ranks[it[PlayersTable.rank]]!!
-            if(chunkAmount != (rankData.claims + it[PlayersTable.addedClaims]) - it[PlayersTable.remainingClaims]){
-                PlayersTable.update(where = {PlayersTable.uuid eq uuid}){ it2 ->
-                    it2[remainingClaims] = rankData.claims + it[addedClaims] - chunkAmount
-                }
-            }
-            if(homesAmount != rankData.homes - it[PlayersTable.remainingHomes]){
-                PlayersTable.update(where = {PlayersTable.uuid eq uuid}){ it2 ->
-                    it2[remainingHomes] = rankData.homes - homesAmount
-                }
-            }
-        }
     }
 }

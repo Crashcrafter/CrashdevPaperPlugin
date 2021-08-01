@@ -2,6 +2,7 @@ package dev.crash
 
 import dev.crash.items.CustomItems
 import dev.crash.items.ciName
+import dev.crash.permission.rankData
 import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -11,9 +12,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import java.time.LocalDate
 import java.util.*
 
 var dailyquests = HashMap<Int, Quest>()
@@ -423,40 +421,8 @@ fun dailyQuestCreation(player: Player) {
         dailyChosen.add(createDailyQuest(i, player, dailyChosen))
         rlgPlayer.hasDaily = false
     }
-    qidUpdate(player, true)
     rlgPlayer.changeXP(100)
     giveBalance(player, 500, "Täglicher Login")
-}
-
-fun qidUpdate(player: Player, onlyDaily: Boolean){
-    val rlgPlayer = player.rlgPlayer()
-    val quests: List<Quest> = rlgPlayer.quests
-    val questStatusBuilder = StringBuilder()
-    val questProgressBuilder = StringBuilder()
-    val questIdsBuilder = StringBuilder()
-    for (i in 0..5) {
-        val quest = quests[i]
-        questStatusBuilder.append(quest.status.toString() + " ")
-        questProgressBuilder.append(quest.counter.toString() + " ")
-        questIdsBuilder.append(quest.qid).append(" ")
-        if (i == 2) {
-            questStatusBuilder.append(if (rlgPlayer.hasDaily) 2 else 0).append(" ")
-        } else if (i == 5) {
-            questStatusBuilder.append(if (rlgPlayer.hasWeekly) 2 else 0).append(" ")
-        }
-    }
-    val questIds = questIdsBuilder.toString().substring(0, questIdsBuilder.toString().length - 1)
-    val questStatus = questStatusBuilder.toString().substring(0, questStatusBuilder.toString().length - 1)
-    val questProgress = questProgressBuilder.toString().substring(0, questProgressBuilder.toString().length - 1)
-    transaction { 
-        PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
-            it[PlayersTable.quests] = questIds
-            it[PlayersTable.questStatus] = questStatus
-            it[PlayersTable.questProgress] = questProgress
-            it[lastDailyQuest] = LocalDate.now()
-            if(!onlyDaily) it[lastWeeklyQuest] = LocalDate.now()
-        }
-    }
 }
 
 private fun createDailyQuest(i: Int, player: Player, dailyChosen:MutableList<Int>): Int{
@@ -500,22 +466,13 @@ fun weeklyQuestCreation(player: Player) {
     }
     rlgPlayer.hasDaily = false
     rlgPlayer.hasWeekly = false
-    qidUpdate(player, false)
     player.updateScoreboard()
 }
 
 fun Player.canGetQuest(): Boolean {
-    var count = 0
     val rlgPlayer = this.rlgPlayer()
-    for (quest in rlgPlayer.quests) {
-        if (quest.status == 1) {
-            count++
-        }
-    }
-    var limit = 2
-    if (rlgPlayer.rank > 0) {
-        limit = 3
-    }
+    val count = rlgPlayer.quests.filter { it.status == 1 }.size
+    val limit = rlgPlayer.rankData().quests
     val can = count < limit
     if (!can) {
         this.sendMessage("§4Du kannst maximal $limit Quests gleichzeitig machen!")

@@ -232,7 +232,7 @@ fun warnPlayer(player: Player, reason: String, modName: String){
 fun removeAllWarns(player: Player) {
     transaction {
         WarnTable.deleteWhere {
-            PlayersTable.uuid eq player.uniqueId.toString()
+            WarnTable.uuid eq player.uniqueId.toString()
         }
     }
 }

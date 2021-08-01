@@ -1,8 +1,7 @@
 package dev.crash
 
 import dev.crash.listener.addMessageListener
-import dev.crash.player.RLGPlayer
-import dev.crash.player.rlgPlayer
+import dev.crash.player.*
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.jetbrains.exposed.sql.*
@@ -19,12 +18,6 @@ val guildSetupProgress = HashMap<Player, SetupGuild>()
 fun RLGPlayer.guild(): Guild? {
     if(!guilds.containsKey(this.guildId)){
         this.guildId = 0
-        val rlgPlayer = this
-        transaction {
-            PlayersTable.update(where = {PlayersTable.uuid eq rlgPlayer.player.uniqueId.toString()}){
-                it[guildId] = 0
-            }
-        }
         return null
     }
     return guilds[this.guildId]!!
@@ -114,9 +107,6 @@ fun guildSetup(player: Player, msg: String){
                 final.id = id
                 guilds[id] = final
                 rlgPlayer.guildId = id
-                PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
-                    it[guildId] = id
-                }
             }
             rlgPlayer.setName()
             pay(player, 50000, "Gründen der Guild")
@@ -141,11 +131,6 @@ fun RLGPlayer.removeFromGuild(reason: String){
     guild.saveMembers(guildId)
     guild.sendMessage(reason)
     this.guildId = 0
-    transaction {
-        PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
-            it[PlayersTable.guildId] = guild.id
-        }
-    }
     this.setName()
     updateTabOfPlayers()
 }
@@ -171,8 +156,9 @@ fun RLGPlayer.deleteGuild(){
     this.guildId = 0
     transaction {
         guild.member_uuids.forEach { it2 ->
-            PlayersTable.update(where = {PlayersTable.uuid eq it2}){
-                it[PlayersTable.guildId] = 0
+            modifyPlayerData(it2){
+                it.guildId = 0
+                it
             }
             val player = Bukkit.getPlayer(UUID.fromString(it2))
             if(player != null){
@@ -198,11 +184,6 @@ fun RLGPlayer.joinGuild(id: Int) {
         guild.member_names.add(this.player.name)
         guild.member_uuids.add(this.player.uniqueId.toString())
         guild.sendMessage("§a${this.player.name} ist der Guild beigetreten!")
-        transaction {
-            PlayersTable.update(where = {PlayersTable.uuid eq this@joinGuild.player.uniqueId.toString()}){
-                it[guildId] = id
-            }
-        }
         guild.saveMembers(guildId)
     }else {
         this.player.sendMessage("§4Du bist bereits in einer Guild!")

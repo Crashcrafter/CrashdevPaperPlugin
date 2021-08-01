@@ -15,7 +15,7 @@ class ElytraListener : Listener {
         val player = e.player
         val rlgPlayer = player.rlgPlayer()
         if (rlgPlayer.elytraCoolDown <= System.currentTimeMillis() || player.isOp) {
-            rlgPlayer.elytraCoolDown = System.currentTimeMillis() + 1000 * 45
+            rlgPlayer.elytraCoolDown = System.currentTimeMillis() + 1000 * 30
             val location = player.location
             val range: Int = dropRange
             if (location.z < -range || location.z > range || location.x < -range || location.x > range) {
@@ -31,7 +31,7 @@ class ElytraListener : Listener {
         val player = e.player
         val rlgPlayer = player.rlgPlayer()
         if (rlgPlayer.elytraCoolDown <= System.currentTimeMillis() || player.isOp) {
-            rlgPlayer.elytraCoolDown = System.currentTimeMillis() + 1000 * 45
+            rlgPlayer.elytraCoolDown = System.currentTimeMillis() + 1000 * 30
             val location = player.location
             val range: Int = dropRange
             if (location.z < -range || location.z > range || location.x < -range || location.x > range) {

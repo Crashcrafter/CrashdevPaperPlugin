@@ -1,8 +1,9 @@
 package dev.crash.permission
 
 import dev.crash.ChunkTable
-import dev.crash.PlayersTable
 import dev.crash.guild
+import dev.crash.player.getPlayerData
+import dev.crash.player.modifyPlayerData
 import dev.crash.player.rlgPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -39,11 +40,6 @@ fun Chunk.claim(uuid: String, name: String, player: Player? = null): Boolean {
                 it[x] = chunk.x
                 it[z] = chunk.z
             }
-            if(player != null){
-                PlayersTable.update(where = {PlayersTable.uuid eq uuid}){
-                    it[remainingClaims] = getRemainingClaims(uuid)
-                }
-            }
         }
         if(player != null) player.rlgPlayer().remainingClaims--
         val chunkClass = ChunkClass(chunk.x, chunk.z, chunk.world.name, uuid, name, ArrayList())
@@ -66,12 +62,14 @@ fun Chunk.unClaim() {
         try {
             val ownerUuid = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
             if(ownerUuid.length > 3){
-                PlayersTable.update(where = {PlayersTable.uuid eq ownerUuid}){
-                    it[remainingClaims] = getRemainingClaims(ownerUuid) + 1
-                }
                 val owner = Bukkit.getPlayer(UUID.fromString(ownerUuid))
                 if(owner != null) {
                     owner.rlgPlayer().remainingClaims++
+                }else {
+                    modifyPlayerData(ownerUuid){
+                        it.remainingClaims++
+                        it
+                    }
                 }
             }
             chunks[chunkKey]!!.remove(world.name)
@@ -85,35 +83,23 @@ fun Chunk.unClaim() {
 fun Chunk.claim(player: Player): Boolean = this.claim(player.uniqueId.toString(), player.name, player)
 
 fun getRemainingClaims(uuid: String): Int {
-    var amount = 0
-    transaction {
-        amount = PlayersTable.select(where = {PlayersTable.uuid eq uuid}).first()[PlayersTable.remainingClaims]
-    }
-    return amount
+    return getPlayerData(uuid).remainingClaims
 }
 
 fun changeAddedClaims(player: Player, amount: Int){
     player.rlgPlayer().remainingClaims += amount
-    changeAddedClaims(player.uniqueId.toString(), amount)
 }
 
 fun changeAddedClaims(uuid: String, amount: Int) {
-    val remainingClaims = getRemainingClaims(uuid)
-    val addedClaims = getAddedClaims(uuid)
-    transaction {
-        PlayersTable.update(where = {PlayersTable.uuid eq uuid}){
-            it[PlayersTable.remainingClaims] = remainingClaims+amount
-            it[PlayersTable.addedClaims] = addedClaims+amount
-        }
+    modifyPlayerData(uuid){
+        it.remainingClaims += amount
+        it.addedClaims += amount
+        it
     }
 }
 
 fun getAddedClaims(uuid: String): Int {
-    var addedClaims = 0
-    transaction {
-        addedClaims = PlayersTable.select(where = {PlayersTable.uuid eq uuid}).first()[PlayersTable.addedClaims]
-    }
-    return addedClaims
+    return getPlayerData(uuid).addedClaims
 }
 
 fun Chunk.changeChunkAccess(player: Player, grant: Boolean, executor: Player?){this.changeChunkAccess(player.uniqueId.toString(), grant, executor)}

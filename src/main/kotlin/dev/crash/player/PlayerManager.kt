@@ -1,15 +1,15 @@
 package dev.crash.player
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.*
 import dev.crash.permission.givePerms
 import dev.crash.permission.ranks
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
-import java.time.LocalDate
+import java.io.File
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 private val PlayerData: HashMap<Player, RLGPlayer> = HashMap()
 
@@ -21,83 +21,71 @@ fun Player.rlgPlayer() : RLGPlayer {
     return PlayerData[this]!!
 }
 
-fun Player.load(){
+data class PlayerSaveData(val uuid: String, var rank: Int, var remainingClaims: Int, var sharedClaims: List<String>, var remainingHomes: Int,
+                          var addedClaims: Int, var addedHomes: Int, var balance: Long, var quests: List<QuestSaveObj>, var hasDaily: Boolean,
+                          var hasWeekly: Boolean, var lastDailyQuest: Long, var lastWeeklyQuest: Long, var xpLevel: Int, var xp: Long, var vxpLevel: Int,
+                          var guildId: Int, var lastKeys: Long, var leftKeys: HashMap<Int, Int>, var homepoints: HashMap<String, String>,
+                          var warns: List<Warn>)
+data class QuestSaveObj(var qid: Int, var status: Int, var progress: Int, var isDaily: Boolean)
+data class Warn(val reason: String, val modName: String, val time: Long)
+// "${INSTANCE.dataFolder.path}/player/"
+internal fun Player.load(){
     val player = this
     if(PlayerData.containsKey(player)) return
-    transaction {
-        val queryResult = PlayersTable.select(where = { PlayersTable.uuid eq player.uniqueId.toString() })
-        if (!queryResult.empty()) {
-            val result = queryResult.first()
-            val homes = HashMap<String, Block>()
-            HomepointTable.select(where = { HomepointTable.uuid eq player.uniqueId.toString() }).forEach {
-                homes[it[HomepointTable.keyword]] = getBlockByPositionString(it[HomepointTable.homePos])
-            }
-            val rlgPlayer = RLGPlayer(
-                player,
-                result[PlayersTable.rank],
-                result[PlayersTable.remainingClaims],
-                homes,
-                result[PlayersTable.remainingHomes],
-                result[PlayersTable.balance],
-                result[PlayersTable.quests],
-                result[PlayersTable.questStatus],
-                result[PlayersTable.questProgress],
-                result[PlayersTable.xpLevel],
-                result[PlayersTable.xp],
-                result[PlayersTable.vxpLevel],
-                result[PlayersTable.guildId]
-            )
-            if (rlgPlayer.isMod) moderator.add(player)
-            PlayerData[player] = rlgPlayer
-            player.givePerms()
-            if(result[PlayersTable.lastWeeklyQuest].isBefore(LocalDate.now().minusDays(6))){
-                weeklyQuestCreation(player)
-            } else if(result[PlayersTable.lastDailyQuest].isBefore(LocalDate.now())){
-                dailyQuestCreation(player)
-            }
-        } else {
-            PlayersTable.insert {
-                it[uuid] = player.uniqueId.toString()
-            }
-            val rlgPlayer = RLGPlayer(
-                player, 0, ranks[0]!!.claims, HashMap(), ranks[0]!!.homes, 0,
-                "1 2 3 1 2 3", "0 0 0 0 0 0 0 0", "0 0 0 0 0 0", 0, 0, 0, 0
-            )
-            PlayerData[player] = rlgPlayer
-            player.teleport(warps["spawn"]!!)
-            player.givePerms()
+    val saveFile = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
+    if(saveFile.exists()){
+        val saveObj = jacksonObjectMapper().readValue<PlayerSaveData>(saveFile)
+        val homes = hashMapOf<String, Block>()
+        saveObj.homepoints.forEach {
+            homes[it.key] = getBlockByPositionString(it.value)
         }
+        val rlgPlayer = RLGPlayer(player)
+        if (rlgPlayer.isMod) moderator.add(player)
+        PlayerData[player] = rlgPlayer
+        player.givePerms()
+        if(Instant.ofEpochMilli(saveObj.lastWeeklyQuest).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
+            weeklyQuestCreation(player)
+        }else if(Instant.ofEpochMilli(saveObj.lastDailyQuest).isBefore(Instant.now().minus(1, ChronoUnit.DAYS))){
+            dailyQuestCreation(player)
+        }
+        if(Instant.ofEpochMilli(saveObj.lastKeys).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
+            player.sendMessage("§2Du kannst mit /weekly deine wöchentlichen Keys abholen!")
+        }
+    }else {
+        saveFile.createNewFile()
+        val playerSaveData = PlayerSaveData(player.uniqueId.toString(), 0, ranks[0]!!.claims, listOf(), ranks[0]!!.homes, 0, 0, 0,
+            listOf(), false, false, System.currentTimeMillis(), System.currentTimeMillis(), 0, 0, 0, 0, 0,
+            ranks[0]!!.weeklyKeys, hashMapOf(), listOf())
+        jacksonObjectMapper().writeValue(saveFile, playerSaveData)
+        val rlgPlayer = RLGPlayer(player)
+        PlayerData[player] = rlgPlayer
+        weeklyQuestCreation(player)
+        player.teleport(warps["spawn"]!!)
+        player.givePerms()
     }
 }
 
-fun Player.unload(){
+internal fun Player.unload(){
     val player = this
     if(!PlayerData.containsKey(player)) return
     val rlgPlayer = player.rlgPlayer()
     rlgPlayer.managen?.cancel()
-    val quests: List<Quest> = rlgPlayer.quests
-    val questStatusBuilder = StringBuilder()
-    val questProgressBuilder = StringBuilder()
-    for (i in 0..5) {
-        val quest = quests[i]
-        questStatusBuilder.append(quest.status.toString() + " ")
-        questProgressBuilder.append(quest.counter.toString() + " ")
-        if (i == 2) {
-            questStatusBuilder.append(if (rlgPlayer.hasDaily) 2 else 0).append(" ")
-        } else if (i == 5) {
-            questStatusBuilder.append(if (rlgPlayer.hasWeekly) 2 else 0).append(" ")
-        }
-    }
-    transaction {
-        PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
-            it[questStatus] = questStatusBuilder.toString()
-            it[questProgress] = questProgressBuilder.toString()
-            it[vxpLevel] = rlgPlayer.vxpLevel
-            it[xpLevel] = rlgPlayer.xpLevel
-            it[xp] = rlgPlayer.xp
-        }
-    }
+    rlgPlayer.save()
     PlayerData.remove(player)
 }
 
-fun clearPlayerData() = PlayerData.clear()
+internal fun clearPlayerData() = PlayerData.clear()
+
+fun modifyPlayerData(uuid: String, f: (PlayerSaveData) -> PlayerSaveData){
+    f.invoke(getPlayerData(uuid)).save()
+}
+
+fun getPlayerData(uuid: String): PlayerSaveData {
+    val saveFile = File("${INSTANCE.dataFolder.path}/player/${uuid}.json")
+    return jacksonObjectMapper().readValue(saveFile)
+}
+
+private fun PlayerSaveData.save(){
+    val saveFile = File("${INSTANCE.dataFolder.path}/player/${uuid}.json")
+    jacksonObjectMapper().writeValue(saveFile, this)
+}

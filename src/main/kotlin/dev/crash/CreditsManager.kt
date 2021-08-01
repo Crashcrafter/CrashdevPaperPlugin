@@ -4,12 +4,13 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.items.CustomItems
 import dev.crash.permission.rankData
+import dev.crash.player.getPlayerData
+import dev.crash.player.modifyPlayerData
 import dev.crash.player.rlgPlayer
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import me.kbrewster.mojangapi.MojangAPI
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -22,7 +23,6 @@ import org.bukkit.entity.WanderingTrader
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
 import java.text.SimpleDateFormat
@@ -112,11 +112,9 @@ fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
     val onePercent = amount/100
     val newAmount = amount - onePercent
     player.sendMessage("${newAmount.withPoints()} Credits wurden an " + target.name + " gesendet")
-    player.changeCredits(playerRlgPlayer.balance)
     val targetRlgPlayer = target.rlgPlayer()
     targetRlgPlayer.balance += newAmount
     target.sendMessage("Du hast " + newAmount.withPoints() + " Credits von " + player.name + " erhalten")
-    target.changeCredits(targetRlgPlayer.balance)
     player.updateScoreboard()
     target.updateScoreboard()
     return true
@@ -125,7 +123,6 @@ fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
 fun giveBalance(target: Player, amount: Long, reason: String) {
     val rlgPlayer = target.rlgPlayer()
     rlgPlayer.balance += amount
-    target.changeCredits(rlgPlayer.balance)
     if (amount < 0) {
         target.sendMessage("§4Du hast " + abs(amount).withPoints() + " Credits für " + reason + " ausgegeben")
     } else {
@@ -138,7 +135,6 @@ fun pay(target: Player, amount: Long, reason: String): Boolean {
     val rlgPlayer = target.rlgPlayer()
     return if (rlgPlayer.balance >= amount) {
         rlgPlayer.balance -= amount
-        target.changeCredits(rlgPlayer.balance)
         target.sendMessage("§2Du hast ${amount.withPoints()} Credits für $reason ausgegeben!")
         target.updateScoreboard()
         true
@@ -357,30 +353,15 @@ object ShopInventories {
     var normalView: Inventory? = null
 }
 
-fun Player.changeCredits(newAmount: Long){
-    val player = this
-    transaction { 
-        PlayersTable.update(where = {PlayersTable.uuid eq player.uniqueId.toString()}){
-            it[balance] = newAmount
-        }
-    }
-}
-
 fun addCreditsToPlayer(uuid: String, amount: Long){
-    transaction { 
-        val bal = PlayersTable.select(where = {PlayersTable.uuid eq uuid}).first()[PlayersTable.balance]
-        PlayersTable.update(where = {PlayersTable.uuid eq uuid}){
-            it[balance] = bal+amount
-        }
+    modifyPlayerData(uuid){
+        it.balance += amount
+        it
     }
 }
 
 fun getCredits(uuid: String): Long{
-    var bal: Long = 0
-    transaction {
-        bal = PlayersTable.select(where = {PlayersTable.uuid eq uuid}).first()[PlayersTable.balance].toLong()
-    }
-    return bal
+    return getPlayerData(uuid).balance
 }
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -407,10 +388,11 @@ fun getCreditsScoreboard(): String {
     messageBuilder.append("§6§l§nAktuelles Ranking:§r\n§7Letztes Update: $time\n")
     transaction {
         var count = 1
-        PlayersTable.selectAll().orderBy(PlayersTable.balance, SortOrder.DESC).limit(5).forEach {
+        //TODO: Offline
+        /*PlayersTable.selectAll().orderBy(PlayersTable.balance, SortOrder.DESC).limit(5).forEach {
             messageBuilder.append("§7$count. §2${MojangAPI.getName(UUID.fromString(it[PlayersTable.uuid]))}: §6${it[PlayersTable.balance].withPoints()} Credits§r\n")
             count++
-        }
+        }*/
     }
     messageBuilder.append("§6Diese Statistik wird alle 5 Minuten aktualisiert!")
     return messageBuilder.toString()
