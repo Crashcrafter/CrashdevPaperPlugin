@@ -160,7 +160,7 @@ fun addPortal(block: Block, target: String) {
     transaction {
         PortalTable.insert {
             it[targetWorld] = target
-            it[portalPos] = block.toSQLString()
+            it[portalPos] = block.toPositionString()
         }
     }
 }
@@ -168,7 +168,7 @@ fun addPortal(block: Block, target: String) {
 fun removePortal(block: Block) {
     transaction {
         PortalTable.deleteWhere {
-            PortalTable.portalPos eq block.toSQLString()
+            PortalTable.portalPos eq block.toPositionString()
         }
     }
 }

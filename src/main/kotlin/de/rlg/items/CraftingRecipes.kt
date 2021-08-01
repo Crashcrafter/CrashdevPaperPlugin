@@ -12,7 +12,7 @@ import java.io.File
 object CraftingRecipes {
     data class CustomRecipe(val result: String, val shape: List<String>, val ingredients: HashMap<Char, String>)
 
-    fun loadRecipes() {
+    internal fun loadRecipes() {
         val file = File(INSTANCE.dataFolder.path + "/recipes.json")
         if(file.exists()){
             val customItems = jacksonObjectMapper().readValue<HashMap<String, CustomRecipe>>(file)
@@ -22,11 +22,13 @@ object CraftingRecipes {
                 val shape = recipeObj.shape
                 try {
                     recipe.shape(shape[0], shape[1], shape[2])
-                }catch (ex: ArrayIndexOutOfBoundsException){println("Out of index at recipe $name")}
-                recipeObj.ingredients.forEach {
-                    recipe.setIngredient(it.key, itemStringToItem(it.value))
+                    recipeObj.ingredients.forEach {
+                        recipe.setIngredient(it.key, itemStringToItem(it.value))
+                    }
+                    Bukkit.addRecipe(recipe)
+                }catch (ex: ArrayIndexOutOfBoundsException){
+                    println("Out of index at recipe $name")
                 }
-                Bukkit.addRecipe(recipe)
             }
         }else {
             file.createNewFile()

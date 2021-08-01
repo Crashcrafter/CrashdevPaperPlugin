@@ -20,7 +20,6 @@ var dropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
 const val dcLink = "https://discord.gg/qQtaYsDN6w"
 var dropWardenName = "§4§lDrop Warden"
-val customRangeMap = hashMapOf(Material.IRON_SWORD to hashMapOf(1 to 5), Material.DIAMOND_SWORD to hashMapOf(1 to 5, 2 to 50), Material.NETHERITE_SWORD to hashMapOf(1 to 5))
 
 //VARIABLE DATA
 val amount_Sleeping: ArrayList<Player> = ArrayList()

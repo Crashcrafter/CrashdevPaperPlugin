@@ -33,14 +33,10 @@ class RLGPlayer() {
     var isMod = false
     var mana = 0
     var managen: Job? = null
-
     var quests :ArrayList<Quest> = ArrayList()
     var hasDaily by Delegates.notNull<Boolean>()
     var hasWeekly by Delegates.notNull<Boolean>()
-
     var deathPos: Location? = null
-    var lastDamage: Long? = null
-
     var disabledMovement = false
     var dropCoolDown by Delegates.notNull<Long>()
     var elytraCoolDown = System.currentTimeMillis() + 1000*30
@@ -237,7 +233,7 @@ class RLGPlayer() {
             HomepointTable.insert {
                 it[keyword] = keyWord
                 it[uuid] = player.uniqueId.toString()
-                it[homePos] = playerPos.toSQLString()
+                it[homePos] = playerPos.toPositionString()
             }
         }
         homes[keyWord] = playerPos

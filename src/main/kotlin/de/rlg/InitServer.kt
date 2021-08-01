@@ -21,24 +21,20 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Material
 import org.bukkit.WorldCreator
-import org.bukkit.block.Chest
-import org.bukkit.block.Sign
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.io.File
 
-fun initServer(){
+internal fun initServer(){
     initDatabase()
     loadWarps()
-
     initQuests()
     initGuilds()
     loadRanks()
     loadFromDb()
     fixDb()
-
     CustomItems.loadItems()
     loadLootTables()
     initTradingInventories()
@@ -48,12 +44,11 @@ fun initServer(){
     CraftingRecipes.loadRecipes()
     loadMaxEnchantmentLevel()
     loadPrices()
-
     registerCommands()
     registerEvents()
 }
 
-fun registerEvents(){
+internal fun registerEvents(){
     val listener = listOf(AnvilListener(), ChatListener(), CheatListener(), ChunkListener(), ClaimListener(), CraftingListener(), DamageListener(),
     DeathListener(), DeSpawnListener(), ElytraListener(), InteractListener(), InventoryListener(), JoinListener(), LeaveListener(), MobSpawnListener(),
     PortalListener(), QuestListener(), RespawnListener(), SignListener(), SleepListener(), VoteListener(), ProjectileListener())
@@ -64,7 +59,7 @@ fun registerEvents(){
     }
 }
 
-fun registerCommands(){
+internal fun registerCommands(){
     INSTANCE.getCommand("ci")!!.setExecutor(CICommand())
     INSTANCE.getCommand("ci")!!.tabCompleter = CICommand()
     INSTANCE.getCommand("discord")!!.setExecutor(DiscordCommand())
@@ -119,7 +114,7 @@ fun registerCommands(){
     INSTANCE.getCommand("warp")!!.tabCompleter = WarpCommand()
 }
 
-fun loadWorlds(){
+internal fun loadWorlds(){
     val worlds = INSTANCE.config.getStringList("worlds")
     if(worlds.isEmpty()){
         worlds.add("event")
@@ -131,7 +126,7 @@ fun loadWorlds(){
     }
 }
 
-fun loadFromDb(){
+internal fun loadFromDb(){
     transaction {
         chunks.clear()
         ChunkTable.selectAll().forEach {
@@ -144,27 +139,13 @@ fun loadFromDb(){
                 chunks[chunkKey] = hashMapOf(chunkClass.world to chunkClass)
             }
         }
-        shops.clear()
-        ShopTable.selectAll().forEach {
-            val sign = getBlockBySQLString(it[ShopTable.signPos])
-            val chest = getBlockBySQLString(it[ShopTable.chestPos])
-            val shop = Shop(chest.state as Chest, sign.state as Sign,
-                it[ShopTable.ownerUUID], it[ShopTable.playername], it[ShopTable.sellPrice], it[ShopTable.buyPrice], Material.valueOf(it[ShopTable.material]),
-                it[ShopTable.cmd])
-            if(sign.state !is Sign || chest.state !is Chest){
-                removeShop(shop)
-            }else {
-                shops.add(shop)
-                signs[sign] = shop
-            }
-        }
         keyChests.clear()
         KeyChestTable.selectAll().forEach {
-            keyChests[getBlockBySQLString(it[KeyChestTable.chestPos])] = it[KeyChestTable.type]
+            keyChests[getBlockByPositionString(it[KeyChestTable.chestPos])] = it[KeyChestTable.type]
         }
         portals.clear()
         PortalTable.selectAll().forEach {
-            portals[getBlockBySQLString(it[PortalTable.portalPos])] = it[PortalTable.targetWorld]
+            portals[getBlockByPositionString(it[PortalTable.portalPos])] = it[PortalTable.targetWorld]
         }
     }
     updateTabOfPlayers()
@@ -182,7 +163,7 @@ fun loadFromDb(){
 }
 
 data class PricesSaveObj(val material: String, val cmd: Int, val price: Long)
-fun loadPrices(){
+internal fun loadPrices(){
     prices.clear()
     val file = File(INSTANCE.dataFolder.path + "/prices.json")
     if(file.exists()){
@@ -200,7 +181,7 @@ fun loadPrices(){
     }
 }
 
-fun fixDb(){
+internal fun fixDb(){
     transaction {
         PlayersTable.selectAll().forEach {
             val uuid = it[PlayersTable.uuid]

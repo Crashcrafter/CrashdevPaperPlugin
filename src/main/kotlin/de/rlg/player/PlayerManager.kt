@@ -30,7 +30,7 @@ fun Player.load(){
             val result = queryResult.first()
             val homes = HashMap<String, Block>()
             HomepointTable.select(where = { HomepointTable.uuid eq player.uniqueId.toString() }).forEach {
-                homes[it[HomepointTable.keyword]] = getBlockBySQLString(it[HomepointTable.homePos])
+                homes[it[HomepointTable.keyword]] = getBlockByPositionString(it[HomepointTable.homePos])
             }
             val rlgPlayer = RLGPlayer(
                 player,

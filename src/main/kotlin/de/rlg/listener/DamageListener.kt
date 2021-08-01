@@ -21,9 +21,6 @@ class DamageListener : Listener {
         if (e.entityType == EntityType.PLAYER) {
             val player = e.entity as Player
             val rlgPlayer = player.rlgPlayer()
-            if (e is EntityDamageByEntityEvent && e.damager is Player) {
-                rlgPlayer.lastDamage = System.currentTimeMillis() + (1000*10)
-            }
             val chunk = player.location.chunk
             if (e.cause != EntityDamageEvent.DamageCause.VOID && deventCancel(chunk, player)) {
                 e.isCancelled = true

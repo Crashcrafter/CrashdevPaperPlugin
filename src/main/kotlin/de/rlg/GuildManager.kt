@@ -32,7 +32,7 @@ fun RLGPlayer.guild(): Guild? {
 
 fun SetupGuild.finalize(): Guild = Guild(0, this.name, this.suffix, this.owner_uuid, this.owner_name, arrayListOf(this.owner_name), arrayListOf(this.owner_uuid))
 
-fun initGuilds(){
+internal fun initGuilds(){
     transaction {
         GuildTable.selectAll().forEach {
             val id = it[GuildTable.id].value

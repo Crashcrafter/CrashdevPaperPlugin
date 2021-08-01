@@ -143,7 +143,7 @@ data class Key(val id: Int, val name: String, val displayName: String, val crate
 }
 data class LootTableItem(val itemString: String, val probability: Int, val amount: Int = 1, val enchantments: HashMap<String, Int>? = null)
 
-fun loadLootTables(){
+internal fun loadLootTables(){
     val file = File(INSTANCE.dataFolder.path + "/keys.json")
     if(file.exists()){
         val keys = jacksonObjectMapper().readValue<List<Key>>(file)

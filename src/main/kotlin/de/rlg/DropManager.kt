@@ -300,7 +300,7 @@ data class DropObj(val type: Int, val possibility: Int, val allowedWorlds: List<
 val dropTypeMap = hashMapOf<Int, DropObj>()
 val dropLootTableMap = hashMapOf<Int, MutableList<LootTableItem>>()
 
-fun loadDropTables(){
+internal fun loadDropTables(){
     canDropStart = true
     val file = File(INSTANCE.dataFolder.path + "/drops.json")
     if(file.exists()){

@@ -5,7 +5,6 @@ import de.rlg.permission.invSeeECs
 import de.rlg.permission.invSeeInventories
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.block.Chest
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -29,10 +28,6 @@ class InventoryListener : Listener {
             }
             shopinventories.contains(inventory) -> {
                 shopinventories.remove(inventory)
-                inventory.clear()
-            }
-            playershopinventories.containsKey(inventory) -> {
-                playershopinventories.remove(inventory)
                 inventory.clear()
             }
             questinventories.contains(inventory) -> {
@@ -85,11 +80,6 @@ class InventoryListener : Listener {
                 clickHandler(e.clickedInventory!!.getItem(e.slot)!!, player)
             } catch (ignored: NullPointerException) { }
             catch (ignored: ArrayIndexOutOfBoundsException) { }
-        } else if (playershopinventories.containsKey(e.inventory)) {
-            e.isCancelled = true
-            try {
-                shopInvClickHandler(player, e.clickedInventory!!.getItem(e.slot)!!, playershopinventories[e.clickedInventory]!!)
-            }catch (ex: NullPointerException) {}
         } else if (questinventories.contains(e.clickedInventory)) {
             e.isCancelled = true
             questClickHandler(e.whoClicked as Player, e.clickedInventory!!, e.slot)

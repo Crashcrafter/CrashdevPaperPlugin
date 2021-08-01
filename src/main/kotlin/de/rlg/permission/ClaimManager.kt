@@ -116,43 +116,16 @@ fun getAddedClaims(uuid: String): Int {
     return addedClaims
 }
 
-fun Chunk.grantChunkAccess(player: Player, executor: Player?) {this.grantChunkAccess(player.uniqueId.toString(), executor)}
+fun Chunk.changeChunkAccess(player: Player, grant: Boolean, executor: Player?){this.changeChunkAccess(player.uniqueId.toString(), grant, executor)}
 
-fun Chunk.grantChunkAccess(uuid: String, executor: Player?) {
-    val chunk = this
-    if(!chunk.isClaimed()) {
-        executor?.sendMessage("§4Der Chunk is nicht geclaimt!")
-        return
-    }
-    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
-    if(executor != null && (chunkClass.owner_uuid != executor.uniqueId.toString() || executor.isOp)){
-        executor.sendMessage("§4Dir gehört der Chunk nicht!")
-        return
-    }
-    transaction {
-        val shared = ChunkTable.select(where = {ChunkTable.x eq chunk.x and(ChunkTable.z eq chunk.z and(ChunkTable.world eq chunk.world.name))}).first()[ChunkTable.shared]
-        val sharedArray = shared.split(" ").toMutableList()
-        if(sharedArray.contains(uuid)){
-            executor?.sendMessage("§4Der Spieler hat schon Zugriff auf diesen Chunk!")
-            return@transaction
-        }
-        sharedArray.add(uuid)
-        chunkClass.shared.add(uuid)
-        updateChunkShared(chunk, sharedArray)
-        executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk gewärt!")
-    }
-}
-
-fun Chunk.revokeChunkAccess(player: Player, executor: Player?) {this.revokeChunkAccess(player.uniqueId.toString(), executor)}
-
-fun Chunk.revokeChunkAccess(uuid: String, executor: Player?){
+fun Chunk.changeChunkAccess(uuid: String, grant: Boolean, executor: Player?){
     val chunk = this
     if(!chunk.isClaimed()){
         executor?.sendMessage("§4Der Chunk is nicht geclaimt!")
         return
     }
     val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
-    if(executor != null && (chunkClass.owner_uuid != executor.uniqueId.toString() || executor.isOp)){
+    if(executor != null && (chunkClass.owner_uuid != executor.uniqueId.toString() && !executor.isOp)){
         executor.sendMessage("§4Dir gehört der Chunk nicht!")
         return
     }
@@ -163,10 +136,16 @@ fun Chunk.revokeChunkAccess(uuid: String, executor: Player?){
             executor?.sendMessage("§4Der Spieler hat keinen Zugriff auf diesen Chunk!")
             return@transaction
         }
-        sharedArray.remove(uuid)
-        chunkClass.shared.remove(uuid)
+        if(grant){
+            sharedArray.add(uuid)
+            chunkClass.shared.add(uuid)
+            executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk gewährt!")
+        }else {
+            sharedArray.remove(uuid)
+            chunkClass.shared.remove(uuid)
+            executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk entfernt!")
+        }
         updateChunkShared(chunk, sharedArray)
-        executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk entfernt!")
     }
 }
 
@@ -184,11 +163,7 @@ fun Player.changeAccessAllChunks(uuid: String, grant: Boolean){
             chunks.add(Bukkit.getWorld(it[ChunkTable.world])!!.getChunkAt(it[ChunkTable.x], it[ChunkTable.z]))
         }
         chunks.forEach {
-            if(grant){
-                it.grantChunkAccess(uuid, null)
-            }else {
-                it.revokeChunkAccess(uuid, null)
-            }
+            it.changeChunkAccess(uuid, grant, null)
         }
     }
 }

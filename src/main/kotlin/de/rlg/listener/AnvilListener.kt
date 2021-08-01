@@ -35,7 +35,7 @@ class AnvilListener : Listener {
 val maxEnchLevel = HashMap<Enchantment, Int>()
 
 data class EnchantmentSaveObj(val key: String, val level: Int)
-fun loadMaxEnchantmentLevel(){
+internal fun loadMaxEnchantmentLevel(){
     val file = File(INSTANCE.dataFolder.path + "/enchantments.json")
     if(file.exists()){
         val enchantments = jacksonObjectMapper().readValue<List<EnchantmentSaveObj>>(File(INSTANCE.dataFolder.path + "/enchantments.json"))
@@ -73,6 +73,12 @@ fun ItemStack.getAllEnchantments(): MutableMap<Enchantment, Int> {
 fun ItemStack.applyEnchantment(enchantment: Enchantment, is1: ItemStack, is2: ItemStack){
     val ench1 = is1.getEnchLevel(enchantment)
     val ench2 = is2.getEnchLevel(enchantment)
+    is1.enchantments.forEach {
+        if(enchantment.conflictsWith(it.key)) return
+    }
+    is2.enchantments.forEach {
+        if(enchantment.conflictsWith(it.key)) return
+    }
     val resultLevel = when {
         ench1 == ench2 -> {
             if(ench1 < (maxEnchLevel[enchantment] ?: enchantment.maxLevel)) {
@@ -87,5 +93,11 @@ fun ItemStack.applyEnchantment(enchantment: Enchantment, is1: ItemStack, is2: It
             ench1
         }
     }
-    this.addUnsafeEnchantment(enchantment, resultLevel)
+    if(type == Material.ENCHANTED_BOOK){
+        val meta =  (itemMeta as EnchantmentStorageMeta)
+        meta.addStoredEnchant(enchantment, resultLevel, true)
+        this.itemMeta = meta
+    }else {
+        this.addUnsafeEnchantment(enchantment, resultLevel)
+    }
 }

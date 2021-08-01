@@ -3,9 +3,6 @@ package de.rlg
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import de.rlg.items.CustomItems
-import de.rlg.items.ciName
-import de.rlg.items.getByTypeCmd
-import de.rlg.listener.addMessageListener
 import de.rlg.permission.rankData
 import de.rlg.player.rlgPlayer
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -18,9 +15,6 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.block.Block
-import org.bukkit.block.Chest
-import org.bukkit.block.Sign
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.Villager
@@ -39,21 +33,11 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 
 var prices = HashMap<Material, HashMap<Int, Long>>()
-var amountmap = HashMap<Int, Int>()
-var shops: MutableList<Shop> = ArrayList()
-var signs = HashMap<Block, Shop>()
-var setupShop = HashMap<Player, Shop>()
+var amountmap = hashMapOf(0 to 1, 1 to 8, 2 to 16, 3 to 64)
 var shopinventories: MutableList<Inventory> = ArrayList()
-var playershopinventories = HashMap<Inventory, Shop>()
 var creditsScoreBoard = ""
 
-fun initTradingInventories() {
-    amountmap.clear()
-    amountmap[0] = 1
-    amountmap[1] = 8
-    amountmap[2] = 16
-    amountmap[3] = 64
-
+internal fun initTradingInventories() {
     val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
     overview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "§1Buch-Shop", arrayListOf(), 1, hashMapOf("rlgAction" to "book")))
     overview.setItem(1, CustomItems.defaultCustomItem(Material.OAK_LOG, "§cHolz-Shop", arrayListOf(), 0, hashMapOf("rlgAction" to "wood")))
@@ -189,7 +173,7 @@ fun tradingInventory(player: Player) {
         if (player.inventory.itemInMainHand.type == Material.AIR) {
             val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
             overview.contents = TradingInventories.overview!!.contents.copyOf()
-            if(rlgPlayer.xpLevel < 10){
+            if(rlgPlayer.xpLevel <= 10){
                 overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 10 benötigt"), 1, hashMapOf("rlgAction" to "crypto")))
             }
             showTradingInventory(player, overview, "Shop")
@@ -371,347 +355,6 @@ object ShopInventories {
     var normalView: Inventory? = null
 }
 
-fun setupShop1(chest: Chest, sign: Sign, player: Player) {
-    val shop = Shop(chest, sign, player)
-    setupShop[player] = shop
-    player.sendMessage("§6Bitte leg das Item, was du ankaufen/verkaufen willst, in den ersten Slot der Kiste!\n§2Schreib in den Chat den Verkaufspreis §l§4pro 1 Item in Credits§r§2 rein (Keine Kommastellen!)\nSchreib - wenn du nicht verkaufen möchtest")
-    player.addMessageListener { asyncChatEvent, s ->
-        setupShop2(player, s)
-        asyncChatEvent.isCancelled = true
-        true
-    }
-}
-
-fun setupShop2(player: Player, msgPrice: String) {
-    val price: Int = try {
-        msgPrice.toInt()
-    } catch (ignored: NumberFormatException) {
-        if (msgPrice.contentEquals("-")) {
-            -1
-        } else {
-            return
-        }
-    }
-    val shop = setupShop[player]
-    val shopInv = shop!!.chest.blockInventory
-    var type = Material.AIR
-    var cmd = 0
-    for (itemStack: ItemStack? in shopInv) {
-        if (itemStack != null) {
-            if (type == Material.AIR) {
-                type = itemStack.type
-                cmd = if (itemStack.itemMeta.hasCustomModelData()) itemStack.itemMeta.customModelData else 0
-            }
-            if (cmd != 0) {
-                if (!itemStack.itemMeta.hasCustomModelData() || cmd != itemStack.itemMeta.customModelData) {
-                    player.sendMessage("Bitte kontaktiere den Shop-Besitzer: Es befinden sich verschiedene Items im Inventar!")
-                    return
-                }
-            }
-            if (type != itemStack.type) {
-                player.sendMessage("Bitte kontaktiere den Shop-Besitzer: Es befinden sich verschiedene Items im Inventar!")
-                return
-            }
-        }
-    }
-    val itemStack = shop.chest.blockInventory.getItem(0)
-    try {
-        assert(itemStack != null)
-        itemStack!!.type
-    } catch (ignored: NullPointerException) {
-        player.sendMessage("§4Es befindet sich kein Item in der Kiste!\nBitte starte das Setup von vorne!")
-        setupShop.remove(player)
-        return
-    }
-    shop.setOffer(itemStack, price)
-    if (cmd != 0) {
-        shop.cmd = cmd
-    }
-    player.sendMessage("§6Verkaufspreis wurde gesetzt! ($msgPrice)")
-    player.sendMessage("§2Schreib in den Chat den Ankaufspreis §l§4pro 1 Item in Credits§r§2 rein (Keine Kommastellen!)\nSchreib - wenn du nicht ankaufen möchtest")
-    player.addMessageListener { asyncChatEvent, s ->
-        setupShop3(player, s)
-        asyncChatEvent.isCancelled = true
-        true
-    }
-}
-
-fun setupShop3(player: Player, msgPrice: String) {
-    val price: Int = try {
-        msgPrice.toInt()
-    } catch (ignored: NumberFormatException) {
-        if (msgPrice.contentEquals("-")) {
-            -1
-        } else {
-            return
-        }
-    }
-    val shop = setupShop[player]
-    shop!!.buyprice = price
-    shops.add(shop)
-    setupShop.remove(player)
-    val sign = shop.sign
-    signs[sign.block] = shop
-    val itemString: String = ciName(shop.type!!, shop.cmd) ?: shop.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial()
-    player.sendMessage("§6Kaufspreis wurde gesetzt! ($msgPrice)")
-    player.sendMessage(
-        "§2Dein Shop wurde erstellt!\nItem: " + itemString + "\nVerkauf: " + (if (shop.sellprice == -1) "-" else shop.sellprice) + " Credits\n"
-                + "Ankauf: " + (if (shop.buyprice == -1) "-" else shop.buyprice) + " Credits"
-    )
-    Bukkit.getScheduler().runTask(INSTANCE, Runnable {
-        sign.line(0, Component.text("[Shop]"))
-        sign.line(1, Component.text(itemString))
-        sign.line(2, Component.text("Buy: " + (if (shop.sellprice == -1) "-" else shop.sellprice.toString() + " Cr")))
-        sign.line(3, Component.text("Sell: " + (if (shop.buyprice == -1) "-" else shop.buyprice.toString() + " Cr")))
-        sign.update()
-    })
-    addShop(shop)
-}
-
-class Shop {
-    constructor(chest: Chest, sign: Sign, player: Player) {
-        this.chest = chest
-        this.sign = sign
-        uuid = player.uniqueId.toString()
-        playername = player.name
-    }
-
-    constructor(
-        chest: Chest,
-        sign: Sign,
-        owner_uuid: String,
-        playername: String,
-        sellprice: Int,
-        buyprice: Int,
-        type: Material?,
-        cmd: Int
-    ) {
-        this.chest = chest
-        this.sign = sign
-        uuid = owner_uuid
-        this.playername = playername
-        this.sellprice = sellprice
-        this.buyprice = buyprice
-        this.type = type
-        this.cmd = cmd
-    }
-
-    fun setOffer(item: ItemStack?, sellprice: Int) {
-        type = item!!.type
-        this.sellprice = sellprice
-    }
-
-    var chest: Chest
-    var sign: Sign
-    var uuid: String
-    var playername: String
-    var sellprice: Int = 0
-    var buyprice: Int = 0
-    var type: Material? = null
-    var cmd = 0
-}
-
-fun showShopView(shop: Shop, player: Player) {
-    val inventory = ShopInventories.normalView
-    val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(shop.playername + "'s Shop"))
-    val clone = inventory.contents.copyOf()
-    cloned.contents = clone
-    if (shop.sellprice != -1) {
-        cloned.setItem(11, CustomItems.defaultCustomItem(Material.GREEN_WOOL, "§2Buy", arrayListOf(), 0, hashMapOf("rlgAction" to "buy")))
-    }
-    if (shop.uuid.contentEquals(player.uniqueId.toString())) {
-        cloned.setItem(13, CustomItems.defaultCustomItem(Material.BARRIER, "§4Shop löschen", arrayListOf(), 0, hashMapOf("rlgAction" to "delete")))
-    }
-    if (shop.buyprice != -1) {
-        cloned.setItem(15, CustomItems.defaultCustomItem(Material.ORANGE_WOOL, "§6Sell", arrayListOf(), 0, hashMapOf("rlgAction" to "sell")))
-    }
-    playershopinventories[cloned] = shop
-    player.closeInventory()
-    player.openInventory(cloned)
-}
-
-fun showBuySellView(shop: Shop, player: Player, buy: Boolean) {
-    val inventory = ShopInventories.normalView
-    val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(shop.playername + "'s Shop"))
-    val clone = inventory.contents.copyOf()
-    cloned.contents = clone
-    for (i in 0 until amountmap.size) {
-        val itemStack = ItemStack((shop.type)!!)
-        if (shop.type!!.maxStackSize < (amountmap[i])!!) break
-        itemStack.amount = (amountmap[i])!!
-        val im = itemStack.itemMeta
-        if (shop.cmd != 0) {
-            im.setCustomModelData(shop.cmd)
-        }
-        if (buy) {
-            im.displayName(Component.text(
-                "Kaufe " + amountmap[i] + " " + shop.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " für " +
-                        (amountmap[i]!! * shop.sellprice).withPoints() + " Credits"))
-            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgAction"), PersistentDataType.STRING, "buy ${amountmap[i]}")
-        } else {
-            im.displayName(Component.text(
-                "Verkaufe " + amountmap[i] + " " + shop.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " für " + (
-                        amountmap[i]!! * shop.buyprice).withPoints() + " Credits"))
-            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgAction"), PersistentDataType.STRING, "sell ${amountmap[i]}")
-        }
-        itemStack.itemMeta = im
-        cloned.setItem(i + 11, itemStack)
-    }
-    playershopinventories[cloned] = shop
-    player.closeInventory()
-    player.openInventory(cloned)
-}
-
-fun shopInvClickHandler(player: Player, clicked: ItemStack, shop: Shop) {
-    try {
-        if (clicked.hasItemMeta() && clicked.itemMeta.hasLore() && clicked.itemMeta.lore()!!.contains(Component.text("Aus Creative-Inventar"))) {
-            return
-        }
-        if (clicked.itemMeta.hasDisplayName()) {
-            when (val action = clicked.itemMeta.persistentDataContainer[NamespacedKey(INSTANCE, "rlgAction"), PersistentDataType.STRING]!!) {
-                "buy" -> showBuySellView(shop, player, true)
-                "sell" -> showBuySellView(shop, player, false)
-                "delete" -> removeShop(shop, player)
-                else -> if (clicked.type != Material.GRAY_STAINED_GLASS_PANE) {
-                    val firstWord = action.split(" ").toTypedArray()[0]
-                    val amount = action.split(" ").toTypedArray()[1].toInt()
-                    if (firstWord.contentEquals("buy")) {
-                        buyFromPlayerShop(player, shop, amount)
-                    } else if (firstWord.contentEquals("sell")) {
-                        sellToPlayerShop(player, shop, amount)
-                    }
-                }
-            }
-        }
-    } catch (ignored: NullPointerException) { }
-}
-
-fun buyFromPlayerShop(player: Player, shop: Shop, amount: Int) {
-    val price = amount * shop.sellprice
-    val shopInv = shop.chest.blockInventory
-    var itemsinchest = 0
-    for (itemStack: ItemStack? in shopInv) {
-        if (itemStack != null) {
-            if (itemStack.type != shop.type) {
-                player.sendMessage("§4Bitte kontaktiere den Shop-Besitzer, es befinden sich falsche Items in der Kiste!")
-                return
-            }
-            if (shop.cmd != 0) {
-                if (!itemStack.itemMeta.hasCustomModelData() || itemStack.itemMeta.customModelData != shop.cmd) {
-                    player.sendMessage("§4Bitte kontaktiere den Shop-Besitzer, es befinden sich falsche Items in der Kiste!")
-                    return
-                }
-            }
-            itemsinchest += itemStack.amount
-        }
-    }
-    if (amount <= itemsinchest) {
-        if (pay(player, price.toLong(), shop.playername + "'s Shop")) {
-            var itemStack = ItemStack((shop.type)!!)
-            if (shop.cmd != 0) {
-                itemStack = getByTypeCmd(shop.type, shop.cmd)!!
-            }
-            itemStack.amount = amount
-            removeItems(shopInv, shop.type!!, amount, shop.cmd)
-            player.inventory.addItem(itemStack)
-            try {
-                val owner = Bukkit.getPlayer(UUID.fromString(shop.uuid))!!
-                giveBalance(owner, price.toLong(), "deinen Shop")
-            } catch (ignored: NullPointerException) {
-                addCreditsToPlayer(shop.uuid, price.toLong())
-            }
-        }
-    } else {
-        player.sendMessage("§4Der Shop ist leer!")
-    }
-}
-
-fun sellToPlayerShop(player: Player, shop: Shop, amount: Int) {
-    val shopInv = shop.chest.blockInventory
-    val playerInv: Inventory = player.inventory
-    val playerContents = playerInv.contents
-    var spaceinchest = 27 * shop.type!!.maxStackSize
-    for (itemStack: ItemStack? in shopInv) {
-        if (itemStack != null) {
-            if (itemStack.type == shop.type) {
-                if (shop.cmd != 0) {
-                    if (!itemStack.itemMeta.hasCustomModelData() || itemStack.itemMeta.customModelData != shop.cmd) {
-                        player.sendMessage("§4Bitte kontaktiere den Shop-Besitzer, es befinden sich falsche Items in der Kiste!")
-                        break
-                    }
-                }
-                spaceinchest -= itemStack.amount
-            } else {
-                player.sendMessage("§4Bitte kontaktiere den Shop-Besitzer, es befinden sich falsche Items in der Kiste!")
-                break
-            }
-        }
-    }
-    var amountitemsinplayer = 0
-    for (itemStack: ItemStack? in playerContents) {
-        if (itemStack != null) {
-            if (itemStack.type == shop.type) {
-                if (shop.cmd != 0) {
-                    if (itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == shop.cmd) {
-                        amountitemsinplayer += itemStack.amount
-                    }
-                } else {
-                    amountitemsinplayer += itemStack.amount
-                }
-            }
-        }
-    }
-    if (amount <= spaceinchest) {
-        if (amount <= amountitemsinplayer) {
-            val revenue = amount * shop.buyprice
-            val shopBalance: Long = getCredits(shop.uuid)
-            if (shopBalance > revenue) {
-                removeItems(playerInv, shop.type!!, amount, shop.cmd)
-                var itemStack = ItemStack((shop.type)!!, amount)
-                if (shop.cmd != 0) {
-                    itemStack = getByTypeCmd(shop.type, shop.cmd)!!
-                    itemStack.amount = amount
-                }
-                shopInv.addItem(itemStack)
-                giveBalance(player, revenue.toLong(), shop.playername + "'s Shop")
-                try {
-                    val owner = Bukkit.getPlayer(UUID.fromString(shop.uuid))!!
-                    giveBalance(owner, -revenue.toLong(), "deinen Shop")
-                } catch (ignored: NullPointerException) {
-                    addCreditsToPlayer(shop.uuid, -revenue.toLong())
-                }
-            }
-        } else {
-            player.sendMessage("§4Du hast nicht dieses Item")
-        }
-    } else {
-        player.sendMessage("§4Der Shop ist voll!")
-    }
-}
-
-fun signClickHandler(player: Player, sign: Sign) {
-    val shop = signs[sign.block] ?: return
-    showShopView(shop, player)
-}
-
-fun removeShop(shop: Shop, player: Player) {
-    if (player.uniqueId.toString().contentEquals(shop.uuid)) {
-        val sign = shop.sign
-        Bukkit.getScheduler().runTask(INSTANCE, Runnable {
-            sign.line(0, Component.text(""))
-            sign.line(1, Component.text(""))
-            sign.line(2, Component.text(""))
-            sign.line(3, Component.text(""))
-            sign.update()
-        })
-        player.closeInventory()
-        removeShop(shop)
-        shops.remove(shop)
-        signs.remove(sign.block)
-        player.sendMessage("§2Dein Shop wurde erfolgreich gelöscht!")
-    }
-}
-
 fun Player.changeCredits(newAmount: Long){
     val player = this
     transaction { 
@@ -738,41 +381,12 @@ fun getCredits(uuid: String): Long{
     return bal
 }
 
-fun removeShop(shop: Shop){
-    transaction {
-        ShopTable.deleteWhere{
-            ShopTable.ownerUUID eq shop.uuid and(ShopTable.chestPos eq shop.chest.world.name + "/" + shop.chest.x + "/" + shop.chest.y + "/" + shop.chest.z)
-        }
-    }
-}
-
-private fun addShop(shop: Shop){
-    transaction {
-        ShopTable.insert {
-            it[signPos] = shop.sign.world.name + "/" + shop.sign.x + "/" + shop.sign.y + "/" + shop.sign.z
-            it[chestPos] = shop.chest.world.name + "/" + shop.chest.x + "/" + shop.chest.y + "/" + shop.chest.z
-            it[ownerUUID] = shop.uuid
-            it[playername] = shop.playername
-            it[sellPrice] = shop.sellprice
-            it[buyPrice] = shop.buyprice
-            it[material] = shop.type.toString()
-            it[cmd] = shop.cmd
-        }
-    }
-}
-
 @OptIn(DelicateCoroutinesApi::class)
-fun updateCreditScore(){
+internal fun updateCreditScore(){
     allJobs.add(GlobalScope.launch {
         while (true){
             lastUpdate = Date(System.currentTimeMillis())
             creditsScoreBoard = getCreditsScoreboard()
-            Bukkit.getScheduler().runTask(INSTANCE, Runnable {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as @e[type=boat] at @s store result score @s kb_isEmpty run data get entity @s Passengers")
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as @a at @s store result score @s kb_isEmpty run data get entity @s RootVehicle")
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute as @a[scores={kb_isEmpty=1..}] at @s run scoreboard players set @e[type=boat,sort=nearest,limit=1] kb_isEmpty 1")
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=boat,scores={kb_isEmpty=0}]")
-            })
             val response = URL("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin,nano,ethereum,litecoin&vs_currencies=usd").readText()
             val obj = jacksonObjectMapper().readValue<CoingeckoPriceInfo>(response)
             prices[Material.STICK]!![1] = (obj["bitcoin"]!!.usd * 100).roundToInt().toLong()

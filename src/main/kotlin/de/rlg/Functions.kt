@@ -145,13 +145,13 @@ fun getKeysPerRank(rank: Int): String {
     return result.toString().removeSuffix(" ")
 }
 
-fun getBlockBySQLString(input: String): Block {
+fun getBlockByPositionString(input: String): Block {
     val parts = input.split("/").toTypedArray()
     return Objects.requireNonNull(Bukkit.getWorld(parts[0]))!!
         .getBlockAt(parts[1].toInt(), parts[2].toInt(), parts[3].toInt())
 }
 
-fun Block.toSQLString(): String = "${this.world.name}/${this.x}/${this.y}/${this.z}"
+fun Block.toPositionString(): String = "${this.world.name}/${this.x}/${this.y}/${this.z}"
 
 fun List<Component>.toStringList(): MutableList<String>{
     val result = mutableListOf<String>()

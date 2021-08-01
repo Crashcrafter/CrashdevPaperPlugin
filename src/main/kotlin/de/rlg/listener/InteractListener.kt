@@ -64,16 +64,11 @@ class InteractListener : Listener {
             } else if (eventCancel(chunk, player)) {
                 e.isCancelled = true
                 return
-            } else if (e.action == Action.RIGHT_CLICK_BLOCK && block!!.state is Sign) {
+            } else if (e.action == Action.RIGHT_CLICK_BLOCK && block!!.state is Sign && player.isSneaking && !eventCancel(block.chunk, player)) {
                 val sign = block.state as Sign
-                if (signs.containsKey(sign.block)) {
-                    signClickHandler(player, sign)
-                    return
-                } else if (player.isSneaking && !eventCancel(block.chunk, player)) {
-                    sign.isEditable = true
-                    player.openSign((block.state as Sign))
-                    return
-                }
+                sign.isEditable = true
+                player.openSign((block.state as Sign))
+                return
             }else if (player.inventory.itemInMainHand.type == Material.FISHING_ROD && e.clickedBlock!!.type == Material.NOTE_BLOCK) {
                 addAFKCounter(player)
             }
@@ -122,8 +117,8 @@ class InteractListener : Listener {
                     return
                 }
             }
-            if(customRangeMap.containsKey(type) && customRangeMap[type]!!.containsKey(cmd) && e.action == Action.LEFT_CLICK_AIR){
-                val range = customRangeMap[type]!![cmd]!!
+            if(itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgRange"), PersistentDataType.STRING) && e.action == Action.LEFT_CLICK_AIR){
+                val range = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgRange"), PersistentDataType.STRING)!!.toInt()
                 val target = player.getTargetEntity(range, false)
                 if(target != null && target is LivingEntity){
                     var damage = itemStack.itemMeta.attributeModifiers?.get(Attribute.GENERIC_ATTACK_DAMAGE)?.first()?.amount ?: type.getItemAttributes(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE).first().amount
@@ -135,10 +130,6 @@ class InteractListener : Listener {
                     Bukkit.getPluginManager().callEvent(event)
                     return
                 }
-                /*val targetBlock = player.rayTraceBlocks(range.toDouble())?.hitBlock
-                if(targetBlock != null){
-                    targetBlock.
-                }*/
             }
         }
     }

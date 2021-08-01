@@ -68,11 +68,11 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                 }
                 val target = Bukkit.getPlayer(s2)
                 if(target != null) {
-                    if(give)chunk.grantChunkAccess(player, target) else chunk.revokeChunkAccess(player, target)
+                    chunk.changeChunkAccess(target, give, player)
                     return true
                 }
                 val targetUuid = MojangAPI.getUUID(s2).toString()
-                if(!give)chunk.revokeChunkAccess(targetUuid, player)
+                if(!give)chunk.changeChunkAccess(targetUuid, false, player)
             } else {
                 player.sendMessage("§aDu bist der Besitzer des Chunks!")
             }

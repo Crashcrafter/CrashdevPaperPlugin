@@ -86,7 +86,7 @@ fun deleteWarp(key: String){
     INSTANCE.saveConfig()
 }
 
-fun loadWarps(){
+internal fun loadWarps(){
     val section = INSTANCE.config.getConfigurationSection("warps") ?: return
     section.getKeys(false).forEach {
         warps[it] = INSTANCE.config.getLocation("warps.$it")!!

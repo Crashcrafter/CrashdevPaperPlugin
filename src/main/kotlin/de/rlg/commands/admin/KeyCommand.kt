@@ -86,7 +86,7 @@ class KeyCommand : CommandExecutor, TabCompleter {
 }
 
 fun addKeyChest(block: Block, type: Int) {
-    val blockString = block.toSQLString()
+    val blockString = block.toPositionString()
     transaction {
         if(KeyChestTable.select(where = {KeyChestTable.chestPos eq blockString}).empty()){
             KeyChestTable.insert {
@@ -101,7 +101,7 @@ fun addKeyChest(block: Block, type: Int) {
 fun removeKeyChest(block: Block) {
     transaction {
         KeyChestTable.deleteWhere {
-            KeyChestTable.chestPos eq block.toSQLString()
+            KeyChestTable.chestPos eq block.toPositionString()
         }
     }
     keyChests.remove(block)

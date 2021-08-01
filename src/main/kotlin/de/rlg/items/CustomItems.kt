@@ -8,6 +8,7 @@ import de.rlg.customItemsMap
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.BookMeta
 import org.bukkit.persistence.PersistentDataType
@@ -15,9 +16,9 @@ import java.io.File
 
 object CustomItems {
 
-    data class CustomItem(val material: String, val displayName: String, val lore: List<String>? = null, val cmd: Int? = null, val data: HashMap<String, String>? = null)
+    data class CustomItem(val material: String, val displayName: String, val lore: List<String>? = null, val cmd: Int? = null, val enchantments: HashMap<String, Int>? = null, val data: HashMap<String, String>? = null)
 
-    fun loadItems(){
+    internal fun loadItems(){
         val file = File(INSTANCE.dataFolder.path + "/ci.json")
         if(file.exists()){
             val customItems = jacksonObjectMapper().readValue<HashMap<String, CustomItem>>(file)
@@ -44,6 +45,9 @@ object CustomItems {
             itemMeta.persistentDataContainer.set(NamespacedKey(INSTANCE, it.key), PersistentDataType.STRING, it.value)
         }
         itemStack.itemMeta = itemMeta
+        enchantments?.forEach {
+            itemStack.addUnsafeEnchantment(Enchantment.getByKey(NamespacedKey.fromString(it.key))!!, it.value)
+        }
         return itemStack
     }
 

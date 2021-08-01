@@ -49,9 +49,9 @@ class Quest {
 
     constructor(qid: Int, uuid: String, daily: Boolean, status: Int, progress: Int) {
         val quest: Quest = if (daily) {
-            dailyquests[qid]!!
+            dailyquests[qid] ?: dailyquests[Random().nextInt(dailyquests.size-1)]!!
         } else {
-            weeklyquests[qid]!!
+            weeklyquests[qid] ?: weeklyquests[Random().nextInt(weeklyquests.size-1)]!!
         }
         this.uuid = uuid
         this.status = status
@@ -79,7 +79,7 @@ class Quest {
     var isDaily: Boolean
 }
 
-fun initQuests() {
+internal fun initQuests() {
     dailyquests[1] = Quest(1, Reward(3000, 1250), "Ungewöhnlicher Sammler", 3, "Schließe 3 Ungewöhnliche Drops ab", true)
     dailyquests[2] = Quest(2, Reward(1600, 1250), "Monster Hunter", 100, "Töte 100 feindliche Mobs", true)
     dailyquests[3] = Quest(3, Reward(1750, 1500), "Killing Streak", 50, "Töte 50 Zombies", true)

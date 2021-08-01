@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.time.Instant
 import java.time.LocalDate
 
-fun initDatabase(){
+internal fun initDatabase(){
     TransactionManager.defaultDatabase = Database.connect("jdbc:mysql://${LoginData.ip}/mcplugin", user = LoginData.user, password = LoginData.pw)
 }
 
@@ -69,17 +69,6 @@ object ProcessedTable : Table("processed"){
     val lastTime = date("lasttime")
     val leftKeys = varchar("leftkeys", 20)
     override val primaryKey = PrimaryKey(uuid)
-}
-
-object ShopTable : Table("shops"){
-    val signPos = text("signcords")
-    val chestPos = text("chestcords")
-    val ownerUUID = varchar("owner_uuid", 36)
-    val playername = varchar("playername", 100)
-    val sellPrice = integer("sellprice")
-    val buyPrice = integer("buyprice")
-    val material = varchar("material", 50)
-    val cmd = integer("cmd")
 }
 
 object WarnTable : Table("warns"){
