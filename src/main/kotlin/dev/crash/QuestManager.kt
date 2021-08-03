@@ -3,6 +3,7 @@ package dev.crash
 import dev.crash.items.CustomItems
 import dev.crash.items.ciName
 import dev.crash.permission.rankData
+import dev.crash.player.RLGPlayer
 import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -414,15 +415,14 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
     }
 }
 
-fun dailyQuestCreation(player: Player) {
-    val rlgPlayer = player.rlgPlayer()
+fun RLGPlayer.dailyQuestCreation() {
     val dailyChosen: MutableList<Int> = ArrayList()
     for (i in 0..2) {
         dailyChosen.add(createDailyQuest(i, player, dailyChosen))
-        rlgPlayer.hasDaily = false
+        hasDaily = false
     }
-    rlgPlayer.changeXP(100)
-    rlgPlayer.lastDailyQuest = System.currentTimeMillis()
+    changeXP(100)
+    lastDailyQuest = System.currentTimeMillis()
     giveBalance(player, 500, "Täglicher Login")
 }
 
@@ -442,9 +442,8 @@ private fun createDailyQuest(i: Int, player: Player, dailyChosen:MutableList<Int
     return randomid
 }
 
-fun weeklyQuestCreation(player: Player) {
-    val rlgPlayer = player.rlgPlayer()
-    dailyQuestCreation(player)
+fun RLGPlayer.weeklyQuestCreation() {
+    dailyQuestCreation()
     val weeklyChosen: MutableList<Int> = ArrayList()
     for (i in 3..5) {
         val random = Random()
@@ -453,15 +452,15 @@ fun weeklyQuestCreation(player: Player) {
             randomid = random.nextInt(weeklyquests.size) + 1
         }
         weeklyChosen.add(randomid)
-        if (rlgPlayer.quests.size <= i) {
-            rlgPlayer.quests.add(i, Quest(randomid, player.uniqueId.toString(), false, 0, 0))
+        if (quests.size <= i) {
+            quests.add(i, Quest(randomid, player.uniqueId.toString(), false, 0, 0))
         } else {
-            rlgPlayer.quests[i] = Quest(randomid, player.uniqueId.toString(), false, 0, 0)
+            quests[i] = Quest(randomid, player.uniqueId.toString(), false, 0, 0)
         }
     }
-    rlgPlayer.lastWeeklyQuest = System.currentTimeMillis()
-    rlgPlayer.hasDaily = false
-    rlgPlayer.hasWeekly = false
+    lastWeeklyQuest = System.currentTimeMillis()
+    hasDaily = false
+    hasWeekly = false
     player.updateScoreboard()
 }
 

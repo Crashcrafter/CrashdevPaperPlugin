@@ -137,19 +137,26 @@ internal fun loadFromDb(){
             }
         }
         keyChests.clear()
-        KeyChestTable.selectAll().forEach {
-            keyChests[getBlockByPositionString(it[KeyChestTable.chestPos])] = it[KeyChestTable.type]
+        val keyChestsFile = File(INSTANCE.dataFolder.path + "/keychests.json")
+        if(keyChestsFile.exists()){
+            val keyChestsMap = jacksonObjectMapper().readValue<HashMap<String, Int>>(keyChestsFile)
+            keyChestsMap.forEach {
+                keyChests[getBlockByPositionString(it.key)] = it.value
+            }
+        }else {
+            keyChestsFile.createNewFile()
+            jacksonObjectMapper().writeValue(keyChestsFile, hashMapOf<String, Int>())
         }
         portals.clear()
-        val file = File(INSTANCE.dataFolder.path + "/portals.json")
-        if(file.exists()){
-            val portalMap = jacksonObjectMapper().readValue<HashMap<String, String>>(file)
+        val portalFile = File(INSTANCE.dataFolder.path + "/portals.json")
+        if(portalFile.exists()){
+            val portalMap = jacksonObjectMapper().readValue<HashMap<String, String>>(portalFile)
             portalMap.forEach {
                 portals[getBlockByPositionString(it.key)] = it.value
             }
         }else {
-            file.createNewFile()
-            jacksonObjectMapper().writeValue(file, hashMapOf<String, String>())
+            portalFile.createNewFile()
+            jacksonObjectMapper().writeValue(portalFile, hashMapOf<String, String>())
         }
     }
     updateTabOfPlayers()

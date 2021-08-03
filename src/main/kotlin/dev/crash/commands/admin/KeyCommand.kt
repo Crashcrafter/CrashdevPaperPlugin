@@ -8,10 +8,6 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class KeyCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -86,23 +82,9 @@ class KeyCommand : CommandExecutor, TabCompleter {
 }
 
 fun addKeyChest(block: Block, type: Int) {
-    val blockString = block.toPositionString()
-    transaction {
-        if(KeyChestTable.select(where = {KeyChestTable.chestPos eq blockString}).empty()){
-            KeyChestTable.insert {
-                it[chestPos] = blockString
-                it[KeyChestTable.type] = type
-            }
-        }
-    }
     keyChests[block] = type
 }
 
 fun removeKeyChest(block: Block) {
-    transaction {
-        KeyChestTable.deleteWhere {
-            KeyChestTable.chestPos eq block.toPositionString()
-        }
-    }
     keyChests.remove(block)
 }

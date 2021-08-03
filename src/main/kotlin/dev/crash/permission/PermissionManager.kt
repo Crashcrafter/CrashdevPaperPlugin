@@ -9,14 +9,14 @@ var invSeeInventories = HashMap<Inventory, Player>()
 var invSeeECs = HashMap<Inventory, Player>()
 
 fun Player.givePerms(){
-    val attachment = this.addAttachment(INSTANCE)
+    val attachment = addAttachment(INSTANCE)
     for (string in attachment.permissions.keys) {
         attachment.unsetPermission(string!!)
     }
-    val rlgPlayer = this.rlgPlayer()
+    val rlgPlayer = rlgPlayer()
     val rankData = rlgPlayer.rankData()
     rankData.perms.forEach {
         attachment.setPermission(it.key, it.value)
     }
-    this.isOp = rankData.isAdmin
+    isOp = rankData.isAdmin
 }

@@ -1,5 +1,6 @@
 package dev.crash
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import dev.crash.player.load
 import dev.crash.player.rlgPlayer
 import dev.crash.player.unload
@@ -39,14 +40,16 @@ class Main : JavaPlugin(), PluginMessageListener {
     }
 
     override fun onDisable() {
-        Bukkit.getScheduler().pendingTasks.forEach {
-            it.cancel()
-        }
         allJobs.forEach {
             it.cancel()
         }
         Bukkit.getOnlinePlayers().forEach {
             it.unload()
+        }
+        jacksonObjectMapper().writeValue(File(INSTANCE.dataFolder.path + "/keychests.json"), keyChests.toStringKeyMap())
+        jacksonObjectMapper().writeValue(File(INSTANCE.dataFolder.path + "/portals.json"), portals.toStringKeyMap())
+        Bukkit.getScheduler().pendingTasks.forEach {
+            it.cancel()
         }
         Bukkit.getScheduler().cancelTasks(this)
         println("[INFO] Plugin wird deaktiviert...")

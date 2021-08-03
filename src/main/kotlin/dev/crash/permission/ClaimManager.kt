@@ -1,9 +1,8 @@
 package dev.crash.permission
 
 import dev.crash.ChunkTable
+import dev.crash.PlayerTable
 import dev.crash.guild
-import dev.crash.player.getPlayerData
-import dev.crash.player.modifyPlayerData
 import dev.crash.player.rlgPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -48,7 +47,6 @@ fun Chunk.claim(uuid: String, name: String, player: Player? = null): Boolean {
         if(player != null) {
             val rlgPlayer = player.rlgPlayer()
             rlgPlayer.remainingClaims--
-            rlgPlayer.chunks.add("${chunk.world.name}:${chunk.chunkKey}")
         }
         val chunkClass = ChunkClass(chunk.x, chunk.z, chunk.world.name, uuid, name, ArrayList())
         if(chunks.containsKey(chunk.chunkKey)){
@@ -74,9 +72,9 @@ fun Chunk.unClaim() {
                 if(owner != null) {
                     owner.rlgPlayer().remainingClaims++
                 }else {
-                    modifyPlayerData(ownerUuid){
-                        it.remainingClaims++
-                        it
+                    val remainingClaims = PlayerTable.select(where = {PlayerTable.uuid eq ownerUuid}).first()[PlayerTable.remainingClaims]
+                    PlayerTable.update(where = {PlayerTable.uuid eq ownerUuid}){
+                        it[PlayerTable.remainingClaims] = remainingClaims + 1
                     }
                 }
             }
@@ -91,7 +89,11 @@ fun Chunk.unClaim() {
 fun Chunk.claim(player: Player): Boolean = this.claim(player.uniqueId.toString(), player.name, player)
 
 fun getRemainingClaims(uuid: String): Int {
-    return getPlayerData(uuid).remainingClaims
+    var remainingClaims = 0
+    transaction {
+        remainingClaims = PlayerTable.select(where = {PlayerTable.uuid eq uuid}).first()[PlayerTable.remainingClaims]
+    }
+    return remainingClaims
 }
 
 fun changeAddedClaims(player: Player, amount: Int){
@@ -106,24 +108,12 @@ fun changeAddedHomes(player: Player, amount: Int){
     rlgPlayer.addedHomes += amount
 }
 
-fun changeAddedHomes(uuid: String, amount: Int) {
-    modifyPlayerData(uuid){
-        it.remainingHomes += amount
-        it.addedHomes += amount
-        it
-    }
-}
-
-fun changeAddedClaims(uuid: String, amount: Int) {
-    modifyPlayerData(uuid){
-        it.remainingClaims += amount
-        it.addedClaims += amount
-        it
-    }
-}
-
 fun getAddedClaims(uuid: String): Int {
-    return getPlayerData(uuid).addedClaims
+    var addedClaims = 0
+    transaction {
+        addedClaims = PlayerTable.select(where = {PlayerTable.uuid eq uuid}).first()[PlayerTable.addedClaims]
+    }
+    return addedClaims
 }
 
 fun Chunk.changeChunkAccess(player: Player, grant: Boolean, executor: Player?){this.changeChunkAccess(player.uniqueId.toString(), grant, executor)}
@@ -193,7 +183,7 @@ fun eventCancel(chunk: Chunk, player: Player): Boolean {
 fun heventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
     if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
-    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
+    val chunkClass = chunk.chunkData()!!
     if(chunkClass.owner_uuid == "0") return true
     if(chunkClass.owner_uuid.length <= 3) return false
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return false
@@ -203,7 +193,7 @@ fun heventCancel(chunk: Chunk, player: Player): Boolean {
 
 fun deventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
-    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
+    val chunkClass = chunk.chunkData()!!
     if(chunkClass.owner_uuid == "0") return true
     if(chunkClass.owner_uuid.length <= 3) return false
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
@@ -213,7 +203,7 @@ fun deventCancel(chunk: Chunk, player: Player): Boolean {
 
 fun canBack(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return true
-    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
+    val chunkClass = chunk.chunkData()!!
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
     val guild = player.rlgPlayer().guild()
     if(guild != null && guild.member_uuids.contains(chunkClass.owner_uuid)) return true

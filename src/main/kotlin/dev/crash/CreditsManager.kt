@@ -4,13 +4,12 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.items.CustomItems
 import dev.crash.permission.rankData
-import dev.crash.player.getPlayerData
-import dev.crash.player.modifyPlayerData
 import dev.crash.player.rlgPlayer
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.kbrewster.mojangapi.MojangAPI
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -23,7 +22,11 @@ import org.bukkit.entity.WanderingTrader
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -354,14 +357,20 @@ object ShopInventories {
 }
 
 fun addCreditsToPlayer(uuid: String, amount: Long){
-    modifyPlayerData(uuid){
-        it.balance += amount
-        it
+    transaction {
+        val currentBalance = PlayerTable.select(where = {PlayerTable.uuid eq uuid}).first()[PlayerTable.balance]
+        PlayerTable.update(where = {PlayerTable.uuid eq uuid}){
+            it[balance] = currentBalance + amount
+        }
     }
 }
 
 fun getCredits(uuid: String): Long{
-    return getPlayerData(uuid).balance
+    var currentBalance = 0L
+    transaction {
+        currentBalance = PlayerTable.select(where = {PlayerTable.uuid eq uuid}).first()[PlayerTable.balance]
+    }
+    return currentBalance
 }
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -388,11 +397,10 @@ fun getCreditsScoreboard(): String {
     messageBuilder.append("§6§l§nAktuelles Ranking:§r\n§7Letztes Update: $time\n")
     transaction {
         var count = 1
-        //TODO: Offline
-        /*PlayersTable.selectAll().orderBy(PlayersTable.balance, SortOrder.DESC).limit(5).forEach {
-            messageBuilder.append("§7$count. §2${MojangAPI.getName(UUID.fromString(it[PlayersTable.uuid]))}: §6${it[PlayersTable.balance].withPoints()} Credits§r\n")
+        PlayerTable.selectAll().orderBy(PlayerTable.balance, SortOrder.DESC).limit(5).forEach {
+            messageBuilder.append("§7$count. §2${MojangAPI.getName(UUID.fromString(it[PlayerTable.uuid]))}: §6${it[PlayerTable.balance].withPoints()} Credits§r\n")
             count++
-        }*/
+        }
     }
     messageBuilder.append("§6Diese Statistik wird alle 5 Minuten aktualisiert!")
     return messageBuilder.toString()

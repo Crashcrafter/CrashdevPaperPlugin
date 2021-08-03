@@ -2,7 +2,6 @@ package dev.crash.commands
 
 import dev.crash.asPlayer
 import dev.crash.permission.*
-import dev.crash.player.modifyPlayerData
 import dev.crash.player.rlgPlayer
 import me.kbrewster.mojangapi.MojangAPI
 import org.bukkit.Bukkit
@@ -41,15 +40,10 @@ class ClaimCommand : CommandExecutor, TabCompleter {
             if(chunk.isClaimed()) {
                 if (player.isOp && (player.gameMode == GameMode.CREATIVE || player.gameMode == GameMode.SPECTATOR)) {
                     player.sendMessage("§aClaim wurde entfernt!")
-                    modifyPlayerData(chunk.chunkData()!!.owner_uuid){
-                        it.chunks.remove("${chunk.world.name}:${chunk.chunkKey}")
-                        it
-                    }
                     chunk.unClaim()
                 } else if (!player.world.name.contentEquals("shops")) {
                     if (chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid == player.uniqueId.toString()) {
                         player.sendMessage("§aClaim wurde entfernt!")
-                        player.rlgPlayer().chunks.remove("${chunk.world.name}:${chunk.chunkKey}")
                         chunk.unClaim()
                     }
                 } else {

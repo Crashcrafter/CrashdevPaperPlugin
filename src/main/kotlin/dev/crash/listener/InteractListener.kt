@@ -10,6 +10,8 @@ import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
+import org.bukkit.block.Barrel
+import org.bukkit.block.Chest
 import org.bukkit.block.ShulkerBox
 import org.bukkit.block.Sign
 import org.bukkit.entity.Fireball
@@ -36,8 +38,14 @@ class InteractListener : Listener {
         val player = e.player
         if (keyChests.containsKey(block)) {
             try {
+                val inventory = when(val state = block!!.state){
+                    is ShulkerBox -> state.inventory
+                    is Chest -> state.inventory
+                    is Barrel -> state.inventory
+                    else -> return
+                }
                 if (!player.inventory.itemInMainHand.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING)
-                    && !lotteryI.contains((block!!.state as ShulkerBox).inventory)) {
+                    && !lotteryI.contains(inventory)) {
                     e.isCancelled = true
                     return
                 }
@@ -49,7 +57,7 @@ class InteractListener : Listener {
             val chunk = Objects.requireNonNull(block)!!.chunk
             if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET && chunk.isClaimed()) {
                 val uuid: String = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
-                if (uuid.length <= 3 && !uuid.contentEquals("0") && block!!.type == Material.CHEST) {
+                if (uuid.length <= 3 && uuid != "0" && block!!.type == Material.CHEST) {
                     waveManager(chunk)
                     if(player.gameMode == GameMode.SURVIVAL) e.isCancelled = true
                     return

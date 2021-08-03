@@ -1,5 +1,6 @@
 package dev.crash.player
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.*
@@ -12,7 +13,13 @@ import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.io.File
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.Random
 import kotlin.properties.Delegates
 
@@ -49,35 +56,51 @@ class RLGPlayer {
     val playerOffenseCounter = mutableListOf<Long>()
     val playerAfkCounter = mutableListOf<Long>()
     var warns = mutableListOf<Warn>()
-    var chunks = mutableListOf<String>()
 
     constructor(player: Player) {
         val saveFile = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
-        val saveObj = jacksonObjectMapper().readValue<PlayerSaveData>(saveFile)
+        val saveObj: PlayerSaveData = try {
+            jacksonObjectMapper().readValue(saveFile)
+        }catch (ex: MismatchedInputException){
+            val altFile = File("${INSTANCE.dataFolder.path}/playerBackup/${player.uniqueId}.json")
+            try {
+                jacksonObjectMapper().readValue(altFile)
+            }catch (ex: MismatchedInputException){
+                val oldData: OldPlayerSaveData = try {
+                    jacksonObjectMapper().readValue(saveFile)
+                }catch (ex: MismatchedInputException){
+                    jacksonObjectMapper().readValue(altFile)
+                }
+                transaction {
+                    println("write player ${oldData.uuid}")
+                    if(PlayerTable.select(where = {PlayerTable.uuid eq oldData.uuid}).empty()){
+                        PlayerTable.insert {
+                            it[uuid] = oldData.uuid
+                            it[rank] = oldData.rank
+                            it[remainingClaims] = oldData.remainingClaims
+                            it[remainingHomes] = oldData.remainingHomes
+                            it[addedClaims] = oldData.addedClaims
+                            it[addedHomes] = oldData.addedHomes
+                            it[balance] = oldData.balance
+                            it[xpLevel] = oldData.xpLevel
+                            it[xp] = oldData.xp
+                            it[vxpLevel] = oldData.vxpLevel
+                            it[guildId] = oldData.guildId
+                        }
+                    }
+                }
+                PlayerSaveData(oldData.uuid, oldData.quests, oldData.hasDaily, oldData.hasWeekly, oldData.lastDailyQuest, oldData.lastWeeklyQuest, oldData.lastKeys,
+                oldData.leftKeys, oldData.homepoints, oldData.warns)
+            }
+        }
         this.player = player
-        this.rank = saveObj.rank
-        this.remainingClaims = saveObj.remainingClaims
         val homes = hashMapOf<String, Block>()
         saveObj.homepoints.forEach {
             homes[it.key] = getBlockByPositionString(it.value)
         }
         this.homes = homes
-        this.addedClaims = saveObj.addedClaims
-        this.addedHomes = saveObj.addedHomes
-        this.remainingHomes = saveObj.remainingHomes
-        this.balance = saveObj.balance
         this.lastKeys = saveObj.lastKeys
         this.weeklyKeys = saveObj.leftKeys
-        this.xpLevel = saveObj.xpLevel
-        this.xp = saveObj.xp
-        this.vxpLevel = saveObj.vxpLevel
-        while(xpLevel > vxpLevel){
-            if(isSpace(player.inventory)){
-                player.inventory.addItem(genKey(5))
-                vxpLevel++
-            }else break
-        }
-        this.isMod = ranks[rank]!!.isMod
         saveObj.quests.forEach {
             this.quests.add(Quest(it.qid, player.uniqueId.toString(), it.isDaily, it.status, it.progress))
         }
@@ -86,20 +109,27 @@ class RLGPlayer {
         this.hasDaily = saveObj.hasDaily
         this.hasWeekly = saveObj.hasWeekly
         this.dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+ Random().nextInt(10))
-        this.guildId = saveObj.guildId
         this.warns = saveObj.warns.toMutableList()
-        this.chunks = saveObj.chunks.toMutableList()
+        loadFromDb()
+        this.isMod = ranks[rank]!!.isMod
+        while(xpLevel > vxpLevel){
+            if(isSpace(player.inventory)){
+                player.inventory.addItem(genKey(5))
+                vxpLevel++
+            }else break
+        }
         changeMana(0)
         this.setName()
+        if(Instant.ofEpochMilli(saveObj.lastKeys).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
+            player.sendMessage("§2Du kannst mit /weekly deine wöchentlichen Keys abholen!")
+        }
         check()
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun changeMana(amount: Int) {
         mana -= amount
-        if (managen != null) {
-            managen!!.cancel()
-        }
+        managen?.cancel()
         player.sendActionBar(Component.text("§1Mana: $mana"))
         val job = GlobalScope.launch {
             try {
@@ -231,20 +261,53 @@ class RLGPlayer {
         homes.forEach {
             homeList[it.key] = it.value.toPositionString()
         }
-        val playerSaveObj = PlayerSaveData(uuid, rank, remainingClaims, mutableListOf(), remainingHomes, addedClaims, addedHomes, balance, questList,
-            hasDaily, hasWeekly, lastDailyQuest, lastWeeklyQuest, xpLevel, xp, vxpLevel, guildId, lastKeys, weeklyKeys, homeList, warns, chunks)
+        val playerSaveObj = PlayerSaveData(uuid, questList, hasDaily, hasWeekly, lastDailyQuest, lastWeeklyQuest, lastKeys, weeklyKeys, homeList, warns)
         val file = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
         if(!file.exists()) file.createNewFile()
         jacksonObjectMapper().writeValue(file, playerSaveObj)
+        transaction {
+            PlayerTable.update(where = {PlayerTable.uuid eq player.uniqueId.toString()}){
+                it[rank] = this@RLGPlayer.rank
+                it[remainingClaims] = this@RLGPlayer.remainingClaims
+                it[remainingHomes] = this@RLGPlayer.remainingHomes
+                it[addedClaims] = this@RLGPlayer.addedClaims
+                it[addedHomes] = this@RLGPlayer.addedHomes
+                it[balance] = this@RLGPlayer.balance
+                it[xpLevel] = this@RLGPlayer.xpLevel
+                it[xp] = this@RLGPlayer.xp
+                it[vxpLevel] = this@RLGPlayer.vxpLevel
+                it[guildId] = this@RLGPlayer.guildId
+            }
+        }
     }
 
-    fun check(){
-        if(rankData().claims + addedClaims - chunks.size != remainingClaims){
-            remainingClaims = rankData().claims + addedClaims - chunks.size
+    private fun check(){
+        var chunkAmount = 0
+        transaction {
+            chunkAmount = ChunkTable.select(where = {ChunkTable.uuid eq player.uniqueId.toString()}).fetchSize ?: 0
+        }
+        if(rankData().claims + addedClaims - chunkAmount != remainingClaims){
+            remainingClaims = rankData().claims + addedClaims - chunkAmount
         }
         if(rankData().homes + addedHomes - homes.size != remainingHomes){
             remainingHomes = rankData().homes + addedHomes - homes.size
         }
         save()
+    }
+
+    private fun loadFromDb(){
+        transaction {
+            val query = PlayerTable.select(where = {PlayerTable.uuid eq player.uniqueId.toString()}).first()
+            rank = query[PlayerTable.rank]
+            remainingClaims = query[PlayerTable.remainingClaims]
+            remainingHomes = query[PlayerTable.remainingHomes]
+            addedClaims = query[PlayerTable.addedClaims]
+            addedHomes = query[PlayerTable.addedHomes]
+            balance = query[PlayerTable.balance]
+            xpLevel = query[PlayerTable.xpLevel]
+            xp = query[PlayerTable.xp]
+            vxpLevel = query[PlayerTable.vxpLevel]
+            guildId = query[PlayerTable.guildId]
+        }
     }
 }

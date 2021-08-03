@@ -3,6 +3,7 @@ package dev.crash.listener
 import com.vexsoftware.votifier.model.Vote
 import dev.crash.*
 import dev.crash.player.load
+import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -46,7 +47,7 @@ class JoinListener : Listener{
             }
         }
         player.sendMessage("Willkommen, ${player.name}!\nJoin unserem Discord Server, um Mitspieler zu finden und den Support zu kontaktieren!\n§o§nhttps://discord.gg/qQtaYsDN6w\n")
-        player.load()
+        player.rlgPlayer()
         player.setResourcePack(texturePackUrl, texturePackHash)
         if(player.hasResourcePack()){
             player.sendMessage("§4Die Texturen des Server-Texturepack sind auf das Standard-Texturen ausgelegt!")

@@ -156,9 +156,8 @@ fun RLGPlayer.deleteGuild(){
     this.guildId = 0
     transaction {
         guild.member_uuids.forEach { it2 ->
-            modifyPlayerData(it2){
-                it.guildId = 0
-                it
+            PlayerTable.update(where = {PlayerTable.uuid eq it2}){
+                it[PlayerTable.guildId] = 0
             }
             val player = Bukkit.getPlayer(UUID.fromString(it2))
             if(player != null){

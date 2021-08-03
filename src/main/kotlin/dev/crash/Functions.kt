@@ -23,6 +23,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.pow
 
 
@@ -295,4 +296,12 @@ private fun copyFile(sourceFile: File, destinationFile: File) {
             }
         }
     }
+}
+
+fun HashMap<Block, *>.toStringKeyMap(): HashMap<String, Any> {
+    val result = hashMapOf<String, Any>()
+    forEach {
+        result[it.key.toPositionString()] = it.value
+    }
+    return result
 }

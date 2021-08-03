@@ -38,7 +38,7 @@ class QuestsCommand : CommandExecutor, TabCompleter {
                 } else if (args[0].contentEquals("reset")) {
                     if (args.size >= 2) {
                         val target: Player = Bukkit.getPlayer(args[1])!!
-                        weeklyQuestCreation(target)
+                        target.rlgPlayer().weeklyQuestCreation()
                         player.sendMessage("§2Die Quests von dem Spieler wurden zurückgesetzt!")
                     } else {
                         player.sendMessage("§2Unvollständiger Command!")
