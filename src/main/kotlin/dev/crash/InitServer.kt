@@ -14,7 +14,6 @@ import dev.crash.items.CustomItems
 import dev.crash.listener.*
 import dev.crash.permission.*
 import dev.crash.player.clearPlayerData
-import dev.crash.player.load
 import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.*
@@ -26,6 +25,7 @@ internal fun initServer(){
     if(!File(INSTANCE.dataFolder.path + "/player/").exists()){
         File(INSTANCE.dataFolder.path + "/player/").mkdir()
     }
+    loadPluginConfig()
     initDatabase()
     loadWarps()
     initQuests()
@@ -162,10 +162,9 @@ internal fun loadFromDb(){
     updateTabOfPlayers()
     clearPlayerData()
     Bukkit.getOnlinePlayers().forEach {
-        it.setResourcePack(texturePackUrl, texturePackHash)
-        it.load()
-        it.updateScoreboard()
+        it.setResourcePack(CONFIG.texturePackURL, CONFIG.texturePackHash)
         val playerTextComponent = Component.text("${it.rlgPlayer().rankData().prefix} ${it.name}")
+        it.updateScoreboard()
         it.playerListName(playerTextComponent)
         it.displayName(playerTextComponent)
         it.customName(playerTextComponent)

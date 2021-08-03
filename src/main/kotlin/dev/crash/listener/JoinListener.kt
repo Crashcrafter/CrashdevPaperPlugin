@@ -48,7 +48,7 @@ class JoinListener : Listener{
         }
         player.sendMessage("Willkommen, ${player.name}!\nJoin unserem Discord Server, um Mitspieler zu finden und den Support zu kontaktieren!\n§o§nhttps://discord.gg/qQtaYsDN6w\n")
         player.rlgPlayer()
-        player.setResourcePack(texturePackUrl, texturePackHash)
+        player.setResourcePack(CONFIG.texturePackURL, CONFIG.texturePackHash)
         if(player.hasResourcePack()){
             player.sendMessage("§4Die Texturen des Server-Texturepack sind auf das Standard-Texturen ausgelegt!")
         }

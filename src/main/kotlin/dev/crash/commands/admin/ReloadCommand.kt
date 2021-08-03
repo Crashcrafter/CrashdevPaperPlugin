@@ -11,7 +11,7 @@ class ReloadCommand : CommandExecutor {
         val player = sender.asPlayer()
         if(!player.hasPermission("rlg.reloaddb")) return true
         loadFromDb()
-        sender.sendMessage("§2DB Reloaded!")
+        player.sendMessage("§2DB Reloaded!")
         return true
     }
 }

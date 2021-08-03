@@ -40,7 +40,7 @@ internal fun Player.load(){
         saveFile.createNewFile()
         val playerSaveData = PlayerSaveData(player.uniqueId.toString(), mutableListOf(),false, false, System.currentTimeMillis(),
             System.currentTimeMillis(), 0, hashMapOf(), hashMapOf(), mutableListOf())
-        player.teleport(warps["spawn"]!!)
+        player.teleport(warps[CONFIG.defaultWarpName]!!)
         transaction {
             PlayerTable.insert {
                 it[uuid] = player.uniqueId.toString()

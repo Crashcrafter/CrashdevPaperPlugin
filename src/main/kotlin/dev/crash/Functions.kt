@@ -1,7 +1,6 @@
 package dev.crash
 
 import dev.crash.permission.rankData
-import dev.crash.permission.ranks
 import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -21,7 +20,6 @@ import org.bukkit.scoreboard.Scoreboard
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.pow
@@ -114,40 +112,9 @@ fun String.toStartUppercaseMaterial(): String {
     return builder.toString()
 }
 
-fun removeItems(inventory: Inventory, type: Material, itemAmount: Int, cmd: Int) {
-    var amount = itemAmount
-    if (amount <= 0) return
-    val size = inventory.size
-    for (slot in 0 until size) {
-        val itemStack = inventory.getItem(slot) ?: continue
-        if (type == itemStack.type) {
-            if (cmd == 0 || itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == cmd) {
-                val newAmount = itemStack.amount - amount
-                if (newAmount > 0) {
-                    itemStack.amount = newAmount
-                    break
-                } else {
-                    inventory.clear(slot)
-                    amount = -newAmount
-                    if (amount == 0) break
-                }
-            }
-        }
-    }
-}
-
 fun isSpace(inventory: Inventory): Boolean = inventory.firstEmpty() != -1
 
 fun getEXPForLevel(level: Int): Long = (15 + 7 * level).toDouble().pow(2.0).toLong()
-
-fun getKeysPerRank(rank: Int): String {
-    val rankData = ranks[rank]!!
-    val result = StringBuilder()
-    for (i in 0..keysData.size){
-        result.append(rankData.weeklyKeys[i+1] ?: 0).append(" ")
-    }
-    return result.toString().removeSuffix(" ")
-}
 
 fun getBlockByPositionString(input: String): Block {
     val parts = input.split("/").toTypedArray()
@@ -296,12 +263,4 @@ private fun copyFile(sourceFile: File, destinationFile: File) {
             }
         }
     }
-}
-
-fun HashMap<Block, *>.toStringKeyMap(): HashMap<String, Any> {
-    val result = hashMapOf<String, Any>()
-    forEach {
-        result[it.key.toPositionString()] = it.value
-    }
-    return result
 }

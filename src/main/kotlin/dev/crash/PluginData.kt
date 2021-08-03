@@ -1,5 +1,7 @@
 package dev.crash
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.vexsoftware.votifier.model.Vote
 import kotlinx.coroutines.Job
 import org.bukkit.Location
@@ -8,17 +10,15 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 //CONST DATA
 val warps = hashMapOf<String, Location>()
-const val texturePackUrl = "https://drive.google.com/uc?export=download&id=1coCcIPR-ZbC3oKF7F8st0alr1sd6_WYi"
-const val texturePackHash = "356B369F80A1CFF49BE7B40685975D349F3CBD36"
 var dropRange = 10000
 val customItemsMap = HashMap<String, ItemStack>()
-const val dcLink = "https://discord.gg/qQtaYsDN6w"
 var dropWardenName = "§4§lDrop Warden"
 
 //VARIABLE DATA
@@ -80,3 +80,20 @@ var beginnerbook = arrayOf(
             "~~~~~~~~~~~~~~~~")
 )
 //endregion
+
+data class PluginConfig(val dbUser: String, val dbPw: String, val dbIp: String, val dbName: String, val dcLink: String,
+                        val texturePackURL: String, val texturePackHash: String, val defaultWarpName: String)
+private val DEFAULT_CONFIG = PluginConfig("NOTSET", "NOTSET", "localhost", "mcplugin", "https://discord.gg/NbW6JVvxY7",
+    "", "", "spawn")
+lateinit var CONFIG: PluginConfig
+
+internal fun loadPluginConfig(){
+    val configFile = File(INSTANCE.dataFolder.path + "/config.json")
+    if(configFile.exists()){
+        CONFIG = jacksonObjectMapper().readValue(configFile)
+    }else {
+        configFile.createNewFile()
+        CONFIG = DEFAULT_CONFIG
+        jacksonObjectMapper().writeValue(configFile, DEFAULT_CONFIG)
+    }
+}

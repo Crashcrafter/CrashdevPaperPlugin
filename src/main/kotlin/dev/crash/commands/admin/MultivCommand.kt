@@ -1,7 +1,6 @@
 package dev.crash.commands.admin
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.*
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -10,16 +9,13 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 
 class MultivCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
         if (player.hasPermission("rlg.multiv")) {
-            if (args[0].contentEquals("tp")) {
+            if (args[0] == "tp") {
                 if (args.size >= 2) {
                     val w: World = Bukkit.getWorld(args[1])!!
                     var p: Player? = null
@@ -34,7 +30,7 @@ class MultivCommand : CommandExecutor, TabCompleter {
                 } else {
                     player.sendMessage("Ungültige Argumente")
                 }
-            } else if (args[0].contentEquals("create")) {
+            } else if (args[0] == "create") {
                 if (args.size >= 3) {
                     val worldName: String = args[1]
                     val environment: String = args[2]
@@ -80,7 +76,7 @@ class MultivCommand : CommandExecutor, TabCompleter {
                 } else {
                     player.sendMessage("§4Bitte die richtigen Arguments benutzen!")
                 }
-            } else if (args[0].contentEquals("portal")) {
+            } else if (args[0] == "portal") {
                 if (args.size == 2) {
                     val block = player.world.getBlockAt(player.location.add(0.0, -1.0, 0.0))
                     addPortal(block, args[1])
@@ -88,7 +84,7 @@ class MultivCommand : CommandExecutor, TabCompleter {
                 } else {
                     player.sendMessage("Ungültige Argumente")
                 }
-            } else if(args[0].contentEquals("remove")) {
+            } else if(args[0] == "remove") {
                 if(args.size == 2) {
                     val worldName = args[1]
                     removeWorld(worldName)
@@ -105,6 +101,7 @@ class MultivCommand : CommandExecutor, TabCompleter {
         alias: String,
         args: Array<out String>
     ): MutableList<String>? {
+        if(!sender.asPlayer().hasPermission("rlg.multiv")) return null
         return when(args.size) {
             1 -> mutableListOf("create", "remove", "tp", "portal")
             2 -> {
@@ -169,11 +166,10 @@ fun removePortal(block: Block) {
     savePortals()
 }
 
-internal fun savePortals(){
-    val file = File(INSTANCE.dataFolder.path + "/keys.json")
+private fun savePortals(){
     val portalMap = hashMapOf<String, String>()
     portals.forEach {
         portalMap[it.key.toPositionString()] = it.value
     }
-    jacksonObjectMapper().writeValue(file, portalMap)
+    jacksonObjectMapper().writeValue(File(INSTANCE.dataFolder.path + "/portals.json"), portalMap)
 }
