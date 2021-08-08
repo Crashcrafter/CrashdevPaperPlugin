@@ -1,7 +1,7 @@
 package dev.crash.items.staffs
 
 import dev.crash.permission.isClaimed
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -17,9 +17,9 @@ object WeatherStaff1 {
 
     fun handleClick(e: PlayerInteractEvent) {
         val player = e.player
-        val rlgPlayer = player.rlgPlayer()
+        val crashPlayer = player.crashPlayer()
         val action = e.action
-        val mana: Int = rlgPlayer.mana
+        val mana: Int = crashPlayer.mana
         when (action) {
             Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> try {
                 if (mana >= 30) {
@@ -36,7 +36,7 @@ object WeatherStaff1 {
                             return
                         }
                         if (!block!!.chunk.isClaimed() || player.isOp) {
-                            rlgPlayer.changeMana(30)
+                            crashPlayer.changeMana(30)
                             val entities = block.location.getNearbyLivingEntities(5.0)
                             for (entity in entities) {
                                 entity.addPotionEffect(PotionEffect(PotionEffectType.LEVITATION, 5, 60))
@@ -66,7 +66,7 @@ object WeatherStaff1 {
                             return
                         }
                         if (!block!!.chunk.isClaimed() || player.isOp) {
-                            rlgPlayer.changeMana(40)
+                            crashPlayer.changeMana(40)
                             val strike = block.world.strikeLightning(block.location)
                             strike.customName = "weather1"
                             block.world.playSound(block.location, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 5f, 1f)

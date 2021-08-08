@@ -2,14 +2,13 @@ package dev.crash.listener
 
 import dev.crash.permission.deventCancel
 import dev.crash.permission.eventCancel
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.vehicle.VehicleDamageEvent
@@ -20,7 +19,7 @@ class DamageListener : Listener {
     fun onEntityDamage(e: EntityDamageEvent) {
         if (e.entityType == EntityType.PLAYER) {
             val player = e.entity as Player
-            val rlgPlayer = player.rlgPlayer()
+            val crashPlayer = player.crashPlayer()
             val chunk = player.location.chunk
             if (e.cause != EntityDamageEvent.DamageCause.VOID && deventCancel(chunk, player)) {
                 e.isCancelled = true
@@ -28,56 +27,56 @@ class DamageListener : Listener {
             }
             val cause = e.cause
             var itemStack = player.inventory.itemInMainHand
-            if (rlgPlayer.mana >= 1) {
+            if (crashPlayer.mana >= 1) {
                 if (cause == EntityDamageEvent.DamageCause.POISON) {
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 1) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                     itemStack = player.inventory.itemInOffHand
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 1) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                 } else if (cause == EntityDamageEvent.DamageCause.FIRE || cause == EntityDamageEvent.DamageCause.FIRE_TICK) {
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 2) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                     itemStack = player.inventory.itemInOffHand
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 2) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                 } else if (cause == EntityDamageEvent.DamageCause.LIGHTNING) {
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 3) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                     itemStack = player.inventory.itemInOffHand
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 3) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                 } else if (cause == EntityDamageEvent.DamageCause.WITHER) {
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 4) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                     itemStack = player.inventory.itemInOffHand
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 4) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                 } else if (cause == EntityDamageEvent.DamageCause.DROWNING) {
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 5) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                     itemStack = player.inventory.itemInOffHand
                     if (itemStack.type == Material.WOODEN_HOE && itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == 5) {
                         e.isCancelled = true
-                        rlgPlayer.changeMana(1)
+                        crashPlayer.changeMana(1)
                     }
                 }
             }

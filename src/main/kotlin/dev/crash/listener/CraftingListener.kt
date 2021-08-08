@@ -22,7 +22,7 @@ class CraftingListener : Listener {
     @EventHandler
     fun onCrafting(e: CraftItemEvent) {
         e.inventory.contents.forEach {
-            if(it != null && it.hasItemMeta() && it.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)){
+            if(it != null && it.hasItemMeta() && it.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)){
                 e.result = Event.Result.DENY
                 e.isCancelled = true
                 e.whoClicked.closeInventory()

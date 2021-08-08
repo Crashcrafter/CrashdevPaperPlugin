@@ -2,7 +2,7 @@ package dev.crash.items.staffs
 
 import dev.crash.allJobs
 import dev.crash.permission.eventCancel
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -22,15 +22,15 @@ object ChaosStaff1 {
     @OptIn(DelicateCoroutinesApi::class)
     fun handleClick(e: PlayerInteractEvent) {
         val player = e.player
-        val rlgPlayer = player.rlgPlayer()
+        val crashPlayer = player.crashPlayer()
         val action = e.action
-        val mana: Int = rlgPlayer.mana
+        val mana: Int = crashPlayer.mana
         when (action) {
             Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> try {
                 if (mana >= 30) {
                     if (spell1Cooldown.containsKey(player) && spell1Cooldown[player]!! <= System.currentTimeMillis() || !spell1Cooldown.containsKey(player)) {
                         spell1Cooldown.remove(player)
-                        rlgPlayer.changeMana(30)
+                        crashPlayer.changeMana(30)
                         player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 405, 3))
                         player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 405, 0))
                         player.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS, 405, 0))
@@ -57,7 +57,7 @@ object ChaosStaff1 {
                                 entity.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 300, 3))
                                 entity.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS, 300, 3))
                             }
-                            rlgPlayer.changeMana(75)
+                            crashPlayer.changeMana(75)
                             allJobs.add(GlobalScope.launch {
                                 var count = 0
                                 while (count < 10) {

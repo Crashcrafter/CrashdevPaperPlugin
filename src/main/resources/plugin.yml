@@ -1,4 +1,4 @@
-name: RLGPaperPlugin
+name: crashPaperPlugin
 main: dev.crash.Main
 version: 0.1
 description: Nix lol
@@ -8,185 +8,202 @@ depend: [Votifier]
 
 commands:
   back:
-    description: Back to Death point
+    description: Back to last death point
     usage: /back
+    permission: crash.back
   reloaddb:
-    description: Reload DB
+    description: reload DB
     usage: /reloaddb
-    permission: rlg.reloaddb
+    permission: crash.reloaddb
   reloaduser:
     description: Reload a user
     usage: /reloaduser
-    permission: rlg.reloaddb
+    permission: crash.reloaddb
   rank:
     description: Manage Roles
     usage: </command>
-    permission: rlg.rank
+    permission: crash.rank
   discord:
     description: Send Discord link
     usage: /discord
   claim:
-    description: Claim Chunk
+    description: Claim Chunk & Manage your claims
     usage: </command>
     aliases: [c]
   key:
     description: Key commands
-    usage: </command>
-    permission: rlg.key
+    usage: /key create [type] [amount]
+    permission: crash.key
   ci:
-    description: Get cis
-    usage: </command>
-    permission: rlg.ci
+    description: Get custom items
+    usage: /ci [itemname as in ci.json]
+    permission: crash.ci
   tempban:
-    description: Tempbanne Spieler
-    usage: </command>
-    permission: rlg.tempban
+    description: Tempban player
+    usage: /tempban [player] [amount] [timeunit] [Reason]
+    permission: crash.tempban
   home:
-    description: Teleportiere dich zu deinem Homepoint
-    usage: </command>
+    description: Teleport to homepoint
+    usage: /home [name]
     aliases: [h]
   sethome:
-    description: Setze innerhalb deiner chunks deine Homepoint
-    usage: </command>
+    description: Set homepoint
+    usage: /sethome [name]
   delhome:
-    description: Lösche deinen Homepoint
-    usage: </command>
+    description: Delete homepoint
+    usage: /delhome [name]
   homes:
-    description: Zeig alle deine Homepoints an
+    description: Show your homepoints
     usage: /homes
   warn:
     description: Warnt einen User
-    usage: </command>
-    permission: rlg.warn
+    usage: /warn [player] [reason]
+    permission: crash.warn
   invsee:
-    description: Zeige das Inventar von einem Spieler
-    usage: </command>
-    permission: rlg.invsee
+    description: Show Inventory of Player
+    usage: /invsee [player]
+    permission: crash.invsee
   tpa:
     description: TPA to a player
-    usage: </command>
+    usage: /tpa [player]
+    permission: crash.tpa
   tpaccept:
     description: Accept a TPA request
-    usage: </command>
+    usage: /tpaccept
+    permission: crash.tpa
   tpdeny:
     description: Deny a TPA request
-    usage: </command>
+    usage: /tpdeny
+    permission: crash.tpa
   invec:
-    description: Zeig die Enderchest
-    usage: </command>
-    permission: rlg.invec
+    description: Show ender chest of a player
+    usage: /invec [player]
+    permission: crash.invec
   ec:
-    description: Nutze die Ender Chest
+    description: Show your ender chest
     usage: /ec
-    permission: rlg.ec
+    permission: crash.ec
   credits:
-    description: Zeigt deinen aktuellen Kontostand
-    usage: </command>
+    description: Manage your credits
+    usage: /credits
     aliases: [cr]
   multiv:
-    description: Kann Welten erstellen/benutzen
-    usage: </command>
-    permission: rlg.multiv
+    description: Manage multiworld
+    usage: /multiv create [new World name] [Dimension] [WorldGenType] [seed]
+    permission: crash.multiv
   drop:
-    description: Drop-Befehle
-    usage: </command>
-    permission: rlg.drop
+    description: Drop commands
+    usage: /drop [args]
+    permission: crash.drop
   modchat:
     description: Modchat
-    usage: /mc message
-    permission: rlg.modchat
+    usage: /mc [message]
+    permission: crash.modchat
     aliases: [staffchat, mc]
   vote:
     description: Voting
     usage: /vote
   quests:
-    description: Quest-Überblick
+    description: Quest-Overview
     usage: /quests
     aliases: [q]
   exp:
-    description: Level-Verwaltung
-    usage: </command>
-    permission: rlg.exp
+    description: Level management
+    usage: /exp [add/remove] [amount] [XP/Level]
+    permission: crash.exp
   profile:
-    description: Info über den User
+    description: Show player profile
     usage: /profile [Player]
   m:
-    description: Private Nachricht
+    description: Private message
     usage: /m [player] message
     aliases: [msg, say, tell]
   weekly:
     description: Claim weekly Keys
     usage: /weekly
   mute:
-    description: Spieler muten
+    description: Mute player
     usage: /mute [player]
-    permission: rlg.mute
+    permission: crash.mute
   unmute:
-    description: Spieler entmuten
+    description: Unmute player
     usage: /unmute [player]
-    permission: rlg.unmute
+    permission: crash.unmute
   crypto:
-    description: Info über aktuelle Kurse
+    description: Show current crypto prices
     usage: /crypto
   checkitem:
-    description: Info über aktuelles Item
+    description: Info about current item
     usage: /checkitem
-    permission: rlg.checkitem
+    permission: crash.checkitem
   guild:
-    description: Guild Command
-    usage: </command>
+    description: Guild Commands
+    usage: /guild
     aliases: [g]
   warp:
-    description: Warp Command
-    usage: </command>
+    description: Teleport to warppoints
+    usage: /warp [name]
+    permission: crash.warp
     aliases: [w]
 
 permissions:
-  rlg.reloaddb:
-    description: Zugriff auf DB Reload
+  crash.reloaddb:
+    description: Can reload DB
     default: op
-  rlg.rank:
-    description: Zugriff auf Rollenverwaltung
+  crash.back:
+    description: Can teleport to death pos after death
+    default: true
+  crash.tpa:
+    description: Can use the TPA-System
+    default: true
+  crash.rank:
+    description: Can change ranks
     default: op
-  rlg.key:
-    description: Kann keys verwalten
+  crash.key:
+    description: Can manage keys
     default: op
-  rlg.ci:
-    description: Kann Ci geben
+  crash.ci:
+    description: Can generate custom items
     default: op
-  rlg.tempban:
-    description: Kann User Tempbannen
+  crash.tempban:
+    description: Can tempban user
     default: op
-  rlg.warn:
-    description: Kann warnen
+  crash.warn:
+    description: Can warn player
     default: op
-  rlg.invsee:
-    description: Kann Inventare durchsuchen
+  crash.invsee:
+    description: See other players inventories
     default: op
-  rlg.invec:
-    description: Kann Ender Chest Inventar öffnen
+  crash.invec:
+    description: See other players ender chest
     default: op
-  rlg.ec:
-    description: Kann auf Enderchest
+  crash.ec:
+    description: Access the ender chest
     default: op
-  rlg.multiv:
-    description: Kann Welten verwalten
+  crash.multiv:
+    description: Multiworld
     default: op
-  rlg.drop:
-    description: Kann Drop-Befehle
+  crash.drop:
+    description: Manage drops
     default: op
-  rlg.modchat:
-    description: Kann den Modchat bedienen
+  crash.modchat:
+    description: Read/Write to the Teamchat
     default: op
-  rlg.exp:
-    description: Kann Level verwalten
+  crash.exp:
+    description: Manage player levels
     default: op
-  rlg.mute:
-    description: Kann Spieler muten
+  crash.mute:
+    description: Mute players
     default: op
-  rlg.unmute:
-    description: Kann Spieler entmuten
+  crash.unmute:
+    description: Unmute players
     default: op
-  rlg.checkitem:
-    description: Kann Items Checken
+  crash.checkitem:
+    description: Check items
+    default: op
+  crash.warp:
+    description: Can use warp commands
+    default: true
+  crash.setwarp:
+    description: Can set/delete warp points
     default: op

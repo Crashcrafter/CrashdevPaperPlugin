@@ -1,7 +1,7 @@
 package dev.crash.commands.user
 
 import dev.crash.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -13,7 +13,7 @@ class CreditsCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
         if (args.isEmpty()) {
-            player.sendMessage("§6Dein aktueller Kontostand: " + player.rlgPlayer().balance.withPoints() + " Credits")
+            player.sendMessage("§6Dein aktueller Kontostand: " + player.crashPlayer().balance.withPoints() + " Credits")
         } else if (args[0].contentEquals("transfer")) {
             try {
                 val target: Player
@@ -67,7 +67,7 @@ class CreditsCommand : CommandExecutor, TabCompleter {
             if (player.isOp) {
                 try {
                     val target: Player = Bukkit.getPlayer(args[1])!!
-                    player.sendMessage("§6" + target.name + " hat " + target.rlgPlayer().balance.withPoints() + " Credits")
+                    player.sendMessage("§6" + target.name + " hat " + target.crashPlayer().balance.withPoints() + " Credits")
                 } catch (e: NullPointerException) {
                     player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
                 } catch (e: NumberFormatException) {

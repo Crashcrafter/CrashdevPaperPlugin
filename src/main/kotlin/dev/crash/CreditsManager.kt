@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.items.CustomItems
 import dev.crash.permission.rankData
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -42,14 +42,14 @@ var creditsScoreBoard = ""
 
 internal fun initTradingInventories() {
     val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
-    overview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "§1Buch-Shop", arrayListOf(), 1, hashMapOf("rlgAction" to "book")))
-    overview.setItem(1, CustomItems.defaultCustomItem(Material.OAK_LOG, "§cHolz-Shop", arrayListOf(), 0, hashMapOf("rlgAction" to "wood")))
-    overview.setItem(2, CustomItems.defaultCustomItem(Material.POLISHED_ANDESITE, "§6Bau-Shop", arrayListOf(), 0, hashMapOf("rlgAction" to "build")))
-    overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf(), 1, hashMapOf("rlgAction" to "crypto")))
+    overview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "§1Buch-Shop", arrayListOf(), 1, hashMapOf("crashAction" to "book")))
+    overview.setItem(1, CustomItems.defaultCustomItem(Material.OAK_LOG, "§cHolz-Shop", arrayListOf(), 0, hashMapOf("crashAction" to "wood")))
+    overview.setItem(2, CustomItems.defaultCustomItem(Material.POLISHED_ANDESITE, "§6Bau-Shop", arrayListOf(), 0, hashMapOf("crashAction" to "build")))
+    overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf(), 1, hashMapOf("crashAction" to "crypto")))
     TradingInventories.overview = overview
 
     val bookOverview: Inventory = Bukkit.createInventory(null, 9, Component.text("Buch-Shop"))
-    bookOverview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "Kaufe 1 Einsteiger-Buch für 100 Credits", arrayListOf(), 2, hashMapOf("rlgAction" to "book beginner")))
+    bookOverview.setItem(0, CustomItems.defaultCustomItem(Material.WRITTEN_BOOK, "Kaufe 1 Einsteiger-Buch für 100 Credits", arrayListOf(), 2, hashMapOf("crashAction" to "book beginner")))
     TradingInventories.bookOverview = bookOverview
 
     val woodMaterials: List<Material> = arrayListOf(Material.OAK_LOG, Material.BIRCH_LOG, Material.SPRUCE_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG, Material.JUNGLE_LOG)
@@ -58,7 +58,7 @@ internal fun initTradingInventories() {
         for (i in 0 until amountmap.size) {
             woodOverview.setItem(i + 9 * j, CustomItems.defaultCustomItem(woodMaterials[j],
                 "Kaufe " + amountmap[i] + " " + woodMaterials[j].toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " für " + (amountmap[i]!! * 16) + " Credits", arrayListOf(),0,
-                hashMapOf("rlgAction" to "wood ${woodMaterials[j].name.lowercase()} ${amountmap[i]}")))
+                hashMapOf("crashAction" to "wood ${woodMaterials[j].name.lowercase()} ${amountmap[i]}")))
         }
     }
     TradingInventories.woodOverview = woodOverview
@@ -67,7 +67,7 @@ internal fun initTradingInventories() {
     for (i in 0 until amountmap.size) {
         buildOverview.setItem(i, CustomItems.defaultCustomItem(Material.STONE,
             "Kaufe " + amountmap[i] + " " + Material.STONE.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " für " + (amountmap[i]!! * 16) + " Credits", arrayListOf(), 0,
-        hashMapOf("rlgAction" to "build stone ${amountmap[i]}")))
+        hashMapOf("crashAction" to "build stone ${amountmap[i]}")))
     }
     val buildMaterials: List<Material> = ArrayList(
         listOf(
@@ -82,7 +82,7 @@ internal fun initTradingInventories() {
         for (i in 0 until amountmap.size) {
             buildOverview.setItem(i + (9 * j) + 9, CustomItems.defaultCustomItem(buildMaterials[j],
                 "Kaufe " + amountmap[i] + " " + buildMaterials[j].toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " für " + (amountmap[i]!! * 32) + " Credits", arrayListOf(), 0,
-                hashMapOf("rlgAction" to "build ${buildMaterials[j].name.lowercase()} ${amountmap[i]}")))
+                hashMapOf("crashAction" to "build ${buildMaterials[j].name.lowercase()} ${amountmap[i]}")))
         }
     }
     TradingInventories.buildOverview = buildOverview
@@ -95,28 +95,28 @@ internal fun initTradingInventories() {
     ShopInventories.normalView = inventory
 
     val blackMarketInv: Inventory = Bukkit.createInventory(null, 9, Component.text("Schwarzmarkt"))
-    blackMarketInv.setItem(0, CustomItems.defaultCustomItem(Material.NAME_TAG, "Keys-Shop", arrayListOf(), 1, hashMapOf("rlgAction" to "key")))
+    blackMarketInv.setItem(0, CustomItems.defaultCustomItem(Material.NAME_TAG, "Keys-Shop", arrayListOf(), 1, hashMapOf("crashAction" to "key")))
     BlackMarketInventories.blackMarketOverview = blackMarketInv
 
     val blackMarketKeysInv: Inventory = Bukkit.createInventory(null, 9, Component.text("Schwarzmarkt"))
-    blackMarketKeysInv.setItem(0, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 CommonKey für 5000 Credits", arrayListOf(), 1, hashMapOf("rlgAction" to "key common")))
-    blackMarketKeysInv.setItem(1, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 EpicKey für 20000 Credits", arrayListOf(), 2, hashMapOf("rlgAction" to "key epic")))
-    blackMarketKeysInv.setItem(2, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 SupremeKey für 50000 Credits", arrayListOf(), 3, hashMapOf("rlgAction" to "key supreme")))
+    blackMarketKeysInv.setItem(0, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 CommonKey für 5000 Credits", arrayListOf(), 1, hashMapOf("crashAction" to "key common")))
+    blackMarketKeysInv.setItem(1, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 EpicKey für 20000 Credits", arrayListOf(), 2, hashMapOf("crashAction" to "key epic")))
+    blackMarketKeysInv.setItem(2, CustomItems.defaultCustomItem(Material.NAME_TAG, "Kaufe 1 SupremeKey für 50000 Credits", arrayListOf(), 3, hashMapOf("crashAction" to "key supreme")))
     BlackMarketInventories.blackMarketKeyOverview = blackMarketKeysInv
 }
 
 fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
-    val playerRlgPlayer = player.rlgPlayer()
-    if (playerRlgPlayer.balance < amount) {
+    val playercrashPlayer = player.crashPlayer()
+    if (playercrashPlayer.balance < amount) {
         player.sendMessage("Du hast nicht genügend Credits, um diese Transaktion durchzuführen")
         return false
     }
-    playerRlgPlayer.balance -= amount
+    playercrashPlayer.balance -= amount
     val onePercent = amount/100
     val newAmount = amount - onePercent
     player.sendMessage("${newAmount.withPoints()} Credits wurden an " + target.name + " gesendet")
-    val targetRlgPlayer = target.rlgPlayer()
-    targetRlgPlayer.balance += newAmount
+    val targetcrashPlayer = target.crashPlayer()
+    targetcrashPlayer.balance += newAmount
     target.sendMessage("Du hast " + newAmount.withPoints() + " Credits von " + player.name + " erhalten")
     player.updateScoreboard()
     target.updateScoreboard()
@@ -124,8 +124,8 @@ fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
 }
 
 fun giveBalance(target: Player, amount: Long, reason: String) {
-    val rlgPlayer = target.rlgPlayer()
-    rlgPlayer.balance += amount
+    val crashPlayer = target.crashPlayer()
+    crashPlayer.balance += amount
     if (amount < 0) {
         target.sendMessage("§4Du hast " + abs(amount).withPoints() + " Credits für " + reason + " ausgegeben")
     } else {
@@ -135,9 +135,9 @@ fun giveBalance(target: Player, amount: Long, reason: String) {
 }
 
 fun pay(target: Player, amount: Long, reason: String): Boolean {
-    val rlgPlayer = target.rlgPlayer()
-    return if (rlgPlayer.balance >= amount) {
-        rlgPlayer.balance -= amount
+    val crashPlayer = target.crashPlayer()
+    return if (crashPlayer.balance >= amount) {
+        crashPlayer.balance -= amount
         target.sendMessage("§2Du hast ${amount.withPoints()} Credits für $reason ausgegeben!")
         target.updateScoreboard()
         true
@@ -149,11 +149,11 @@ fun pay(target: Player, amount: Long, reason: String): Boolean {
 
 fun sellItem(player: Player) {
     val itemStack = player.inventory.itemInMainHand
-    if (itemStack.hasItemMeta() && itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)) {
+    if (itemStack.hasItemMeta() && itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)) {
         return
     }
-    val rlgPlayer = player.rlgPlayer()
-    val multiplier = rlgPlayer.rankData().shopMultiplier
+    val crashPlayer = player.crashPlayer()
+    val multiplier = crashPlayer.rankData().shopMultiplier
     val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
     val isNotCrypto = (itemStack.type == Material.STICK && cmd !in 1..5) || itemStack.type != Material.STICK
     val value = if(isNotCrypto) (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong() else prices[itemStack.type]!![cmd]!! * itemStack.amount
@@ -161,7 +161,7 @@ fun sellItem(player: Player) {
     if(isNotCrypto){
         questCount(player, 12, value.toInt(), true)
         questCount(player, 8, value.toInt(), false)
-        rlgPlayer.changeXP(floor(value / 10.0).toLong())
+        crashPlayer.changeXP(floor(value / 10.0).toLong())
     }
     player.inventory.removeItem(itemStack)
     player.closeInventory()
@@ -169,21 +169,21 @@ fun sellItem(player: Player) {
 }
 
 fun tradingInventory(player: Player) {
-    val rlgPlayer = player.rlgPlayer()
+    val crashPlayer = player.crashPlayer()
     try {
         if (player.inventory.itemInMainHand.type == Material.AIR) {
             val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
             overview.contents = TradingInventories.overview!!.contents.copyOf()
-            if(rlgPlayer.xpLevel <= 10){
-                overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 10 benötigt"), 1, hashMapOf("rlgAction" to "crypto")))
+            if(crashPlayer.xpLevel <= 10){
+                overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 10 benötigt"), 1, hashMapOf("crashAction" to "crypto")))
             }
             showTradingInventory(player, overview, "Shop")
             return
         }
     } catch (e: NullPointerException) {return}
     val isGiven = player.inventory.itemInMainHand
-    if(isGiven.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)) return
-    val multiplier = rlgPlayer.rankData().shopMultiplier
+    if(isGiven.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)) return
+    val multiplier = crashPlayer.rankData().shopMultiplier
     val cmd = if(!isGiven.itemMeta.hasCustomModelData()) 0 else isGiven.itemMeta.customModelData
     val price: Long = try {
         (prices[isGiven.type]!![cmd]!!.toLong() * isGiven.amount * (if((isGiven.type == Material.STICK && cmd !in 1..5) || isGiven.type != Material.STICK) multiplier else 1.0)).toLong()
@@ -208,7 +208,7 @@ fun showTradingInventory(player: Player, inventory: Inventory?, iname: String) {
 }
 
 fun clickHandler(item: ItemStack, player: Player) {
-    val data = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgAction"), PersistentDataType.STRING) ?: return
+    val data = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashAction"), PersistentDataType.STRING) ?: return
     val dataArray = data.split(" ")
     when(dataArray[0]) {
         "book" -> {
@@ -254,20 +254,20 @@ fun clickHandler(item: ItemStack, player: Player) {
             }
         }
         "crypto" -> {
-            if(player.rlgPlayer().xpLevel < 15) return
+            if(player.crashPlayer().xpLevel < 15) return
             if(dataArray.size == 1){
                 val cryptoOverview: Inventory = Bukkit.createInventory(null, 45, Component.text("Crypto Shop"))
                 for (i in 0 until amountmap.size){
                     cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Bitcoin für ${(amountmap[i]!! * prices[Material.STICK]!![1]!!).withPoints()} Credits", arrayListOf(), 1,
-                        hashMapOf("rlgAction" to "crypto bitcoin ${amountmap[i]}")))
+                        hashMapOf("crashAction" to "crypto bitcoin ${amountmap[i]}")))
                     cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Ethereum für ${(amountmap[i]!! * prices[Material.STICK]!![2]!!).withPoints()} Credits", arrayListOf(), 2,
-                        hashMapOf("rlgAction" to "crypto ethereum ${amountmap[i]}")))
+                        hashMapOf("crashAction" to "crypto ethereum ${amountmap[i]}")))
                     cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Litecoin für ${(amountmap[i]!! * prices[Material.STICK]!![3]!!).withPoints()} Credits", arrayListOf(), 3,
-                        hashMapOf("rlgAction" to "crypto litecoin ${amountmap[i]}")))
+                        hashMapOf("crashAction" to "crypto litecoin ${amountmap[i]}")))
                     cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Nano für ${(amountmap[i]!! * prices[Material.STICK]!![5]!!).withPoints()} Credits", arrayListOf(), 5,
-                        hashMapOf("rlgAction" to "crypto nano ${amountmap[i]}")))
+                        hashMapOf("crashAction" to "crypto nano ${amountmap[i]}")))
                     cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Kaufe ${amountmap[i]} Dogecoin für ${(amountmap[i]!! * prices[Material.STICK]!![4]!!).withPoints()} Credits", arrayListOf(), 4,
-                        hashMapOf("rlgAction" to "crypto dogecoin ${amountmap[i]}")))
+                        hashMapOf("crashAction" to "crypto dogecoin ${amountmap[i]}")))
                 }
                 showTradingInventory(player, cryptoOverview, "Crypto-Shop")
                 return
@@ -416,7 +416,7 @@ fun shopVillager(location: Location) {
     shop.isCustomNameVisible = true
     shop.isSilent = true
     shop.removeWhenFarAway = false
-    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING, "shop")
+    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, "shop")
 }
 
 fun blackMarketVillager(location: Location) {
@@ -427,5 +427,5 @@ fun blackMarketVillager(location: Location) {
     blackMarket.isCustomNameVisible = true
     blackMarket.isSilent = true
     blackMarket.removeWhenFarAway = false
-    blackMarket.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING, "blackmarket")
+    blackMarket.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, "blackmarket")
 }

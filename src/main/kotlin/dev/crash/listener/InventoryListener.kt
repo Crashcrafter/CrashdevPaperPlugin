@@ -45,7 +45,7 @@ class InventoryListener : Listener {
             val itemStack = playerInventory.itemInMainHand
             try {
                 if (itemStack.type == Material.NAME_TAG) {
-                    val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING)!!
+                    val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashKeyToken"), PersistentDataType.STRING)!!
                     val type: Int = keyChests[(e.inventory.holder as ShulkerBox).block]!!
                     if (getKeyType(token) == type) {
                         createNewLottery(player, e.inventory, type)

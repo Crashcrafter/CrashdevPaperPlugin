@@ -6,7 +6,7 @@ import dev.crash.permission.getRankByString
 import dev.crash.permission.givePerms
 import dev.crash.permission.rankData
 import dev.crash.permission.ranks
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import dev.crash.updateTabOfPlayers
 import me.kbrewster.mojangapi.MojangAPI
 import org.bukkit.Bukkit
@@ -23,7 +23,7 @@ import org.jetbrains.exposed.sql.update
 class RankCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if (player.hasPermission("rlg.rank")) {
+        if (player.hasPermission("crash.rank")) {
             if (args[0] == "set") {
                 val rank = getRankByString(args[2])
                 if(rank == null){
@@ -43,7 +43,7 @@ class RankCommand : CommandExecutor, TabCompleter {
             } else if (args[0] == "info") {
                 try {
                     val target: Player = Bukkit.getPlayer(args[1]) ?: player
-                    player.sendMessage("The player ${target.name} has the rank ${target.rlgPlayer().rankData().name}")
+                    player.sendMessage("The player ${target.name} has the rank ${target.crashPlayer().rankData().name}")
                 }catch (ex: NullPointerException) {
                     val uuid = MojangAPI.getUUID(args[1])
                     val offlineTarget: OfflinePlayer = Bukkit.getOfflinePlayer(uuid)
@@ -106,17 +106,17 @@ class RankCommand : CommandExecutor, TabCompleter {
 }
 
 fun setRank(player: Player, rank: Int) {
-    val rlgPlayer = player.rlgPlayer()
-    val currentRank = rlgPlayer.rank
-    val currentClaims = rlgPlayer.remainingClaims
-    val currentHomes = rlgPlayer.remainingHomes
+    val crashPlayer = player.crashPlayer()
+    val currentRank = crashPlayer.rank
+    val currentClaims = crashPlayer.remainingClaims
+    val currentHomes = crashPlayer.remainingHomes
     val newRemainingClaims = currentClaims + (ranks[rank]!!.claims - ranks[currentRank]!!.claims)
     val newRemainingHomes = currentHomes + (ranks[rank]!!.homes - ranks[currentRank]!!.homes)
-    rlgPlayer.rank = rank
-    rlgPlayer.remainingClaims = newRemainingClaims
-    rlgPlayer.remainingHomes = newRemainingHomes
-    rlgPlayer.isMod = ranks[rank]!!.isMod
-    rlgPlayer.setName()
+    crashPlayer.rank = rank
+    crashPlayer.remainingClaims = newRemainingClaims
+    crashPlayer.remainingHomes = newRemainingHomes
+    crashPlayer.isMod = ranks[rank]!!.isMod
+    crashPlayer.setName()
     player.givePerms()
     updateTabOfPlayers()
 }

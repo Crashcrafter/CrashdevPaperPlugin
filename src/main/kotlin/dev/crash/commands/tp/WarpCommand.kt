@@ -1,15 +1,13 @@
 package dev.crash.commands.tp
 
 import dev.crash.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.block.data.BlockData
-import org.bukkit.block.data.MultipleFacing
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -19,27 +17,31 @@ import org.bukkit.entity.Player
 class WarpCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
+        if(!player.hasPermission("crash.warp")) return true
         if(args.isEmpty()){
-            player.sendMessage("§4Du musst einen Namen eingeben!")
+            player.sendMessage("§4You must enter a valid warp name!")
             return true
-        }
-        if (player.isOp && args[0].contentEquals("set")) {
-            val newPoint = player.location.block.location.add(0.5, 0.0, 0.5)
-            newPoint.yaw = player.location.yaw
-            newPoint.pitch = player.location.pitch
-            val key = args[1]
-            setWarp(key, newPoint)
-            player.sendMessage("§2Neuer Warp wurde mit dem Namen $key gesetzt!")
-            return true
-        }
-        else if (player.isOp && args[0].contentEquals("delete")){
-            val key = args[1]
-            player.sendMessage("§2Warp $key wurde gelöscht!")
-            deleteWarp(key)
-            return true
-        }
-        else{
-            teleportToWarppoint(player, args[0])
+        }else{
+            if(player.hasPermission("crash.setwarp")){
+                if(args[0] == "set"){
+                    val newPoint = player.location.block.location.add(0.5, 0.0, 0.5)
+                    newPoint.yaw = player.location.yaw
+                    newPoint.pitch = player.location.pitch
+                    val key = args[1]
+                    setWarp(key, newPoint)
+                    player.sendMessage("§2New warp with name $key was set!")
+                    return true
+                }else if(args[0] == "delete"){
+                    val key = args[1]
+                    player.sendMessage("§2Warp $key was deleted!")
+                    deleteWarp(key)
+                    return true
+                }else {
+                    teleportToWarppoint(player, args[0])
+                }
+            }else {
+                teleportToWarppoint(player, args[0])
+            }
         }
         return true
     }
@@ -97,13 +99,13 @@ internal fun loadWarps(){
 fun delayedTeleport(player: Player, location: Location, after: (()->Unit)? = null){
     if(player.isOp){
         player.teleport(location)
-        player.sendMessage("§2Du wurdest teleportiert!")
+        player.sendMessage("§2You have been teleported!")
         after?.invoke()
         return
     }
-    val rlgPlayer = player.rlgPlayer()
-    if(rlgPlayer.dropCoolDown  <= System.currentTimeMillis() + 1000 * 30){
-        rlgPlayer.dropCoolDown = System.currentTimeMillis() + 1000 * 30
+    val crashPlayer = player.crashPlayer()
+    if(crashPlayer.dropCoolDown  <= System.currentTimeMillis() + 1000 * 30){
+        crashPlayer.dropCoolDown = System.currentTimeMillis() + 1000 * 30
     }
     allJobs.add(GlobalScope.launch {
         var lastpos = player.location

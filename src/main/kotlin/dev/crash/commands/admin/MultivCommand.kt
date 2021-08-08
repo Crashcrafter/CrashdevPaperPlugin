@@ -14,7 +14,7 @@ import java.io.File
 class MultivCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if (player.hasPermission("rlg.multiv")) {
+        if (player.hasPermission("crash.multiv")) {
             if (args[0] == "tp") {
                 if (args.size >= 2) {
                     val w: World = Bukkit.getWorld(args[1])!!
@@ -101,7 +101,7 @@ class MultivCommand : CommandExecutor, TabCompleter {
         alias: String,
         args: Array<out String>
     ): MutableList<String>? {
-        if(!sender.asPlayer().hasPermission("rlg.multiv")) return null
+        if(!sender.asPlayer().hasPermission("crash.multiv")) return null
         return when(args.size) {
             1 -> mutableListOf("create", "remove", "tp", "portal")
             2 -> {

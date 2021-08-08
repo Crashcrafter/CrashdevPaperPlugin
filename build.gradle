@@ -74,7 +74,7 @@ shadowJar {
     }
     doLast {
         copy {
-            from("C:\\Users\\nhack\\Downloads\\kotlin-client-generated\\RLGPaperPlugin\\build\\libs\\RLGPaperPlugin-0.1-all.jar")
+            from("C:\\Users\\nhack\\Downloads\\kotlin-client-generated\\crashPaperPlugin\\build\\libs\\RLGPaperPlugin-0.1-all.jar")
             into("D:\\Bruh\\SpigotPluginServer\\plugins")
         }
     }

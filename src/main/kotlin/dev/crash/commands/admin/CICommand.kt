@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack
 class CICommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if(!player.hasPermission("rlg.ci")) return false
+        if(!player.hasPermission("crash.ci")) return false
         if(args.isEmpty()) {
             player.sendMessage("§4Please specify an item!")
             return true

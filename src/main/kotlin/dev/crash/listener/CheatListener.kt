@@ -1,7 +1,7 @@
 package dev.crash.listener
 
 import dev.crash.INSTANCE
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import dev.crash.toComponentList
 import dev.crash.toStringList
 import org.bukkit.GameMode
@@ -22,7 +22,7 @@ class CheatListener : Listener {
         try {
             val itemStack = e.cursor
             val im = itemStack.itemMeta
-            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING, e.whoClicked.name)
+            im.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING, e.whoClicked.name)
             itemStack.itemMeta = im
             if (im.hasLore()) {
                 val list = itemStack.lore()!!.toStringList()
@@ -40,7 +40,7 @@ class CheatListener : Listener {
     @EventHandler
     fun onGameMode(e: PlayerGameModeChangeEvent) {
         val player = e.player
-        if (!player.rlgPlayer().isMod) {
+        if (!player.crashPlayer().isMod) {
             if (e.newGameMode == GameMode.SPECTATOR || e.newGameMode == GameMode.CREATIVE) {
                 e.isCancelled = true
             }

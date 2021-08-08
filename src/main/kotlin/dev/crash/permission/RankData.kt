@@ -3,7 +3,7 @@ package dev.crash.permission
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.*
-import dev.crash.player.RLGPlayer
+import dev.crash.player.CrashPlayer
 import java.io.File
 
 fun getRankByString(rankString: String?): Rank? {
@@ -15,7 +15,7 @@ fun getRankByString(rankString: String?): Rank? {
     return null
 }
 
-fun RLGPlayer.rankData(): Rank = ranks[this.rank]!!
+fun CrashPlayer.rankData(): Rank = ranks[this.rank]!!
 
 val ranks = hashMapOf<Int, Rank>()
 data class Rank(val id: Int, val prefix: String, val name: String, val claims: Int, val homes: Int, val shopMultiplier: Double, val isMod: Boolean,

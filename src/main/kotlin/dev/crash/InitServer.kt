@@ -14,7 +14,7 @@ import dev.crash.items.CustomItems
 import dev.crash.listener.*
 import dev.crash.permission.*
 import dev.crash.player.clearPlayerData
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.*
 import org.jetbrains.exposed.sql.selectAll
@@ -163,7 +163,7 @@ internal fun loadFromDb(){
     clearPlayerData()
     Bukkit.getOnlinePlayers().forEach {
         it.setResourcePack(CONFIG.texturePackURL, CONFIG.texturePackHash)
-        val playerTextComponent = Component.text("${it.rlgPlayer().rankData().prefix} ${it.name}")
+        val playerTextComponent = Component.text("${it.crashPlayer().rankData().prefix} ${it.name}")
         it.updateScoreboard()
         it.playerListName(playerTextComponent)
         it.displayName(playerTextComponent)

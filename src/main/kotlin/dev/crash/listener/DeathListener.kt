@@ -2,7 +2,7 @@ package dev.crash.listener
 
 import dev.crash.*
 import dev.crash.permission.canBack
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.World
@@ -32,7 +32,7 @@ class DeathListener : Listener {
         }
         val location: Location = deathEvent.entity.location
         if(canBack(location.chunk, player)){
-            player.rlgPlayer().deathPos = location
+            player.crashPlayer().deathPos = location
         }
         val deathMessage = StringBuilder()
         deathMessage.append("§4")

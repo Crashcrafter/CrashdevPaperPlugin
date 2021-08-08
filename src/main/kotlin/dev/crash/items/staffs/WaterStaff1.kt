@@ -1,7 +1,7 @@
 package dev.crash.items.staffs
 
 import dev.crash.permission.isClaimed
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -16,9 +16,9 @@ object WaterStaff1 {
 
     fun handleClick(e: PlayerInteractEvent) {
         val player = e.player
-        val rlgPlayer = player.rlgPlayer()
+        val crashPlayer = player.crashPlayer()
         val action = e.action
-        val mana: Int = rlgPlayer.mana
+        val mana: Int = crashPlayer.mana
         when (action) {
             Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK -> try {
                 if (mana >= 15) {
@@ -31,7 +31,7 @@ object WaterStaff1 {
                         val block = result.hitBlock!!
                         val block1 = block.getRelative(Objects.requireNonNull(result.hitBlockFace)!!)
                         if (!block.chunk.isClaimed() || player.isOp) {
-                            rlgPlayer.changeMana(20)
+                            crashPlayer.changeMana(20)
                             block1.type = Material.WATER
                             spell1Cooldown[player] = System.currentTimeMillis() + 1000 * 15
                         } else {

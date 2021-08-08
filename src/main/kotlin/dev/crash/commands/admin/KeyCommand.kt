@@ -2,7 +2,6 @@ package dev.crash.commands.admin
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import dev.crash.*
-import dev.crash.player.rlgPlayer
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.command.Command
@@ -14,7 +13,7 @@ import java.io.File
 class KeyCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if (player.hasPermission("rlg.key")) {
+        if (player.hasPermission("crash.key")) {
             if (args[0] == "chest") {
                 val block = player.rayTraceBlocks(4.0)!!.hitBlock
                 if(block == null) {
@@ -56,7 +55,7 @@ class KeyCommand : CommandExecutor, TabCompleter {
         args: Array<out String>
     ): MutableList<String>? {
         val player = sender.asPlayer()
-        if (player.hasPermission("rlg.key")) {
+        if (player.hasPermission("crash.key")) {
             if (args.size == 1) {
                 return mutableListOf("chest", "create")
             } else if (args.size == 2) {

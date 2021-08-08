@@ -1,7 +1,7 @@
 package dev.crash.commands
 
 import dev.crash.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -13,7 +13,7 @@ import kotlin.collections.HashMap
 class GuildCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        val rlgPlayer = player.rlgPlayer()
+        val crashPlayer = player.crashPlayer()
         when(args.size){
             0 -> {
                 return true
@@ -21,48 +21,48 @@ class GuildCommand : CommandExecutor, TabCompleter {
             1 -> {
                 when(args[0]){
                     "setup" -> guildSetup(player, "")
-                    "leave" -> rlgPlayer.removeFromGuild("${player.name} hat die Guild verlassen!")
-                    "delete" -> rlgPlayer.deleteGuild()
+                    "leave" -> crashPlayer.removeFromGuild("${player.name} has left the Guild!")
+                    "delete" -> crashPlayer.deleteGuild()
                     "accept" -> {
                         if(inviteTargetMap.containsKey(player.uniqueId)){
                             val inviter = Bukkit.getPlayer(inviteTargetMap[player.uniqueId]!!)
                             when {
                                 inviter == null -> {
-                                    player.sendMessage("§4Der andere Spieler ist offline gegangen!")
+                                    player.sendMessage("§4The other player gone offline!")
                                     inviteTargetMap.remove(player.uniqueId)
                                     return true
                                 }
-                                inviter.rlgPlayer().guildId == 0 -> {
-                                    player.sendMessage("§4Der andere Spieler ist in keiner Guild!")
+                                inviter.crashPlayer().guildId == 0 -> {
+                                    player.sendMessage("§4The other player is in no guild!")
                                     inviteTargetMap.remove(player.uniqueId)
                                     return true
                                 }
-                                rlgPlayer.guildId != 0 -> {
-                                    player.sendMessage("§4Du bist bereits in einer Guild!")
+                                crashPlayer.guildId != 0 -> {
+                                    player.sendMessage("§4You are already in a guild!")
                                     inviteTargetMap.remove(player.uniqueId)
                                     return true
                                 }
                                 else -> {
                                     inviteTargetMap.remove(player.uniqueId)
-                                    rlgPlayer.joinGuild(inviter.rlgPlayer().guildId)
+                                    crashPlayer.joinGuild(inviter.crashPlayer().guildId)
                                 }
                             }
                         }else {
-                            player.sendMessage("§4Du hast keine offenen Einladungen!")
+                            player.sendMessage("§4You have no pending invites!")
                         }
                     }
                     "decline" -> {
                         if(inviteTargetMap.containsKey(player.uniqueId)){
-                            Bukkit.getPlayer(inviteTargetMap[player.uniqueId]!!)?.sendMessage("§cEinladung an ${player.name} wurde abgelehnt.")
-                            player.sendMessage("§aEinladung erfolgreich abgelehnt")
+                            Bukkit.getPlayer(inviteTargetMap[player.uniqueId]!!)?.sendMessage("§cInvite to ${player.name} was declined.")
+                            player.sendMessage("§aInvite was successfully declined!")
                             inviteTargetMap.remove(player.uniqueId)
                         }else {
-                            player.sendMessage("§4Du hast keine offenen Einladungen!")
+                            player.sendMessage("§4You have no pending invites!")
                         }
                     }
                     else -> {
-                        if(rlgPlayer.guildId == 0) return true
-                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
+                        if(crashPlayer.guildId == 0) return true
+                        crashPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
                     }
                 }
             }
@@ -71,49 +71,49 @@ class GuildCommand : CommandExecutor, TabCompleter {
                     "setup" -> {
                         if(args[1] == "cancel"){
                             guildSetupProgress.remove(player)
-                            player.sendMessage("§aGuild Setup wurde abgebrochen!")
+                            player.sendMessage("§aGuild-Setup is cancelled!")
                         }
                     }
                     "invite" -> {
-                        if(rlgPlayer.guildId == 0) {
-                            player.sendMessage("§4Du bist in keiner Guild!")
+                        if(crashPlayer.guildId == 0) {
+                            player.sendMessage("§4You are not in a guild!")
                             return true
                         }
                         val target = Bukkit.getPlayer(args[1])
                         if(target == null){
-                            player.sendMessage("§4Du musst einen gültigen Spieler angeben!")
+                            player.sendMessage("§4You must enter a valid player!")
                             return true
                         }
-                        val targetRLGPlayer = target.rlgPlayer()
-                        if(targetRLGPlayer.guildId != 0){
-                            player.sendMessage("§4Der Spieler ist bereits in einer Guild!")
+                        val targetcrashPlayer = target.crashPlayer()
+                        if(targetcrashPlayer.guildId != 0){
+                            player.sendMessage("§4The player ${target.name} is already in a guild!")
                             return true
                         }
                         else if(inviteTargetMap.containsKey(target.uniqueId)){
-                            player.sendMessage("§4Der Spieler hat bereits eine Einladung in eine andere Guild!")
+                            player.sendMessage("§4The player ${target.name} has already been invited to another guild!")
                             return true
                         }
                         inviteTargetMap[target.uniqueId] = player.uniqueId
-                        target.sendMessage("§bDu wurdest von ${player.name} in die Guild ${rlgPlayer.guild()!!.name} eingeladen!\n\nDu kannst diese Einladung mit /guild accept annehmen oder mit /guild decline ablehnen.")
-                        player.sendMessage("§a${target.name} wurde zur Guild eingeladen!")
+                        target.sendMessage("§bYou have been invited by ${player.name} to the guild ${crashPlayer.guild()!!.name}!\n/guild accept OR /guild decline")
+                        player.sendMessage("§a${target.name} has been invited to the guild!")
                     }
                     "kick" -> {
-                        val guild = rlgPlayer.guild() ?: return true
+                        val guild = crashPlayer.guild() ?: return true
                         if(guild.owner_uuid != player.uniqueId.toString()) return true
                         if(!guild.member_names.contains(args[1])) return true
                         val target = Bukkit.getPlayer(args[1])
-                        rlgPlayer.removeFromGuild("${args[1]} wurde aus der Guild gekickt!")
-                        target?.sendMessage("§cDu wurdest aus deiner Guild entfernt!")
+                        crashPlayer.removeFromGuild("${args[1]} has been removed from the guild!")
+                        target?.sendMessage("§cYou have been removed from the guild!")
                     }
                     else -> {
-                        if(rlgPlayer.guildId == 0) return true
-                        rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
+                        if(crashPlayer.guildId == 0) return true
+                        crashPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
                     }
                 }
             }
             else -> {
-                if(rlgPlayer.guildId == 0) return true
-                rlgPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
+                if(crashPlayer.guildId == 0) return true
+                crashPlayer.guild()?.sendMessage(args.drop(0).joinToString(" "), player)
             }
         }
         return true
@@ -129,14 +129,14 @@ class GuildCommand : CommandExecutor, TabCompleter {
         return when(args.size){
             1 -> {
                 val result = arrayListOf<String>()
-                try { if(player.rlgPlayer().guild()!!.owner_uuid == player.uniqueId.toString()) result.addAll(arrayListOf("delete", "invite", "kick")) else result.add("leave") }catch (ex: NullPointerException) {
+                try { if(player.crashPlayer().guild()!!.owner_uuid == player.uniqueId.toString()) result.addAll(arrayListOf("delete", "invite", "kick")) else result.add("leave") }catch (ex: NullPointerException) {
                     result.addAll(arrayListOf("accept", "setup", "decline"))}
                 result
             }
             2 -> {
                 when(args[0]){
                     "setup" -> arrayListOf("cancel")
-                    "kick" -> player.rlgPlayer().guild()?.member_names
+                    "kick" -> player.crashPlayer().guild()?.member_names
                     else -> null
                 }
             }

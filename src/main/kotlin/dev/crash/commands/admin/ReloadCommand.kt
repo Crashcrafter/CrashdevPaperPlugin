@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender
 class ReloadCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if(!player.hasPermission("rlg.reloaddb")) return true
+        if(!player.hasPermission("crash.reloaddb")) return true
         loadFromDb()
         player.sendMessage("§2DB Reloaded!")
         return true

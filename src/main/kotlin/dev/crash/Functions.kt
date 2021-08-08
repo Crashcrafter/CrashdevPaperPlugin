@@ -1,7 +1,7 @@
 package dev.crash
 
 import dev.crash.permission.rankData
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
@@ -42,7 +42,7 @@ fun Player.updateScoreboard(){
     list.add("§6§lRELAUNCH!§r")
     list.add("-------------------  ")
     list.add("§aDein Kontostand:")
-    list.add("§6" + player.rlgPlayer().balance.withPoints() + " Credits")
+    list.add("§6" + player.crashPlayer().balance.withPoints() + " Credits")
     val quests: List<Quest> = getActiveQuests(player)
     if (quests.isNotEmpty()) {
         list.add("-------------------")
@@ -74,20 +74,20 @@ fun Player.updateScoreboard(){
 
 fun Scoreboard.getServerTeams(){
     Bukkit.getOnlinePlayers().forEach {
-        val rlgPlayer = it.rlgPlayer()
+        val crashPlayer = it.crashPlayer()
         val team = this.registerNewTeam(it.name)
         team.setAllowFriendlyFire(true)
         team.setCanSeeFriendlyInvisibles(false)
-        team.prefix(Component.text("${rlgPlayer.rankData().prefix}§r "))
-        if(rlgPlayer.guildId != 0){
-            team.suffix(Component.text(" [§6${rlgPlayer.guild()!!.suffix}§r]"))
+        team.prefix(Component.text("${crashPlayer.rankData().prefix}§r "))
+        if(crashPlayer.guildId != 0){
+            team.suffix(Component.text(" [§6${crashPlayer.guild()!!.suffix}§r]"))
         }
         team.addEntry(it.name)
     }
 }
 
 fun sendModchatMessage(message: String, sender: Player){
-    val msg = "§2[Teamchat]§f ${sender.rlgPlayer().rankData().prefix} ${sender.name}> $message"
+    val msg = "§2[Teamchat]§f ${sender.crashPlayer().rankData().prefix} ${sender.name}> $message"
     moderator.forEach {
         it.sendMessage(msg)
     }
@@ -141,11 +141,11 @@ fun List<String>.toComponentList(): MutableList<Component>{
 }
 
 fun timeMultiplierFromString(input: String): Long = when (input) {
-    "Minuten" -> 60
-    "Stunden" -> 60 * 60
-    "Tage" -> 60 * 60 * 24
-    "Wochen" -> 60 * 60 * 24 * 7
-    "Monate" -> 60 * 60 * 24 * 30
+    "minutes" -> 60
+    "hours" -> 60 * 60
+    "days" -> 60 * 60 * 24
+    "weeks" -> 60 * 60 * 24 * 7
+    "months" -> 60 * 60 * 24 * 30
     else -> 60*60
 }
 

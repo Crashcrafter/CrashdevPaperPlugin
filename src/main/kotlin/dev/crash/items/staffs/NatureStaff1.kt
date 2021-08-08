@@ -2,7 +2,7 @@ package dev.crash.items.staffs
 
 import dev.crash.natureBlocks
 import dev.crash.permission.isClaimed
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
@@ -21,8 +21,8 @@ object NatureStaff1 {
     fun handleClick(e: PlayerInteractEvent) {
         val player = e.player
         val action = e.action
-        val rlgPlayer = player.rlgPlayer()
-        val mana: Int = rlgPlayer.mana
+        val crashPlayer = player.crashPlayer()
+        val mana: Int = crashPlayer.mana
         when (action) {
             Action.RIGHT_CLICK_BLOCK -> try {
                 if (mana >= 15) {
@@ -33,7 +33,7 @@ object NatureStaff1 {
                         spell1Cooldown.remove(player)
                         val block = e.clickedBlock!!
                         if (!block.chunk.isClaimed() || player.isOp) {
-                            rlgPlayer.changeMana(15)
+                            crashPlayer.changeMana(15)
                             var x = block.x - 3
                             while (x < block.x + 4) {
                                 var z = block.z - 3
@@ -74,7 +74,7 @@ object NatureStaff1 {
                         val block = Objects.requireNonNull(player.rayTraceBlocks(50.0))!!
                             .hitBlock!!
                         if (!block.chunk.isClaimed() || player.isOp) {
-                            rlgPlayer.changeMana(30)
+                            crashPlayer.changeMana(30)
                             var x = block.x - 3
                             while (x < block.x + 4) {
                                 var z = block.z - 3

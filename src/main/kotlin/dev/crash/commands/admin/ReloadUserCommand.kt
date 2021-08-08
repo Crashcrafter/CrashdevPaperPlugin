@@ -11,15 +11,15 @@ import org.bukkit.command.CommandSender
 class ReloadUserCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if(player.hasPermission("rlg.reloaddb")){
+        if(player.hasPermission("crash.reloaddb")){
             if(args.isEmpty()){
-                player.sendMessage("§4Du musst ein Spieler angeben!")
+                player.sendMessage("§4You must send a player as first argument!")
                 return true
             }
             val target = Bukkit.getPlayer(args[0])!!
             target.unload()
             target.load()
-            player.sendMessage("§6Spieler wurde reloaded!")
+            player.sendMessage("§6Player is reloaded!")
         }
         return true
     }

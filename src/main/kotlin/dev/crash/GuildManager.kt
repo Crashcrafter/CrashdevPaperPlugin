@@ -15,7 +15,7 @@ data class SetupGuild(var name: String, var suffix: String, val owner_uuid: Stri
 private val guilds = HashMap<Int, Guild>()
 val guildSetupProgress = HashMap<Player, SetupGuild>()
 
-fun RLGPlayer.guild(): Guild? {
+fun CrashPlayer.guild(): Guild? {
     if(!guilds.containsKey(this.guildId)){
         this.guildId = 0
         return null
@@ -37,12 +37,12 @@ internal fun initGuilds(){
 }
 
 fun guildSetup(player: Player, msg: String){
-    val rlgPlayer = player.rlgPlayer()
-    if(rlgPlayer.guildId != 0){
+    val crashPlayer = player.crashPlayer()
+    if(crashPlayer.guildId != 0){
         player.sendMessage("§4Du bist schon in einer Guild!")
         return
     }
-    if(rlgPlayer.balance < 50000){
+    if(crashPlayer.balance < 50000){
         player.sendMessage("§4Du benötigst 50.000 Credits, um eine Guild zu gründen!\nDu musst das Setup von vorne anfangen!")
         guildSetupProgress.remove(player)
         return
@@ -106,9 +106,9 @@ fun guildSetup(player: Player, msg: String){
                 }.value
                 final.id = id
                 guilds[id] = final
-                rlgPlayer.guildId = id
+                crashPlayer.guildId = id
             }
-            rlgPlayer.setName()
+            crashPlayer.setName()
             pay(player, 50000, "Gründen der Guild")
             guildSetupProgress.remove(player)
             updateTabOfPlayers()
@@ -117,7 +117,7 @@ fun guildSetup(player: Player, msg: String){
     }
 }
 
-fun RLGPlayer.removeFromGuild(reason: String){
+fun CrashPlayer.removeFromGuild(reason: String){
     val guildId = this.guildId
     if(guildId == 0) return
     val guild = this.guild()!!
@@ -145,7 +145,7 @@ fun Guild.saveMembers(guildId: Int){
     }
 }
 
-fun RLGPlayer.deleteGuild(){
+fun CrashPlayer.deleteGuild(){
     val guildId = this.guildId
     if(guildId == 0) return
     val guild = this.guild()!!
@@ -161,8 +161,8 @@ fun RLGPlayer.deleteGuild(){
             }
             val player = Bukkit.getPlayer(UUID.fromString(it2))
             if(player != null){
-                player.rlgPlayer().guildId = 0
-                player.rlgPlayer().setName()
+                player.crashPlayer().guildId = 0
+                player.crashPlayer().setName()
                 player.sendMessage("§4Deine Guild wurde aufgelöst!")
             }
         }
@@ -175,7 +175,7 @@ fun RLGPlayer.deleteGuild(){
     updateTabOfPlayers()
 }
 
-fun RLGPlayer.joinGuild(id: Int) {
+fun CrashPlayer.joinGuild(id: Int) {
     if(this.guildId == 0){
         this.guildId = id
         this.setName()

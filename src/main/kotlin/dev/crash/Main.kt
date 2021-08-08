@@ -1,7 +1,7 @@
 package dev.crash
 
 import dev.crash.player.load
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import dev.crash.player.unload
 import org.bukkit.Bukkit
 import org.bukkit.enchantments.Enchantment
@@ -30,7 +30,7 @@ class Main : JavaPlugin() {
         object : BukkitRunnable(){
             override fun run() {
                 Bukkit.getOnlinePlayers().forEach {
-                    it.rlgPlayer().save()
+                    it.crashPlayer().save()
                 }
                 val backupDirectory = File(INSTANCE.dataFolder.path + "/playerBackup/")
                 backupDirectory.delete()

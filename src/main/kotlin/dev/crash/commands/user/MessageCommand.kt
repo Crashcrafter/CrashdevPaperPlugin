@@ -2,7 +2,7 @@ package dev.crash.commands.user
 
 import dev.crash.asPlayer
 import dev.crash.checkMessage
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -21,7 +21,7 @@ class MessageCommand : CommandExecutor {
             msgBuilder.append(args[i]).append(" ")
         }
         val msg = msgBuilder.toString()
-        if (!checkMessage(msg, sender.asPlayer()) && player.rlgPlayer().mutedUntil <= System.currentTimeMillis()) {
+        if (!checkMessage(msg, sender.asPlayer()) && player.crashPlayer().mutedUntil <= System.currentTimeMillis()) {
             target.sendMessage("§7" + player.name + " sagt: " + msg)
             player.sendMessage("§7" + target.name + " wurde gesagt: " + msg)
         }

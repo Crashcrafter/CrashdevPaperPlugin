@@ -3,8 +3,8 @@ package dev.crash
 import dev.crash.items.CustomItems
 import dev.crash.items.ciName
 import dev.crash.permission.rankData
-import dev.crash.player.RLGPlayer
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
+import dev.crash.player.CrashPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -119,9 +119,9 @@ internal fun initQuests() {
 }
 
 fun questCount(player: Player, qid: Int, amount: Int, daily: Boolean) {
-    val rlgPlayer = player.rlgPlayer()
-    if (rlgPlayer.quests.size > 0) {
-        for (quest in rlgPlayer.quests) {
+    val crashPlayer = player.crashPlayer()
+    if (crashPlayer.quests.size > 0) {
+        for (quest in crashPlayer.quests) {
             if (quest.qid == qid && quest.status == 1 && quest.isDaily == daily) {
                 quest.changeCounter(amount)
                 player.updateScoreboard()
@@ -134,7 +134,7 @@ fun questCount(player: Player, qid: Int, amount: Int, daily: Boolean) {
 fun questCompleted(quest: Quest, player: Player) {
     quest.status = 2
     giveBalance(player, quest.reward.credits, "Quest")
-    player.rlgPlayer().changeXP(quest.reward.xp.toLong())
+    player.crashPlayer().changeXP(quest.reward.xp.toLong())
     if (quest.reward.itemStack != null) {
         if (quest.reward.itemStack!!.type == Material.NAME_TAG && quest.reward.itemStack!!.itemMeta.hasCustomModelData()) {
             player.inventory.addItem(genKey(quest.reward.itemStack!!.itemMeta.customModelData))
@@ -196,8 +196,8 @@ fun getQuestLore(quest: Quest, canStart: Boolean): MutableList<String> {
 
 fun getDailyLore(player: Player): MutableList<String> {
     var hascompleted = true
-    val rlgPlayer = player.rlgPlayer()
-    for (quest in rlgPlayer.quests) {
+    val crashPlayer = player.crashPlayer()
+    for (quest in crashPlayer.quests) {
         if (quest.isDaily && quest.status != 2) {
             hascompleted = false
             break
@@ -214,7 +214,7 @@ fun getDailyLore(player: Player): MutableList<String> {
         list.add("§a-5000 XP")
         list.add("§a-Common Key")
         list.add("")
-        if (!rlgPlayer.hasDaily) {
+        if (!crashPlayer.hasDaily) {
             list.add("§2Jetzt Belohnung abholen!")
         } else {
             list.add("§aAbgeschlossen!")
@@ -232,8 +232,8 @@ fun getDailyLore(player: Player): MutableList<String> {
 
 fun getWeeklyLore(player: Player): MutableList<String> {
     var hascompleted = true
-    val rlgPlayer = player.rlgPlayer()
-    for (quest in rlgPlayer.quests) {
+    val crashPlayer = player.crashPlayer()
+    for (quest in crashPlayer.quests) {
         if (!quest.isDaily && quest.status != 2) {
             hascompleted = false
             break
@@ -250,7 +250,7 @@ fun getWeeklyLore(player: Player): MutableList<String> {
         list.add("§a-10000 XP")
         list.add("§a-Epic Key")
         list.add("")
-        if (!rlgPlayer.hasWeekly) {
+        if (!crashPlayer.hasWeekly) {
             list.add("§2Jetzt Belohnung abholen!")
         } else {
             list.add("§aAbgeschlossen!")
@@ -268,7 +268,7 @@ fun getWeeklyLore(player: Player): MutableList<String> {
 
 fun getActiveQuests(player: Player): List<Quest> {
     val quests: MutableList<Quest> = ArrayList()
-    for (quest in player.rlgPlayer().quests) {
+    for (quest in player.crashPlayer().quests) {
         if (quest.status == 1) {
             quests.add(quest)
         }
@@ -281,7 +281,7 @@ fun showAvailableQuests(player: Player) {
     val original = blanckinv!!.contents
     val clone = original.copyOf()
     cloned.contents = clone
-    val quests: List<Quest?> = player.rlgPlayer().quests
+    val quests: List<Quest?> = player.crashPlayer().quests
     for (i in 0..2) {
         if (quests.size > i && quests[i] != null) {
             var quest = quests[i]
@@ -306,19 +306,19 @@ fun showAvailableQuests(player: Player) {
             cloned.setItem(11 + i, quest.getQuestRole())
         }
     }
-    cloned.setItem(20, CustomItems.defaultCustomItem(Material.PAPER, "§eTäglicher Bonus", getDailyLore(player), 1, hashMapOf("rlgAction" to "daily")))
-    cloned.setItem(24, CustomItems.defaultCustomItem(Material.PAPER, "§eWöchentlicher Bonus", getWeeklyLore(player), 1, hashMapOf("rlgAction" to "weekly")))
+    cloned.setItem(20, CustomItems.defaultCustomItem(Material.PAPER, "§eTäglicher Bonus", getDailyLore(player), 1, hashMapOf("crashAction" to "daily")))
+    cloned.setItem(24, CustomItems.defaultCustomItem(Material.PAPER, "§eWöchentlicher Bonus", getWeeklyLore(player), 1, hashMapOf("crashAction" to "weekly")))
     player.closeInventory()
     questinventories.add(cloned)
     player.openInventory(cloned)
 }
 
 fun Quest.getQuestRole() : ItemStack = CustomItems.defaultCustomItem(Material.PAPER, "§e" + this.name, getQuestLore(this, true),
-    1, hashMapOf("rlgAction" to "${this.status} ${this.qid} ${this.isDaily}"))
+    1, hashMapOf("crashAction" to "${this.status} ${this.qid} ${this.isDaily}"))
 
 fun showQuests(player: Player) {
-    val rlgPlayer = player.rlgPlayer()
-    if (rlgPlayer.quests.size != 0) {
+    val crashPlayer = player.crashPlayer()
+    if (crashPlayer.quests.size != 0) {
         val cloned = Bukkit.createInventory(null, blanckinv!!.size, Component.text("Quests"))
         val original = blanckinv!!.contents
         val clone = original.copyOf()
@@ -326,8 +326,8 @@ fun showQuests(player: Player) {
         val processedQuests: MutableList<Int> = ArrayList()
         for (i in 0..2) {
             var quest: Quest? = null
-            for (j in 0 until rlgPlayer.quests.size) {
-                val quest1: Quest = rlgPlayer.quests[j]
+            for (j in 0 until crashPlayer.quests.size) {
+                val quest1: Quest = crashPlayer.quests[j]
                 if (quest1.status == 1 && !processedQuests.contains(j)) {
                     processedQuests.add(j)
                     quest = quest1
@@ -348,15 +348,15 @@ fun showQuests(player: Player) {
 
 fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
     val itemStack = inventory.getItem(slot)!!
-    val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgAction"), PersistentDataType.STRING) ?: return
-    val rlgPlayer = player.rlgPlayer()
+    val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashAction"), PersistentDataType.STRING) ?: return
+    val crashPlayer = player.crashPlayer()
     val dataArray = data.split(" ")
     when(dataArray[0]){
         "0" -> {
             if(player.canGetQuest()){
                 val qid = dataArray[1].toInt()
                 val isDaily = dataArray[2].toBoolean()
-                val quest = rlgPlayer.quests.first { it.qid == qid && it.isDaily == isDaily }
+                val quest = crashPlayer.quests.first { it.qid == qid && it.isDaily == isDaily }
                 quest.status = 1
                 player.sendMessage("§2Du hast die Quest " + quest.name + " erfolgreich gestarted!")
                 player.closeInventory()
@@ -366,7 +366,7 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
         "1" -> {
             val qid = dataArray[1].toInt()
             val isDaily = dataArray[2].toBoolean()
-            val quest = rlgPlayer.quests.first { it.qid == qid && it.isDaily == isDaily }
+            val quest = crashPlayer.quests.first { it.qid == qid && it.isDaily == isDaily }
             if(quest.counter >= quest.needed){
                 questCompleted(quest, player)
                 player.closeInventory()
@@ -375,18 +375,18 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
             }
         }
         "daily" -> {
-            if(!rlgPlayer.hasDaily){
+            if(!crashPlayer.hasDaily){
                 var hascompleted = true
-                for (quest in rlgPlayer.quests) {
+                for (quest in crashPlayer.quests) {
                     if (quest.isDaily && quest.status != 2) {
                         hascompleted = false
                         break
                     }
                 }
                 if(hascompleted) {
-                    rlgPlayer.hasDaily = true
+                    crashPlayer.hasDaily = true
                     giveBalance(player, 3500, "Täglicher Bonus")
-                    rlgPlayer.changeXP(5000)
+                    crashPlayer.changeXP(5000)
                     player.inventory.addItem(genKey(1))
                     player.sendMessage("§2Du hast deinen täglichen Bonus erhalten!")
                     player.closeInventory()
@@ -394,18 +394,18 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
             }
         }
         "weekly" -> {
-            if(!rlgPlayer.hasWeekly){
+            if(!crashPlayer.hasWeekly){
                 var hascompleted = true
-                for (quest in rlgPlayer.quests) {
+                for (quest in crashPlayer.quests) {
                     if (!quest.isDaily && quest.status != 2) {
                         hascompleted = false
                         break
                     }
                 }
                 if(hascompleted) {
-                    rlgPlayer.hasWeekly = true
+                    crashPlayer.hasWeekly = true
                     giveBalance(player, 15000, "Wöchentlicher Bonus")
-                    rlgPlayer.changeXP(10000)
+                    crashPlayer.changeXP(10000)
                     player.inventory.addItem(genKey(2))
                     player.sendMessage("§2Du hast deinen wöchentlichen Bonus erhalten!")
                     player.closeInventory()
@@ -415,7 +415,7 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
     }
 }
 
-fun RLGPlayer.dailyQuestCreation() {
+fun CrashPlayer.dailyQuestCreation() {
     val dailyChosen: MutableList<Int> = ArrayList()
     for (i in 0..2) {
         dailyChosen.add(createDailyQuest(i, player, dailyChosen))
@@ -433,16 +433,16 @@ private fun createDailyQuest(i: Int, player: Player, dailyChosen:MutableList<Int
         randomid = random.nextInt(dailyquests.size) + 1
     }
     dailyChosen.add(randomid)
-    val rlgPlayer = player.rlgPlayer()
-    if(rlgPlayer.quests.size <= i){
-        rlgPlayer.quests.add(i, Quest(randomid, player.uniqueId.toString(), true, 0, 0))
+    val crashPlayer = player.crashPlayer()
+    if(crashPlayer.quests.size <= i){
+        crashPlayer.quests.add(i, Quest(randomid, player.uniqueId.toString(), true, 0, 0))
     }else {
-        rlgPlayer.quests[i] = Quest(randomid, player.uniqueId.toString(), true, 0, 0)
+        crashPlayer.quests[i] = Quest(randomid, player.uniqueId.toString(), true, 0, 0)
     }
     return randomid
 }
 
-fun RLGPlayer.weeklyQuestCreation() {
+fun CrashPlayer.weeklyQuestCreation() {
     dailyQuestCreation()
     val weeklyChosen: MutableList<Int> = ArrayList()
     for (i in 3..5) {
@@ -465,9 +465,9 @@ fun RLGPlayer.weeklyQuestCreation() {
 }
 
 fun Player.canGetQuest(): Boolean {
-    val rlgPlayer = this.rlgPlayer()
-    val count = rlgPlayer.quests.filter { it.status == 1 }.size
-    val limit = rlgPlayer.rankData().quests
+    val crashPlayer = this.crashPlayer()
+    val count = crashPlayer.quests.filter { it.status == 1 }.size
+    val limit = crashPlayer.rankData().quests
     val can = count < limit
     if (!can) {
         this.sendMessage("§4Du kannst maximal $limit Quests gleichzeitig machen!")

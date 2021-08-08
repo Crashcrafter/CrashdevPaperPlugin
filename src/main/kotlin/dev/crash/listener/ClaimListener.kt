@@ -96,9 +96,9 @@ class ClaimListener : Listener {
         if (e.entity.shooter is Player) {
             val player = e.entity.shooter as Player
             if(e.entity is Snowball) {
-                val data = player.inventory.itemInMainHand.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgItemData"), PersistentDataType.STRING)
+                val data = player.inventory.itemInMainHand.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashItemData"), PersistentDataType.STRING)
                 if(data == "mudBall") {
-                    e.entity.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING, "mudBall")
+                    e.entity.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, "mudBall")
                     (e.entity as Snowball).item = customItemsMap["mud_ball"]!!
                 }
             }

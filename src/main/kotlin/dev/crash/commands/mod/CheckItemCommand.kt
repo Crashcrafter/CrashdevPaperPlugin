@@ -11,13 +11,14 @@ import org.bukkit.persistence.PersistentDataType
 class CheckItemCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
+        if(!player.hasPermission("crash.checkitem")) return true
         val item = player.inventory.itemInMainHand
-        if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)){
-            val cheaterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "rlgCheated"), PersistentDataType.STRING)
-            player.sendMessage("§6Das Item wurde von $cheaterName im Creative benutzt/erzeugt!")
+        if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)){
+            val cheaterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)
+            player.sendMessage("§6The item was made by $cheaterName in creative mode!")
         }else if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING)){
             val crafterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING)
-            player.sendMessage("§6Das Item wurde von $crafterName gecraftet!")
+            player.sendMessage("§6This item was crafted by $crafterName!")
         }else player.sendMessage("§4Item hat keine Daten!")
         return true
     }

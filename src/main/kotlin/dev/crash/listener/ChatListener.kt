@@ -2,7 +2,7 @@ package dev.crash.listener
 
 import dev.crash.*
 import dev.crash.permission.rankData
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -15,10 +15,10 @@ class ChatListener : Listener {
     @EventHandler
     fun onChat(chatEvent: AsyncChatEvent){
         val player: Player = chatEvent.player
-        val rlgPlayer = player.rlgPlayer()
+        val crashPlayer = player.crashPlayer()
         val message: String = (chatEvent.message() as TextComponent).content().replace("$", "§")
         when {
-            checkMessage(message, player) || rlgPlayer.mutedUntil > System.currentTimeMillis() -> {
+            checkMessage(message, player) || crashPlayer.mutedUntil > System.currentTimeMillis() -> {
                 chatEvent.isCancelled = true
                 return
             }
@@ -29,11 +29,11 @@ class ChatListener : Listener {
                 return
             }
         }
-        val rankData = rlgPlayer.rankData()
-        if(rlgPlayer.guildId == 0){
+        val rankData = crashPlayer.rankData()
+        if(crashPlayer.guildId == 0){
             chatEvent.renderer { _, _, _, _ -> Component.text("${rankData.prefix} ${player.name}> $message")}
         }else {
-            chatEvent.renderer { _, _, _, _ -> Component.text("${rankData.prefix} §8[§6${rlgPlayer.guild()!!.suffix}§8]§r ${player.name}> $message")}
+            chatEvent.renderer { _, _, _, _ -> Component.text("${rankData.prefix} §8[§6${crashPlayer.guild()!!.suffix}§8]§r ${player.name}> $message")}
         }
     }
 }

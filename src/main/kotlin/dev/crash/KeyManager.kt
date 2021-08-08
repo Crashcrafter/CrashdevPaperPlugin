@@ -53,7 +53,7 @@ fun genKey(type: Int): ItemStack {
     im.lore(lore)
     im.displayName(Component.text(keysData[type]!!.displayName))
     im.setCustomModelData(type)
-    im.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgKeyToken"), PersistentDataType.STRING, token)
+    im.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashKeyToken"), PersistentDataType.STRING, token)
     itemStack.itemMeta = im
     insertKey(token, type)
     return itemStack

@@ -1,7 +1,7 @@
 package dev.crash.commands.admin
 
 import dev.crash.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -12,7 +12,7 @@ import org.bukkit.command.TabCompleter
 class DropCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if (!player.hasPermission("rlg.drop")) return true
+        if (!player.hasPermission("crash.drop")) return true
         when(args[0]){
             "set" -> {
                 if (args.size == 1) {
@@ -38,7 +38,7 @@ class DropCommand : CommandExecutor, TabCompleter {
                 Bukkit.getServer().sendMessage(Component.text("§5The drops are disabled!"))
             }
             "resetdropcooldown" -> {
-                player.rlgPlayer().dropCoolDown = System.currentTimeMillis()
+                player.crashPlayer().dropCoolDown = System.currentTimeMillis()
                 player.sendMessage("§2Dropcooldown resetted!")
         }
         }

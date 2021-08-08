@@ -1,7 +1,7 @@
 package dev.crash.listener
 
 import dev.crash.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import io.papermc.paper.event.packet.PlayerChunkLoadEvent
 import io.papermc.paper.event.packet.PlayerChunkUnloadEvent
 import org.bukkit.event.EventHandler
@@ -19,7 +19,7 @@ class ChunkListener : Listener {
                 val block = chunk.getBlock(0, 0, 0)
                 if (block.x > -dropRange && block.x < dropRange && block.z > -dropRange && block.z < dropRange) {
                     if(setDrop(chunk)){
-                        player.rlgPlayer().dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+Random().nextInt(10))
+                        player.crashPlayer().dropCoolDown = System.currentTimeMillis() + 1000 * 60 * (10+Random().nextInt(10))
                     }
                 }
             }
