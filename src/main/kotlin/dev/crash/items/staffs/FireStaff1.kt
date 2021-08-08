@@ -3,7 +3,7 @@ package dev.crash.items.staffs
 import dev.crash.INSTANCE
 import dev.crash.allJobs
 import dev.crash.permission.isClaimed
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -14,7 +14,6 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.scheduler.BukkitRunnable
 
 object FireStaff1 {
     private var spell1Cooldown = HashMap<Player, Long>()
@@ -22,9 +21,9 @@ object FireStaff1 {
 
     fun handleClick(e: PlayerInteractEvent) {
         val player = e.player
-        val rlgPlayer = player.rlgPlayer()
+        val crashPlayer = player.crashPlayer()
         val action = e.action
-        val mana: Int = rlgPlayer.mana
+        val mana: Int = crashPlayer.mana
         when (action) {
             Action.RIGHT_CLICK_AIR -> try {
                 if (mana >= 30) {
@@ -41,7 +40,7 @@ object FireStaff1 {
                                 var count = 0
                                 while (count < 15) {
                                     Bukkit.getScheduler().runTask(INSTANCE, Runnable {
-                                        rlgPlayer.changeMana(2)
+                                        crashPlayer.changeMana(2)
                                         val fireball =
                                             player.launchProjectile(SmallFireball::class.java)
                                         fireball.customName = "firestaff1"
@@ -73,7 +72,7 @@ object FireStaff1 {
                             val fireball = player.launchProjectile(SmallFireball::class.java)
                             fireball.customName = "firestaff1"
                             fireball.isCustomNameVisible = false
-                            rlgPlayer.changeMana(5)
+                            crashPlayer.changeMana(5)
                             spell2Cooldown[player] = System.currentTimeMillis() + 500
                         } else {
                             player.sendMessage("§4Du kannst in geclaimten Chunks nicht Zaubern!")

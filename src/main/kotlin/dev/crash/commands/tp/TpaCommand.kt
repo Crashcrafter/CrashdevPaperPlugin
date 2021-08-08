@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable
 
 class TpaCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+        if(!sender.hasPermission("crash.tpa")) return true
         if (args.size == 1) {
             if (!Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(args[0]))) {
                 sender.sendMessage(ChatColor.RED.toString() + "Player is not online!")

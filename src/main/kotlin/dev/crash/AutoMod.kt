@@ -1,8 +1,8 @@
 package dev.crash
 
-import dev.crash.player.RLGPlayer
+import dev.crash.player.crashPlayer
+import dev.crash.player.CrashPlayer
 import dev.crash.player.Warn
-import dev.crash.player.rlgPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.BanList
 import org.bukkit.Bukkit
@@ -167,30 +167,30 @@ fun tempbanOnlineUser(target: Player, reason: String, date: Date?) {
 }
 
 fun addLinkSend(player: Player) {
-    val rlgPlayer = player.rlgPlayer()
-    rlgPlayer.playerLinkCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
-    rlgPlayer.playerLinkCounter.checkCounter()
-    if (rlgPlayer.playerLinkCounter.size >= 3) {
+    val crashPlayer = player.crashPlayer()
+    crashPlayer.playerLinkCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
+    crashPlayer.playerLinkCounter.checkCounter()
+    if (crashPlayer.playerLinkCounter.size >= 3) {
         tempbanOnlineUser(player, "Du wurdest gebannt wegen Senden von Links!\nDauer: 3 Tage", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
-    }else rlgPlayer.warn( "Senden von Links", "Automod")
+    }else crashPlayer.warn( "Senden von Links", "Automod")
 }
 
 fun addOffense(player: Player) {
-    val rlgPlayer = player.rlgPlayer()
-    rlgPlayer.playerOffenseCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
-    rlgPlayer.warn("Beleidigung", "Automod")
-    rlgPlayer.playerOffenseCounter.checkCounter()
-    if (rlgPlayer.playerOffenseCounter.size >= 3) {
+    val crashPlayer = player.crashPlayer()
+    crashPlayer.playerOffenseCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
+    crashPlayer.warn("Beleidigung", "Automod")
+    crashPlayer.playerOffenseCounter.checkCounter()
+    if (crashPlayer.playerOffenseCounter.size >= 3) {
         tempbanOnlineUser(player, "Du wurdest gebannt wegen Beleidigung im Chat!\nDauer: 3 Tage", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
     }
 }
 
 fun addAFKCounter(player: Player) {
-    val rlgPlayer = player.rlgPlayer()
-    rlgPlayer.playerAfkCounter.add(System.currentTimeMillis() + 1000 * 60)
-    if (rlgPlayer.playerAfkCounter.size >= 30) {
-        rlgPlayer.playerAfkCounter.checkCounter()
-        if (rlgPlayer.playerAfkCounter.size >= 30) {
+    val crashPlayer = player.crashPlayer()
+    crashPlayer.playerAfkCounter.add(System.currentTimeMillis() + 1000 * 60)
+    if (crashPlayer.playerAfkCounter.size >= 30) {
+        crashPlayer.playerAfkCounter.checkCounter()
+        if (crashPlayer.playerAfkCounter.size >= 30) {
             player.kick(Component.text("AFK-Farming ist verboten!"))
         }
     }
@@ -209,49 +209,49 @@ private fun MutableList<Long>.checkCounter(){
     }
 }
 
-fun RLGPlayer.warn(reason: String, modName: String){
+fun CrashPlayer.warn(reason: String, modName: String){
     if(player.isOp) return
     player.sendMessage("Du wurdest wegen $reason gewarnt!")
     warns.add(Warn(reason, modName, System.currentTimeMillis()))
     checkWarns()
 }
 
-fun RLGPlayer.removeAllWarns(){
+fun CrashPlayer.removeAllWarns(){
     this.warns = mutableListOf()
 }
 
-fun RLGPlayer.removeWarn(number: Int) {
+fun CrashPlayer.removeWarn(number: Int) {
     warns.removeAt(number)
 }
 
-fun RLGPlayer.getWarnsString(): String {
+fun CrashPlayer.getWarnsString(): String {
     val warnList = StringBuilder()
     var i = 0
     warns.forEach {
         warnList.append(i).append(": ").append(it.reason)
-            .append(" von ").append(it.modName).append("\n")
+            .append(" by ").append(it.modName).append("\n")
         i++
     }
     return warnList.toString()
 }
 
-fun RLGPlayer.mute(seconds: Long) {
+fun CrashPlayer.mute(seconds: Long) {
     player.sendMessage("§4Du wurdest temporär gemuted!")
     mutedUntil = System.currentTimeMillis()+(seconds*1000)
 }
 
-fun RLGPlayer.unmute() {
+fun CrashPlayer.unmute() {
     player.sendMessage("§2Du wurdest entmuted!")
     mutedUntil = System.currentTimeMillis()
 }
 
-fun RLGPlayer.checkWarns(){
-    val rlgPlayer = this
+fun CrashPlayer.checkWarns(){
+    val crashPlayer = this
     var lastWeekWarnings = 0
     warns.forEach {
         if(Instant.ofEpochMilli(it.time).isAfter(Instant.now().minus(7, ChronoUnit.DAYS))){
             lastWeekWarnings++
         }
     }
-    if(lastWeekWarnings > 5) tempbanOnlineUser(rlgPlayer.player, "Too many Infractions", Date.from(Instant.now().plus(3, ChronoUnit.DAYS)))
+    if(lastWeekWarnings > 5) tempbanOnlineUser(crashPlayer.player, "Too many Infractions", Date.from(Instant.now().plus(3, ChronoUnit.DAYS)))
 }

@@ -2,7 +2,7 @@ package dev.crash.commands.user
 
 import dev.crash.asPlayer
 import dev.crash.getEXPForLevel
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -24,14 +24,14 @@ class ExpCommand : CommandExecutor, TabCompleter{
                 val amount: Long = args[2].toLong()
                 val factor = if(arg == "remove") -1 else 1
                 if (args[3].contentEquals("XP")) {
-                    target.rlgPlayer().changeXP(amount * factor)
+                    target.crashPlayer().changeXP(amount * factor)
                 } else if (args[3].contentEquals("Level")) {
                     var finalexp: Long = 0
-                    val rlgPlayer = target.rlgPlayer()
+                    val crashPlayer = target.crashPlayer()
                     for (i in 0 until amount) {
-                        finalexp += getEXPForLevel(rlgPlayer.xpLevel + (i.toInt() * factor) - if(factor == -1) 1 else 0)
+                        finalexp += getEXPForLevel(crashPlayer.xpLevel + (i.toInt() * factor) - if(factor == -1) 1 else 0)
                     }
-                    rlgPlayer.changeXP(finalexp * factor)
+                    crashPlayer.changeXP(finalexp * factor)
                 }
                 player.sendMessage("§2Dem Spieler wurden " + (amount*factor) + " " + args[3] + " gegeben!")
             } else {

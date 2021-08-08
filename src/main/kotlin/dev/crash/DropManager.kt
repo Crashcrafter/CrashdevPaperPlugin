@@ -3,7 +3,7 @@ package dev.crash
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.permission.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import kotlinx.coroutines.*
 import org.bukkit.*
 import org.bukkit.block.Chest
@@ -97,7 +97,7 @@ fun unsetDrop(chunk: Chunk, alsoLoot: Boolean) {
         it.cancel()
     }
     drop.participatingPlayer.forEach {
-        it.stopSound("rlg.drop.music", SoundCategory.AMBIENT)
+        it.stopSound("crash.drop.music", SoundCategory.AMBIENT)
     }
     try { drop.waveManager!!.cancel() }catch (ex: NullPointerException) {}
     drops.remove(chunk)
@@ -142,7 +142,7 @@ fun waveManager(chunk: Chunk) {
         for (player in drop.participatingPlayer) {
             drop.musicJobs.add(GlobalScope.launch {
                 while (true){
-                    player.playSound(location, "rlg.drop.music", SoundCategory.AMBIENT, 2f, 1f)
+                    player.playSound(location, "crash.drop.music", SoundCategory.AMBIENT, 2f, 1f)
                     delay(162000)
                 }
             })
@@ -164,7 +164,7 @@ fun waveManager(chunk: Chunk) {
                                 }
                                 for (player in drop.participatingPlayer) {
                                     try {
-                                        player.stopSound("rlg.drop.music", SoundCategory.AMBIENT)
+                                        player.stopSound("crash.drop.music", SoundCategory.AMBIENT)
                                         player.playSound(drop.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.AMBIENT, 5f, 1f)
                                         when(drop.data.type){
                                             0 -> questCount(player, 15, 1, true)
@@ -289,7 +289,7 @@ fun MutableList<DropObj>.draw(): DropObj? {
 
 fun Player.canGenDrops(): Boolean {
     return if (this.gameMode == GameMode.SURVIVAL || this.isOp) {
-        this.rlgPlayer().dropCoolDown <= System.currentTimeMillis()
+        this.crashPlayer().dropCoolDown <= System.currentTimeMillis()
     } else false
 }
 

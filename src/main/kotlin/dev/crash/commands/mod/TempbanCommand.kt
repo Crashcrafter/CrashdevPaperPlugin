@@ -1,7 +1,7 @@
 package dev.crash.commands.mod
 
 import dev.crash.asPlayer
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import dev.crash.tempbanOnlineUser
 import dev.crash.tempbanUser
 import dev.crash.timeMultiplierFromString
@@ -16,7 +16,7 @@ import java.util.*
 class TempbanCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
-        if (player.hasPermission("rlg.tempban")) {
+        if (player.hasPermission("crash.tempban")) {
             val time: Int = args[1].toInt()
             val timeMultiplier = timeMultiplierFromString(args[2])
             val date = Date(System.currentTimeMillis() + time.toLong() * timeMultiplier * 1000)
@@ -27,16 +27,16 @@ class TempbanCommand : CommandExecutor, TabCompleter {
             val reason = sb.toString()
             val target: Player? = Bukkit.getPlayer(args[0])
             if (target == null) {
-                player.sendMessage("Der Spieler " + args[0] + " wurde für " + time + " " + args[2] + " gebannt")
-                tempbanUser("Du wurdest gebannt wegen $reason\nDauer: $time ${args[2]}", date, player, args[0])
+                player.sendMessage("The player ${args[0]} was banned for $time ${args[2]}")
+                tempbanUser("You are banned for $time ${args[2]}\nReason: $reason", date, player, args[0])
                 return true
             }
-            if(target.rlgPlayer().isMod) {
-                player.sendMessage("§4Du kannst keine Moderator bannen!")
+            if(target.crashPlayer().isMod) {
+                player.sendMessage("§4You cant ban moderators!")
                 return true
             }
-            tempbanOnlineUser(target, "Du wurdest gebannt wegen $reason\nDauer: $time ${args[2]}", date)
-            player.sendMessage("Der Spieler " + args[0] + " wurde für " + time + " " + args[2] + " gebannt")
+            tempbanOnlineUser(target, "You are banned for $time ${args[2]}\nReason: $reason", date)
+            player.sendMessage("The player ${args[0]} was banned for $time ${args[2]}")
         }
         return true
     }
@@ -59,8 +59,8 @@ class TempbanCommand : CommandExecutor, TabCompleter {
                 list
             }
             2 -> mutableListOf("1", "3", "7", "14", "30")
-            3 -> mutableListOf("Minuten", "Stunden", "Tage", "Wochen", "Monate")
-            else -> mutableListOf("<Reason>")
+            3 -> mutableListOf("minutes", "hours", "days", "weeks", "months")
+            else -> mutableListOf("<reason>")
         }
     }
 }

@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 internal fun initDatabase(){
-    TransactionManager.defaultDatabase = Database.connect("jdbc:mysql://${LoginData.ip}/mcplugin", user = LoginData.user, password = LoginData.pw)
+    TransactionManager.defaultDatabase = Database.connect("jdbc:mysql://${CONFIG.dbIp}/${CONFIG.dbName}", user = CONFIG.dbUser, password = CONFIG.dbPw)
 }
 
 object ChunkTable : Table("chunks"){

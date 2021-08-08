@@ -23,7 +23,7 @@ import java.time.temporal.ChronoUnit
 import java.util.Random
 import kotlin.properties.Delegates
 
-class RLGPlayer {
+class CrashPlayer {
 
     var player by Delegates.notNull<Player>()
     var rank by Delegates.notNull<Int>()
@@ -267,16 +267,16 @@ class RLGPlayer {
         jacksonObjectMapper().writeValue(file, playerSaveObj)
         transaction {
             PlayerTable.update(where = {PlayerTable.uuid eq player.uniqueId.toString()}){
-                it[rank] = this@RLGPlayer.rank
-                it[remainingClaims] = this@RLGPlayer.remainingClaims
-                it[remainingHomes] = this@RLGPlayer.remainingHomes
-                it[addedClaims] = this@RLGPlayer.addedClaims
-                it[addedHomes] = this@RLGPlayer.addedHomes
-                it[balance] = this@RLGPlayer.balance
-                it[xpLevel] = this@RLGPlayer.xpLevel
-                it[xp] = this@RLGPlayer.xp
-                it[vxpLevel] = this@RLGPlayer.vxpLevel
-                it[guildId] = this@RLGPlayer.guildId
+                it[rank] = this@CrashPlayer.rank
+                it[remainingClaims] = this@CrashPlayer.remainingClaims
+                it[remainingHomes] = this@CrashPlayer.remainingHomes
+                it[addedClaims] = this@CrashPlayer.addedClaims
+                it[addedHomes] = this@CrashPlayer.addedHomes
+                it[balance] = this@CrashPlayer.balance
+                it[xpLevel] = this@CrashPlayer.xpLevel
+                it[xp] = this@CrashPlayer.xp
+                it[vxpLevel] = this@CrashPlayer.vxpLevel
+                it[guildId] = this@CrashPlayer.guildId
             }
         }
     }

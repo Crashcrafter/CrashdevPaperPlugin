@@ -11,9 +11,9 @@ import java.io.File
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-private val PlayerData: HashMap<Player, RLGPlayer> = HashMap()
+private val PlayerData: HashMap<Player, CrashPlayer> = HashMap()
 
-fun Player.rlgPlayer() : RLGPlayer {
+fun Player.crashPlayer() : CrashPlayer {
     if(!PlayerData.containsKey(this)) {
         println("loading player ${this.name}")
         this.load()
@@ -40,7 +40,7 @@ internal fun Player.load(){
         saveFile.createNewFile()
         val playerSaveData = PlayerSaveData(player.uniqueId.toString(), mutableListOf(),false, false, System.currentTimeMillis(),
             System.currentTimeMillis(), 0, hashMapOf(), hashMapOf(), mutableListOf())
-        player.teleport(warps["spawn"]!!)
+        player.teleport(warps[CONFIG.defaultWarpName]!!)
         transaction {
             PlayerTable.insert {
                 it[uuid] = player.uniqueId.toString()
@@ -48,28 +48,27 @@ internal fun Player.load(){
         }
         jacksonObjectMapper().writeValue(saveFile, playerSaveData)
     }
-    val rlgPlayer = RLGPlayer(player)
-    PlayerData[player] = rlgPlayer
-    if(Instant.ofEpochMilli(rlgPlayer.lastWeeklyQuest).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
-        rlgPlayer.weeklyQuestCreation()
-    }else if(Instant.ofEpochMilli(rlgPlayer.lastDailyQuest).isBefore(Instant.now().minus(1, ChronoUnit.DAYS))){
-        if(rlgPlayer.quests.size < 6){
-            rlgPlayer.weeklyQuestCreation()
+    val crashPlayer = CrashPlayer(player)
+    PlayerData[player] = crashPlayer
+    if(Instant.ofEpochMilli(crashPlayer.lastWeeklyQuest).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
+        crashPlayer.weeklyQuestCreation()
+    }else if(Instant.ofEpochMilli(crashPlayer.lastDailyQuest).isBefore(Instant.now().minus(1, ChronoUnit.DAYS))){
+        if(crashPlayer.quests.size < 6){
+            crashPlayer.weeklyQuestCreation()
         }else {
-            rlgPlayer.dailyQuestCreation()
+            crashPlayer.dailyQuestCreation()
         }
-    }else if(rlgPlayer.quests.size < 6){
-        rlgPlayer.weeklyQuestCreation()
+    }else if(crashPlayer.quests.size < 6){
+        crashPlayer.weeklyQuestCreation()
     }
-    if (rlgPlayer.isMod) moderator.add(player)
     player.givePerms()
 }
 
 internal fun Player.unload(){
     if(!PlayerData.containsKey(this)) return
-    val rlgPlayer = rlgPlayer()
-    rlgPlayer.managen?.cancel()
-    rlgPlayer.save()
+    val crashPlayer = crashPlayer()
+    crashPlayer.managen?.cancel()
+    crashPlayer.save()
     PlayerData.remove(this)
 }
 

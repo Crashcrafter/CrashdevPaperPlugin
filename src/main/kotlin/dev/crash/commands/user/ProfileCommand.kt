@@ -3,7 +3,7 @@ package dev.crash.commands.user
 import dev.crash.asPlayer
 import dev.crash.getEXPForLevel
 import dev.crash.getExpDisplay
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import dev.crash.withPoints
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
@@ -21,16 +21,16 @@ class ProfileCommand : CommandExecutor {
                 target = player
             }
         }else target = player
-        val targetRLGPlayer = target.rlgPlayer()
+        val targetcrashPlayer = target.crashPlayer()
         val builder = StringBuilder()
-        builder.append("§6Level ").append(targetRLGPlayer.xpLevel).append(": ")
-        val percent: Double = (targetRLGPlayer.xp.toDouble().div(getEXPForLevel(targetRLGPlayer.xpLevel)))
+        builder.append("§6Level ").append(targetcrashPlayer.xpLevel).append(": ")
+        val percent: Double = (targetcrashPlayer.xp.toDouble().div(getEXPForLevel(targetcrashPlayer.xpLevel)))
         builder.getExpDisplay(percent)
         player.sendMessage(
             """
                 §7----------------Profil----------------
                 §6Name: §a${target.name}
-                §6Credits: §a${targetRLGPlayer.balance.withPoints()}
+                §6Credits: §a${targetcrashPlayer.balance.withPoints()}
                 $builder
                 """.trimIndent()
         )

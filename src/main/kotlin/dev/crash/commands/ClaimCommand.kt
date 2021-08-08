@@ -2,7 +2,7 @@ package dev.crash.commands
 
 import dev.crash.asPlayer
 import dev.crash.permission.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import me.kbrewster.mojangapi.MojangAPI
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -18,54 +18,38 @@ class ClaimCommand : CommandExecutor, TabCompleter {
         val player = sender.asPlayer()
         val chunk = player.world.getChunkAt(player.location)
         if (args.isEmpty()) {
-            if (player.rlgPlayer().remainingClaims > 0 || player.isOp) {
-                if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE){
+            if (player.crashPlayer().remainingClaims > 0 || player.isOp) {
+                if(player.crashPlayer().isMod && player.gameMode == GameMode.CREATIVE){
                     chunk.claim("0", "Server-Team", player)
                 }else {
                     chunk.claim(player)
                 }
             }
-        } else if (args[0].equals("info", ignoreCase = true)) {
+        } else if (args[0] == "info") {
             if(!chunk.isClaimed()){
-                player.sendMessage(
-                    "§6Dieser Chunk gehört niemanden!\nDu kannst noch ${getRemainingClaims(player.uniqueId.toString())} Chunks claimen"
-                )
+                player.sendMessage("§6This chunk belongs to no one!\nYou can claim ${getRemainingClaims(player.uniqueId.toString())} more chunks")
                 return true
             }
-            val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
-            player.sendMessage(
-                "§6Dieser Chunk gehört ${chunkClass.name}\nDu kannst noch ${getRemainingClaims(player.uniqueId.toString())} Chunks claimen"
-            )
-        } else if (args[0].equals("remove", ignoreCase = true)) {
+            val chunkClass = chunk.chunkData()!!
+            player.sendMessage("§6This chunk belongs to ${chunkClass.name}\nYou can claim ${getRemainingClaims(player.uniqueId.toString())} more chunks")
+        } else if (args[0] == "remove") {
             if(chunk.isClaimed()) {
                 if (player.isOp && (player.gameMode == GameMode.CREATIVE || player.gameMode == GameMode.SPECTATOR)) {
-                    player.sendMessage("§aClaim wurde entfernt!")
+                    player.sendMessage("§aClaim was removed!")
                     chunk.unClaim()
-                } else if (!player.world.name.contentEquals("shops")) {
-                    if (chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid == player.uniqueId.toString()) {
-                        player.sendMessage("§aClaim wurde entfernt!")
-                        chunk.unClaim()
-                    }
-                } else {
-                    player.sendMessage("§4Du kannst nicht in der Shop-Welt Claims entfernen!")
+                } else if (chunk.chunkData()!!.owner_uuid == player.uniqueId.toString()) {
+                    player.sendMessage("§aClaim was removed!")
+                    chunk.unClaim()
                 }
-            }else player.sendMessage("§4Chunk ist nicht geclaimt!")
-        } else if (args[0].contentEquals("access")) {
-            var s2 = ""
-            try {
-                s2 = args[2]
-            } catch (e: ArrayIndexOutOfBoundsException) {
-                player.sendMessage("§4Bitte benutze die Richtige Syntax: /claim access [add/remove] [Player]")
+            }else player.sendMessage("§4Chunk is not claimed!")
+        } else if (args[0] == "access") {
+            if(args.size < 3) {
+                player.sendMessage("§4Incomplete command!")
+                return true
             }
-            if (!player.name.contentEquals(s2)) {
-                var give = false
-                try {
-                    if (args[1].contentEquals("add")) {
-                        give = true
-                    }
-                } catch (e: ArrayIndexOutOfBoundsException) {
-                    player.sendMessage("§4Bitte gib einen Spieler an!")
-                }
+            val s2 = args[2]
+            if (player.name != s2) {
+                val give = args[1] == "add"
                 val target = Bukkit.getPlayer(s2)
                 if(target != null) {
                     chunk.changeChunkAccess(target, give, player)
@@ -74,25 +58,22 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                 val targetUuid = MojangAPI.getUUID(s2).toString()
                 if(!give)chunk.changeChunkAccess(targetUuid, false, player)
             } else {
-                player.sendMessage("§aDu bist der Besitzer des Chunks!")
+                player.sendMessage("§aYou are the owner of the chunk!")
             }
-        } else if (args[0].contentEquals("accessall")) {
-            if (!player.name.contentEquals(args[2])) {
-                var give = false
-                try {
-                    if (args[1].contentEquals("add")) {
-                        give = true
-                    }
-                } catch (e: ArrayIndexOutOfBoundsException) {
-                    player.sendMessage("§4Bitte gib einen Aktion an!")
-                }
+        } else if (args[0] == "accessall") {
+            if(args.size < 3) {
+                player.sendMessage("§4Incomplete command!")
+                return true
+            }
+            if (player.name != args[2]) {
+                val give = args[1] == "add"
                 try {
                     val target = Bukkit.getPlayer(args[2])!!.uniqueId.toString()
                     player.changeAccessAllChunks(target, give)
                     return true
                 }catch (ex: Exception) {
                     if(give) {
-                        player.sendMessage("§4Bitte gib einen Spieler an!")
+                        player.sendMessage("§4Please enter a valid player!")
                         return true
                     }
                     val targetUuid = MojangAPI.getUUID(args[2])!!.toString()
@@ -102,38 +83,27 @@ class ClaimCommand : CommandExecutor, TabCompleter {
             } else {
                 player.sendMessage("§4Du bist der Besitzer der Chunks!\nDu kannst dich nicht selbst entfernen!")
             }
-        } else if (args[0].contentEquals("removeall")) {
+        } else if (args[0] == "removeall") {
             removeAllClaims(player)
-            player.sendMessage("§aAlle deine Claims wurden entfernt!")
-        } else if (args[0].contentEquals("list")) {
+            player.sendMessage("§aAll your claims have been removed!")
+        } else if (args[0] == "list") {
             player.sendMessage("${getRemainingClaims(player.uniqueId.toString())}")
-        } else if (args[0].contentEquals("add")) {
-            if (player.isOp) {
-                try {
-                    val player1: Player = Bukkit.getPlayer(args[1])!!
-                    val amount: Int = Integer.valueOf(args[2])
-                    changeAddedClaims(player1, amount)
-                } catch (e: ArrayIndexOutOfBoundsException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler und Anzahl an")
-                }
+        } else if (args[0] =="changeadded") {
+            if (!player.isOp) return true
+            if(args.size < 3) {
+                player.sendMessage("§4Incomplete command!")
+                return true
             }
-        } else if (args[0].contentEquals("removeadded")) {
-            if (player.isOp) {
-                try {
-                    val player1: Player = Bukkit.getPlayer(args[1])!!
-                    val amount: Int = Integer.valueOf(args[2])
-                    changeAddedClaims(player1, -amount)
-                } catch (e: ArrayIndexOutOfBoundsException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler und Anzahl an")
-                }
+            val player1: Player = Bukkit.getPlayer(args[1])!!
+            val amount: Int = args[2].toInt()
+            changeAddedClaims(player1, amount)
+        } else if (args[0] == "addedinfo") {
+            if(args.size < 2) {
+                player.sendMessage("§4Incomplete command!")
+                return true
             }
-        } else if (args[0].contentEquals("addedinfo")) {
-            try {
-                val player1: Player = Bukkit.getPlayer(args[1])!!
-                player.sendMessage(player1.name + " hat " + getAddedClaims(player1.uniqueId.toString()))
-            } catch (e: ArrayIndexOutOfBoundsException) {
-                player.sendMessage("§4Bitte gib einen gültigen Spieler an")
-            }
+            val player1: Player = Bukkit.getPlayer(args[1])!!
+            player.sendMessage(player1.name + " has " + getAddedClaims(player1.uniqueId.toString()))
         }
         return true
     }
@@ -147,19 +117,19 @@ class ClaimCommand : CommandExecutor, TabCompleter {
         val player = sender.asPlayer()
         if (args.size == 1) {
             val list: MutableList<String> = mutableListOf("info", "remove", "access", "accessall", "removeall", "list")
-            if (player.isOp) list.addAll(listOf("add", "removeadded", "addedinfo"))
+            if (player.isOp) list.addAll(listOf("changeadded", "addedinfo"))
             return list
-        } else if (args[0].contentEquals("access") || args[0].contentEquals("accessall")) {
+        } else if (args[0] == "access" || args[0] == "accessall") {
             if (args.size == 2) {
                 return mutableListOf("add", "remove")
             } else if (args.size == 3) {
-                if (args[1].contentEquals("add")) {
+                if (args[1] == "add") {
                     val list: MutableList<String> = ArrayList()
                     for (player1 in Bukkit.getOnlinePlayers()) {
                         list.add(player1.name)
                     }
                     return list
-                } else if (args[1].contentEquals("remove")) {
+                } else if (args[1] == "remove") {
                     val list: MutableList<String> = ArrayList()
                     val chunk = player.location.chunk
                     for (chunkClassWorlds in chunks.values) {

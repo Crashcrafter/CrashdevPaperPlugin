@@ -3,7 +3,7 @@ package dev.crash.permission
 import dev.crash.ChunkTable
 import dev.crash.PlayerTable
 import dev.crash.guild
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.GameMode
@@ -45,8 +45,8 @@ fun Chunk.claim(uuid: String, name: String, player: Player? = null): Boolean {
             }
         }
         if(player != null) {
-            val rlgPlayer = player.rlgPlayer()
-            rlgPlayer.remainingClaims--
+            val crashPlayer = player.crashPlayer()
+            crashPlayer.remainingClaims--
         }
         val chunkClass = ChunkClass(chunk.x, chunk.z, chunk.world.name, uuid, name, ArrayList())
         if(chunks.containsKey(chunk.chunkKey)){
@@ -70,7 +70,7 @@ fun Chunk.unClaim() {
             if(ownerUuid.length > 3){
                 val owner = Bukkit.getPlayer(UUID.fromString(ownerUuid))
                 if(owner != null) {
-                    owner.rlgPlayer().remainingClaims++
+                    owner.crashPlayer().remainingClaims++
                 }else {
                     val remainingClaims = PlayerTable.select(where = {PlayerTable.uuid eq ownerUuid}).first()[PlayerTable.remainingClaims]
                     PlayerTable.update(where = {PlayerTable.uuid eq ownerUuid}){
@@ -97,15 +97,15 @@ fun getRemainingClaims(uuid: String): Int {
 }
 
 fun changeAddedClaims(player: Player, amount: Int){
-    val rlgPlayer = player.rlgPlayer()
-    rlgPlayer.remainingClaims += amount
-    rlgPlayer.addedClaims += amount
+    val crashPlayer = player.crashPlayer()
+    crashPlayer.remainingClaims += amount
+    crashPlayer.addedClaims += amount
 }
 
 fun changeAddedHomes(player: Player, amount: Int){
-    val rlgPlayer = player.rlgPlayer()
-    rlgPlayer.remainingHomes += amount
-    rlgPlayer.addedHomes += amount
+    val crashPlayer = player.crashPlayer()
+    crashPlayer.remainingHomes += amount
+    crashPlayer.addedHomes += amount
 }
 
 fun getAddedClaims(uuid: String): Int {
@@ -172,7 +172,7 @@ fun eventCancel(chunk: Chunk): Boolean = chunk.isClaimed()
 
 fun eventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
-    if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
+    if(player.crashPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
     val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
     if(chunkClass.owner_uuid.length <= 3) return true
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return false
@@ -182,7 +182,7 @@ fun eventCancel(chunk: Chunk, player: Player): Boolean {
 
 fun heventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
-    if(player.rlgPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
+    if(player.crashPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
     val chunkClass = chunk.chunkData()!!
     if(chunkClass.owner_uuid == "0") return true
     if(chunkClass.owner_uuid.length <= 3) return false
@@ -205,7 +205,7 @@ fun canBack(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return true
     val chunkClass = chunk.chunkData()!!
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return true
-    val guild = player.rlgPlayer().guild()
+    val guild = player.crashPlayer().guild()
     if(guild != null && guild.member_uuids.contains(chunkClass.owner_uuid)) return true
     return chunkClass.owner_uuid.length < 3
 }

@@ -1,5 +1,3 @@
-/build/
 /.gradle/
 /.idea/
 /gradle/
-/src/main/kotlin/dev/crash/LoginData.kt

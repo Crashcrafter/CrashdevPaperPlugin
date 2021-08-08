@@ -1,8 +1,7 @@
 package dev.crash
 
 import dev.crash.permission.rankData
-import dev.crash.permission.ranks
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
@@ -21,7 +20,6 @@ import org.bukkit.scoreboard.Scoreboard
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.pow
@@ -44,7 +42,7 @@ fun Player.updateScoreboard(){
     list.add("§6§lRELAUNCH!§r")
     list.add("-------------------  ")
     list.add("§aDein Kontostand:")
-    list.add("§6" + player.rlgPlayer().balance.withPoints() + " Credits")
+    list.add("§6" + player.crashPlayer().balance.withPoints() + " Credits")
     val quests: List<Quest> = getActiveQuests(player)
     if (quests.isNotEmpty()) {
         list.add("-------------------")
@@ -76,20 +74,20 @@ fun Player.updateScoreboard(){
 
 fun Scoreboard.getServerTeams(){
     Bukkit.getOnlinePlayers().forEach {
-        val rlgPlayer = it.rlgPlayer()
+        val crashPlayer = it.crashPlayer()
         val team = this.registerNewTeam(it.name)
         team.setAllowFriendlyFire(true)
         team.setCanSeeFriendlyInvisibles(false)
-        team.prefix(Component.text("${rlgPlayer.rankData().prefix}§r "))
-        if(rlgPlayer.guildId != 0){
-            team.suffix(Component.text(" [§6${rlgPlayer.guild()!!.suffix}§r]"))
+        team.prefix(Component.text("${crashPlayer.rankData().prefix}§r "))
+        if(crashPlayer.guildId != 0){
+            team.suffix(Component.text(" [§6${crashPlayer.guild()!!.suffix}§r]"))
         }
         team.addEntry(it.name)
     }
 }
 
 fun sendModchatMessage(message: String, sender: Player){
-    val msg = "§2[Teamchat]§f ${sender.rlgPlayer().rankData().prefix} ${sender.name}> $message"
+    val msg = "§2[Teamchat]§f ${sender.crashPlayer().rankData().prefix} ${sender.name}> $message"
     moderator.forEach {
         it.sendMessage(msg)
     }
@@ -114,40 +112,9 @@ fun String.toStartUppercaseMaterial(): String {
     return builder.toString()
 }
 
-fun removeItems(inventory: Inventory, type: Material, itemAmount: Int, cmd: Int) {
-    var amount = itemAmount
-    if (amount <= 0) return
-    val size = inventory.size
-    for (slot in 0 until size) {
-        val itemStack = inventory.getItem(slot) ?: continue
-        if (type == itemStack.type) {
-            if (cmd == 0 || itemStack.itemMeta.hasCustomModelData() && itemStack.itemMeta.customModelData == cmd) {
-                val newAmount = itemStack.amount - amount
-                if (newAmount > 0) {
-                    itemStack.amount = newAmount
-                    break
-                } else {
-                    inventory.clear(slot)
-                    amount = -newAmount
-                    if (amount == 0) break
-                }
-            }
-        }
-    }
-}
-
 fun isSpace(inventory: Inventory): Boolean = inventory.firstEmpty() != -1
 
 fun getEXPForLevel(level: Int): Long = (15 + 7 * level).toDouble().pow(2.0).toLong()
-
-fun getKeysPerRank(rank: Int): String {
-    val rankData = ranks[rank]!!
-    val result = StringBuilder()
-    for (i in 0..keysData.size){
-        result.append(rankData.weeklyKeys[i+1] ?: 0).append(" ")
-    }
-    return result.toString().removeSuffix(" ")
-}
 
 fun getBlockByPositionString(input: String): Block {
     val parts = input.split("/").toTypedArray()
@@ -174,11 +141,11 @@ fun List<String>.toComponentList(): MutableList<Component>{
 }
 
 fun timeMultiplierFromString(input: String): Long = when (input) {
-    "Minuten" -> 60
-    "Stunden" -> 60 * 60
-    "Tage" -> 60 * 60 * 24
-    "Wochen" -> 60 * 60 * 24 * 7
-    "Monate" -> 60 * 60 * 24 * 30
+    "minutes" -> 60
+    "hours" -> 60 * 60
+    "days" -> 60 * 60 * 24
+    "weeks" -> 60 * 60 * 24 * 7
+    "months" -> 60 * 60 * 24 * 30
     else -> 60*60
 }
 
@@ -296,12 +263,4 @@ private fun copyFile(sourceFile: File, destinationFile: File) {
             }
         }
     }
-}
-
-fun HashMap<Block, *>.toStringKeyMap(): HashMap<String, Any> {
-    val result = hashMapOf<String, Any>()
-    forEach {
-        result[it.key.toPositionString()] = it.value
-    }
-    return result
 }

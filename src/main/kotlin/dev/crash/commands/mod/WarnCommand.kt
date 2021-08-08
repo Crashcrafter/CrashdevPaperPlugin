@@ -1,7 +1,10 @@
 package dev.crash.commands.mod
 
 import dev.crash.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.Warn
+import dev.crash.player.modifyPlayerData
+import dev.crash.player.crashPlayer
+import me.kbrewster.mojangapi.MojangAPI
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -11,42 +14,46 @@ import org.bukkit.entity.Player
 
 class WarnCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
-        val mod = sender.asPlayer()
+        val player = sender.asPlayer()
         val target: Player? = Bukkit.getPlayer(args[1])
-        if (mod.hasPermission("rlg.warn")) {
-            if (args[0].contentEquals("add")) {
+        if (!player.hasPermission("crash.warn")) return true
+        when(args[0]){
+            "add" -> {
                 val sb = StringBuilder()
                 for (i in 2 until args.size) {
                     sb.append(args[i]).append(" ")
                 }
                 val reason = sb.toString()
-                mod.sendMessage("Der Spieler " + args[1] + " wurde wegen " + reason + " gewarnt!")
+                player.sendMessage("The player ${args[1]} was warned for $reason!")
                 if (target != null) {
-                    target.sendMessage("Du wurdest wegen " + reason + "gewarnt!")
-                    target.rlgPlayer().warn(sb.toString(), mod.name)
-                }
-            } else if (args[0].contentEquals("list")) {
-                val list: String = target!!.rlgPlayer().getWarnsString()
-                mod.sendMessage(
-                    """
-                ${target.name}'s Warnungen:
-                $list
-                """.trimIndent()
-                )
-            } else if (args[0].contentEquals("remove")) {
-                if (args[2].contentEquals("all")) {
-                    if(target == null) {
-                        mod.sendMessage("§4Der Spieler wurde nicht gefunden!")
-                        return true
+                    target.sendMessage("You've been warned for $reason")
+                    target.crashPlayer().warn(sb.toString(), player.name)
+                }else {
+                    modifyPlayerData(MojangAPI.getUUID(args[1]).toString()){
+                        it.warns.add(Warn(reason, player.name, System.currentTimeMillis()))
+                        it
                     }
-                    target.rlgPlayer().removeAllWarns()
-                    mod.sendMessage("§2Alle Warnungen wurden entfernt")
-                } else {
-                    val number: Int = args[2].toInt()
-                    target!!.rlgPlayer().removeWarn(number)
-                    mod.sendMessage("Warnung Nummer $number wurde entfernt")
                 }
             }
+            "list" -> {
+                val list: String = target!!.crashPlayer().getWarnsString()
+                player.sendMessage("\n${target.name}'s warns:\n$list\n")
+            }
+            "remove" -> {
+                if (args[2] == "all") {
+                    if(target == null) {
+                        player.sendMessage("§4Player not found!")
+                        return true
+                    }
+                    target.crashPlayer().removeAllWarns()
+                    player.sendMessage("§2All warns have been removed from ${target.name}")
+                } else {
+                    val number: Int = args[2].toInt()
+                    target!!.crashPlayer().removeWarn(number)
+                    player.sendMessage("§2Warn $number was removed")
+                }
+            }
+            else -> return true
         }
         return true
     }

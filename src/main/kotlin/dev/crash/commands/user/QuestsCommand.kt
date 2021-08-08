@@ -1,7 +1,7 @@
 package dev.crash.commands.user
 
 import dev.crash.*
-import dev.crash.player.rlgPlayer
+import dev.crash.player.crashPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -38,7 +38,7 @@ class QuestsCommand : CommandExecutor, TabCompleter {
                 } else if (args[0].contentEquals("reset")) {
                     if (args.size >= 2) {
                         val target: Player = Bukkit.getPlayer(args[1])!!
-                        target.rlgPlayer().weeklyQuestCreation()
+                        target.crashPlayer().weeklyQuestCreation()
                         player.sendMessage("§2Die Quests von dem Spieler wurden zurückgesetzt!")
                     } else {
                         player.sendMessage("§2Unvollständiger Command!")
@@ -77,7 +77,7 @@ class QuestsCommand : CommandExecutor, TabCompleter {
                 if (args[0].contentEquals("counter")) {
                     val target: Player = Bukkit.getPlayer(args[1])!!
                     var hasvalidquest = false
-                    for (quest in target.rlgPlayer().quests) {
+                    for (quest in target.crashPlayer().quests) {
                         if (quest.status == 1) {
                             list.add(java.lang.String.valueOf(quest.qid))
                             hasvalidquest = true
@@ -114,5 +114,5 @@ fun questVillager(location: Location) {
     shop.isCustomNameVisible = true
     shop.isSilent = true
     shop.removeWhenFarAway = false
-    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "rlgEntityData"), PersistentDataType.STRING, "quester")
+    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, "quester")
 }
