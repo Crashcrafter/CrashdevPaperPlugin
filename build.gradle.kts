@@ -59,6 +59,6 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
         exclude(dependency("org.apache.maven.resolver::.*"))
     }
     doLast {
-        file("./build/libs/${project.name}-${project.version}-all.jar").copyTo(file("./server/plugins"))
+        file("./build/libs/${project.name}-${project.version}-all.jar").copyTo(file("./server/plugins/${project.name}-${project.version}-all.jar"), overwrite = true)
     }
 }
