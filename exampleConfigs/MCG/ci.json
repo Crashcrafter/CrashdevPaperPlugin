@@ -1,0 +1,279 @@
+{
+  "weather_element":{
+    "material":"LIGHT_GRAY_DYE",
+    "displayName":"Wetter-Element",
+    "lore":["Element der Magie", "Kann zum Färben benutzt werden"],
+    "cmd":1,
+    "data":{}
+  },
+  "fire_staff":{
+    "material":"WOODEN_HOE",
+    "displayName":"§r§l§4Feuer-Stab",
+    "lore": ["", "§fRight-Click in Luft §1(30)§f:", "§4Schießt eine Salve Feuerkugeln", "", "§fRight-Click auf Block §1(5)§f:", "§4Zündet den Block mit einer Feuerkugel an", "", "§4Immun gegen Feuer-Schaden §1(1)", ""],
+    "cmd":2,
+    "data":{}
+  },
+  "mud_ball":{
+    "material":"SNOWBALL",
+    "displayName":"§6Mudball",
+    "lore":["§7Rechtsclick zum Werfen", "", "§7Verlangsamt Gegner"],
+    "cmd":1,
+    "data":{"crashitemdata":"mudBall"}
+  },
+  "nature_staff":{
+    "material":"WOODEN_HOE",
+    "displayName":"§r§l§2Natur-Stab",
+    "lore":["",
+    "§fLeft-Click §1(30)§f:",
+    "§2Entfernt an dem Ort alle Natur-Blöcke und vergiftet die Mobs",
+    "",
+    "§fRight-Click auf Block §1(15)§f:",
+    "§2Wende einen stärkeren Bonemeal-Effekt an",
+    "",
+    "§2Immun gegen Gift §1(1)",
+    ""],
+    "cmd":1,
+    "data":{}
+  },
+  "nano":{
+    "material":"STICK",
+    "displayName":"§bNano",
+    "lore":null,
+    "cmd":5,
+    "data":{}
+  },
+  "chaos_staff":{
+    "material":"WOODEN_HOE",
+    "displayName":"§r§l§0Chaos-Stab",
+    "lore":["",
+    "§fLeft-Click §1(75)§f:",
+    "§8Verdirb alle Mobs in dem Bereich",
+    "",
+    "§fRight-Click §1(30)§f:",
+    "§8Macht dich unsichtbar und schnell",
+    "",
+    "§8Immun gegen Wither-Effekt §1(1)",
+    ""],
+    "cmd":4,
+    "data":{}
+  },
+  "add_claim":{
+    "material":"STICK",
+    "displayName":"§2+1 Claim",
+    "lore":["§7Rechtsclick, um einen zusätzlichen Claim zu erhalten!"],
+    "cmd":6,
+    "data":{"crashitemdata":"addClaim"}
+  },
+  "nether_katana":{
+    "material":"NETHERITE_SWORD",
+    "displayName":"§8§l§oKatana",
+    "lore":null,
+    "cmd":1,
+    "enchantments": {
+      "minecraft:sweeping": 4
+    },
+    "data":{
+      "crashRange": "5"
+    }
+  },
+  "fire_element":{
+    "material":"RED_DYE",
+    "displayName":"Feuer-Element",
+    "lore":["Element der Magie",
+    "Kann zum Färben benutzt werden"],
+    "cmd":1,
+    "data":{}
+  },
+  "excalibur":{
+    "material":"DIAMOND_SWORD",
+    "displayName":"Excalibur",
+    "lore":null,
+    "cmd":2,
+    "enchantments": {
+      "minecraft:sharpness": 10000
+    },
+    "data":{
+      "crashRange": "50"
+    }
+  },
+  "iron_katana":{
+    "material":"IRON_SWORD",
+    "displayName":"§7§l§oKatana",
+    "lore":null,
+    "cmd":1,
+    "enchantments": {
+      "minecraft:sweeping": 4
+    },
+    "data":{
+      "crashRange": "5"
+    }
+  },
+  "water_staff":{
+    "material":"WOODEN_HOE",
+    "displayName":"§r§l§1Wasser-Stab",
+    "lore":["",
+    "§fLeft-Click in Luft §1(70)§f:",
+    "§9Gibt dir ResitemStacktenz und erzeugt Wasser vor dir",
+    "",
+    "§fRight-Click §1(15)§f:",
+    "§9Platziert wo du hinschaust Wasser",
+    "",
+    "§9Kann nicht ertrinken §1(1)",
+    ""],
+    "cmd":5,
+    "data":{}
+  },
+  "knockback_stick":{
+    "material":"STICK",
+    "displayName":"Knüppel der Vernichtung",
+    "lore":null,
+    "cmd":0,
+    "enchantments": {
+      "minecraft:knockback": 10000
+    },
+    "data":{
+      "crashRange": "50"
+    }
+  },
+  "ethereum":{
+    "material":"STICK",
+    "displayName":"§7Ethereum",
+    "lore":null,
+    "cmd":2,
+    "data":{}
+  },
+  "dragon_scale":{
+    "material":"STICK",
+    "displayName":"§5Drachenschuppe",
+    "lore":null,
+    "cmd":7,
+    "data":{}
+  },
+  "litecoin":{
+    "material":"STICK",
+    "displayName":"§1Litecoin",
+    "lore":null,
+    "cmd":3,
+    "data":{}
+  },
+  "water_element":{
+    "material":"BLUE_DYE",
+    "displayName":"Wasser-Element",
+    "lore":["Element der Magie",
+    "Kann zum Färben benutzt werden"],
+    "cmd":1,
+    "data":{}
+  },
+  "weather_staff":{
+    "material":"WOODEN_HOE",
+    "displayName":"§r§l§7Wetter-Stab",
+    "lore":["",
+    "§fLeft-Click §1(40)§f:",
+    "§7Beschwört an der Stelle einen Blitz",
+    "",
+    "§fRight-Click §1(30)§f:",
+    "§7Schleudert die Gegner in dem Bereich hoch",
+    "",
+    "§7Immun gegen Blitze §1(1)",
+    ""],
+    "cmd":3,
+    "data":{}
+  },
+  "medium_fireball":{
+    "material":"FIRE_CHARGE",
+    "displayName":"§cMedium Fireball",
+    "lore":["§7Rechtsclick zum Schießen"],
+    "cmd":0,
+    "data":{"crashitemdata":"throwMediumFireball"}
+  },
+  "small_fireball":{
+    "material":"FIRE_CHARGE",
+    "displayName":"§6Small Fireball",
+    "lore":["§7Rechtsclick zum Schießen"],
+    "cmd":0,
+    "data":{"crashitemdata":"throwSmallFireball"}
+  },
+  "katze_rose":{
+    "material":"POPPY",
+    "displayName":"Katze's Liebesrosen",
+    "lore":["Das Original"],
+    "cmd":0,
+    "data":{}
+  },
+  "dogecoin":{
+    "material":"STICK",
+    "displayName":"§eDogecoin",
+    "lore":null,
+    "cmd":4,
+    "data":{}
+  },
+  "mana_shard":{
+    "material":"GOLD_NUGGET",
+    "displayName":"Mana Shard",
+    "lore":["Basismaterial für Magie"],
+    "cmd":1,
+    "data":{}
+  },
+  "mana_dust":{
+    "material":"GOLD_NUGGET",
+    "displayName":"Mana Dust",
+    "lore":["Basismaterial für Magie"],
+    "cmd":2,
+    "data":{}
+  },
+  "big_fireball":{
+    "material":"FIRE_CHARGE",
+    "displayName":"§4Big Fireball",
+    "lore":["§7Rechtsclick zum Schießen"],
+    "cmd":0,
+    "data":{"crashitemdata":"throwBigFireball"}
+  },
+  "mana_crystal":{
+    "material":"GOLD_NUGGET",
+    "displayName":"Mana Crystal",
+    "lore":["Basismaterial für Magie"],
+    "cmd":3,
+    "data":{}
+  },
+  "nature_element":{
+    "material":"GREEN_DYE",
+    "displayName":"Natur-Element",
+    "lore":["Element der Magie",
+    "Kann zum Färben benutzt werden"],
+    "cmd":1,
+    "data":{}
+  },
+  "chaos_element":{"material":"BLACK_DYE",
+    "displayName":"Chaos-Element",
+    "lore":["Element der Magie",
+    "Kann zum Färben benutzt werden"],
+    "cmd":1,
+    "data":{}
+  },
+  "dia_katana":{
+    "material":"DIAMOND_SWORD",
+    "displayName":"§b§l§oKatana",
+    "lore":null,
+    "cmd":1,
+    "enchantments": {
+      "minecraft:sweeping": 4
+    },
+    "data":{
+      "crashRange": "5"
+    }
+  },
+  "bitcoin":{
+    "material":"STICK",
+    "displayName":"§eBitcoin",
+    "lore":null,
+    "cmd":1,
+    "data":{}
+  },
+  "add_home":{
+    "material":"STICK",
+    "displayName":"§2+1 Home",
+    "lore":["§7Rechtsclick, um einen zusätzlichen Homepoint zu erhalten!"],
+    "cmd":8,
+    "data":{"crashitemdata":"addHome"}
+  }
+}
