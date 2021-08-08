@@ -1,4 +1,4 @@
-name: crashPaperPlugin
+name: CrashdevPaperPlugin
 main: dev.crash.Main
 version: 0.1
 description: Nix lol

@@ -121,7 +121,8 @@ class CrashPlayer {
         changeMana(0)
         this.setName()
         if(Instant.ofEpochMilli(saveObj.lastKeys).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
-            player.sendMessage("§2Du kannst mit /weekly deine wöchentlichen Keys abholen!")
+            this.weeklyKeys = rankData().weeklyKeys
+            player.sendMessage("§2You can receive your weekly keys with /weekly!")
         }
         check()
     }
@@ -202,11 +203,11 @@ class CrashPlayer {
 
     fun weeklyKeys() {
         if(rankData().weeklyKeys.isEmpty()) {
-            player.sendMessage("§cDu kannst keine wöchentlichen Keys claimen!")
+            player.sendMessage("§cYou cant claim weekly keys!")
             return
         }
-        if(weeklyKeys.isEmpty()) {
-            player.sendMessage("§cDu hast schon alle wöchentlichen Keys bekommen!")
+        if(weeklyKeys.isEmpty() || Instant.ofEpochMilli(lastKeys).isAfter(Instant.now().minus(7, ChronoUnit.DAYS))){
+            player.sendMessage("§cYou already received your weekly keys!")
             return
         }
         val playerInv: Inventory = player.inventory
@@ -224,19 +225,19 @@ class CrashPlayer {
             }
         }
         lastKeys = System.currentTimeMillis()
-        if(weeklyKeys.size == 0) println(player.name + " hat alle Keys bekommen")
+        if(weeklyKeys.size == 0) println(player.name + " has received all weekly keys!")
     }
 
     fun setHome(keyWord: String){
         homes[keyWord] = player.location.block
         remainingHomes--
-        player.sendMessage("§2Dein Homepoint $keyWord wurde gesetzt!")
+        player.sendMessage("§2Your homepoint $keyWord has been set!")
     }
 
     fun delHome(keyWord: String){
         homes.remove(keyWord)
         remainingHomes++
-        player.sendMessage("§2Dein Homepoint $keyWord wurde entfernt!")
+        player.sendMessage("§2Your homepoint $keyWord has been removed!")
     }
 
     fun setName(){

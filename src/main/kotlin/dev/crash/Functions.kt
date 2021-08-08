@@ -29,7 +29,7 @@ fun CommandSender.asPlayer() : Player = if (this is Player) this else throw Exce
 
 fun updateTabOfPlayers(leave: Boolean = false) {
     Bukkit.getOnlinePlayers().forEach {
-        it.sendPlayerListHeader(Component.text("§e§l---------------  MCGermany.de  ---------------§r§6\nSpieler online: §a${Bukkit.getOnlinePlayers().size - if(leave) 1 else 0}"))
+        it.sendPlayerListHeader(Component.text("§e§l---------------  ${Bukkit.getIp()}  ---------------§r§6\nPlayer online: §a${Bukkit.getOnlinePlayers().size - if(leave) 1 else 0}"))
         it.sendPlayerListFooter(Component.text("\n§6Komm auf unseren Discord (/discord) um Mitspieler zu finden\nund Vorschläge für neuen Content zu machen§r\n\n§2Du kannst für unseren Server voten (/vote) um Vote Keys zu erhalten!"))
         it.updateScoreboard()
     }
@@ -63,7 +63,7 @@ fun Player.updateScoreboard(){
         scoreboard.getServerTeams()
         val objective = scoreboard.registerNewObjective("scoreboard", "scoreboard", Component.text("scoreboard"))
         objective.displaySlot = DisplaySlot.SIDEBAR
-        objective.displayName(Component.text("§e§lMCGermany.de"))
+        objective.displayName(Component.text("§e§l${Bukkit.getIp()}"))
         for (i in list.indices) {
             val score = objective.getScore(list[i])
             score.score = list.size - i

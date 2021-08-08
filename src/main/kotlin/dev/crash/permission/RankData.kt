@@ -15,7 +15,7 @@ fun getRankByString(rankString: String?): Rank? {
     return null
 }
 
-fun CrashPlayer.rankData(): Rank = ranks[this.rank]!!
+fun CrashPlayer.rankData(): Rank = ranks[rank]!!
 
 val ranks = hashMapOf<Int, Rank>()
 data class Rank(val id: Int, val prefix: String, val name: String, val claims: Int, val homes: Int, val shopMultiplier: Double, val isMod: Boolean,

@@ -37,7 +37,7 @@ class Main : JavaPlugin() {
                 copyDirectory(File(INSTANCE.dataFolder.path + "/player/"), backupDirectory)
             }
         }.runTaskTimerAsynchronously(INSTANCE, 0, 20*60)
-        println("[INFO] Plugin wurde geladen...")
+        println("[INFO] CrashdevPaperPlugin was enabled!")
     }
 
     override fun onDisable() {
