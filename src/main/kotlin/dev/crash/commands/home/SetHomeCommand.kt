@@ -1,7 +1,7 @@
 package dev.crash.commands.home
 
 import dev.crash.asPlayer
-import dev.crash.permission.chunks
+import dev.crash.permission.chunkData
 import dev.crash.permission.isClaimed
 import dev.crash.player.crashPlayer
 import org.bukkit.command.Command
@@ -18,7 +18,7 @@ class SetHomeCommand : CommandExecutor {
             if(crashPlayer.remainingHomes > 0){
                 if (!crashPlayer.homes.containsKey(keyword)) {
                     if(chunk.isClaimed()){
-                        if(chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid == player.uniqueId.toString())crashPlayer.setHome(keyword) else player.sendMessage("§4Du kannst nicht in fremden Chunks Homepoints setzen!")
+                        if(chunk.chunkData()!!.owner_uuid == player.uniqueId.toString())crashPlayer.setHome(keyword) else player.sendMessage("§4Du kannst nicht in fremden Chunks Homepoints setzen!")
                     }else crashPlayer.setHome(keyword)
                 } else {
                     player.sendMessage("§4You already have a homepoint with that name!")

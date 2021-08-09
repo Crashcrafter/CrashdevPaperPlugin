@@ -18,20 +18,20 @@ class ClaimCommand : CommandExecutor, TabCompleter {
         val player = sender.asPlayer()
         val chunk = player.world.getChunkAt(player.location)
         if (args.isEmpty()) {
-            if (player.crashPlayer().remainingClaims > 0 || player.isOp) {
-                if(player.crashPlayer().isMod && player.gameMode == GameMode.CREATIVE){
-                    chunk.claim("0", "Server-Team", player)
-                }else {
-                    chunk.claim(player)
-                }
+            if(player.crashPlayer().isMod && player.gameMode == GameMode.CREATIVE){
+                chunk.claim("0", "Server-Team", player)
+            }else if(getRemainingClaims(player.uniqueId.toString()) > 0) {
+                chunk.claim(player)
+            }else {
+                player.sendMessage("§4You can't claim more chunks!")
             }
         } else if (args[0] == "info") {
             if(!chunk.isClaimed()){
-                player.sendMessage("§6This chunk belongs to no one!\nYou can claim ${getRemainingClaims(player.uniqueId.toString())} more chunks")
+                player.sendMessage("§6This chunk belongs to no one!\nYou can claim ${player.crashPlayer().remainingClaims} more chunks")
                 return true
             }
             val chunkClass = chunk.chunkData()!!
-            player.sendMessage("§6This chunk belongs to ${chunkClass.name}\nYou can claim ${getRemainingClaims(player.uniqueId.toString())} more chunks")
+            player.sendMessage("§6This chunk belongs to ${chunkClass.name}\nYou can claim ${player.crashPlayer().remainingClaims} more chunks")
         } else if (args[0] == "remove") {
             if(chunk.isClaimed()) {
                 if (player.isOp && (player.gameMode == GameMode.CREATIVE || player.gameMode == GameMode.SPECTATOR)) {
@@ -69,7 +69,7 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                 val give = args[1] == "add"
                 try {
                     val target = Bukkit.getPlayer(args[2])!!.uniqueId.toString()
-                    player.changeAccessAllChunks(target, give)
+                    player.changeAccessAllChunks(target, give, player)
                     return true
                 }catch (ex: Exception) {
                     if(give) {
@@ -77,11 +77,10 @@ class ClaimCommand : CommandExecutor, TabCompleter {
                         return true
                     }
                     val targetUuid = MojangAPI.getUUID(args[2])!!.toString()
-                    player.changeAccessAllChunks(targetUuid, false)
-                    player.sendMessage("§2Dem Spieler ${args[2]} wurde der Zugriff auf diesen Chunk entfernt entfernt!")
+                    player.changeAccessAllChunks(targetUuid, false, player)
                 }
             } else {
-                player.sendMessage("§4Du bist der Besitzer der Chunks!\nDu kannst dich nicht selbst entfernen!")
+                player.sendMessage("§4You are the owner of the chunk!\nYou can't remove your own access!")
             }
         } else if (args[0] == "removeall") {
             removeAllClaims(player)

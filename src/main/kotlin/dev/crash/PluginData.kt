@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.vexsoftware.votifier.model.Vote
 import kotlinx.coroutines.Job
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -64,27 +65,11 @@ var natureBlocks: List<Material> = ArrayList(
 )
 //endregion
 
-//region Beginner Book
-var beginnerbook = arrayOf(
-    ("\n~~~~~~~~~~~~~~~~\n" +
-            "All unsere Regeln findest du auf unserem Discord (/discord). Falls du Fragen hast, frag einfach im Chat. " +
-            "Das Buch aktualisiert sich von selbst, du musst es nicht neu hohlen.\n\n" +
-            "~~~~~~~~~~~~~~~~"),
-    ("\n~~~~~~~~~~~~~~~~\n" +
-            "MCGermany ist ein Survivalserver mit einem Claim-System. Lauf einfach aus dem Spawn und such die ein schönes Plätzchen. " +
-            "Sobald du einen Platz zum Bauen gefunden hast, drücke F3+G, um die Chunkgrenzen zu sehen.\n" +
-            "~~~~~~~~~~~~~~~~"),
-    ("\n~~~~~~~~~~~~~~~~\n" +
-            "Du kannst als normales Mitglied 4 Chunks claimen. Nutze einfach den Befehl /claim, um einen Chunk zu claimen. " +
-            "Um zu überprüfen, ob ein Chunk einem anderen Spieler bereits gehört, nutze /claim info.\n" +
-            "~~~~~~~~~~~~~~~~")
-)
-//endregion
-
 data class PluginConfig(val dbUser: String, val dbPw: String, val dbIp: String, val dbName: String, val dcLink: String,
-                        val texturePackURL: String, val texturePackHash: String, val defaultWarpName: String)
+                        val texturePackURL: String, val texturePackHash: String, val defaultWarpName: String, val scoreBoardTitle: String, val scoreBoardNews: String,
+                        val playerListFooter: String)
 private val DEFAULT_CONFIG = PluginConfig("NOTSET", "NOTSET", "localhost", "mcplugin", "https://discord.gg/NbW6JVvxY7",
-    "", "", "spawn")
+    "", "", "spawn", Bukkit.getIp(), "", "")
 lateinit var CONFIG: PluginConfig
 
 internal fun loadPluginConfig(){

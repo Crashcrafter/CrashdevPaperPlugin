@@ -197,17 +197,11 @@ fun createNewLottery(player: Player, inventory: Inventory, type: Int) {
             player.world.spawnEntity(player.location, EntityType.FIREWORK)
         }
         if (!reward.itemMeta.hasDisplayName()) {
-            player.sendMessage(
-                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " erhalten!"
-            )
-            println(
-                player.name + " hat " + reward.amount + " " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " erhalten!"
-            )
+            player.sendMessage("§2Congrats! §6You received ${reward.amount} " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial())
+            println(player.name + " has received " + reward.amount + " " + reward.type.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial())
         } else {
-            player.sendMessage(
-                "§2Herzlichen Glückwunsch! §6Du hast ${reward.amount} ${(reward.itemMeta.displayName() as TextComponent).content()}§r§6 erhalten!"
-            )
-            println(player.name + " hat " + reward.amount + " " + (reward.itemMeta.displayName() as TextComponent).content() + "§r erhalten!")
+            player.sendMessage("§2Congrats! §6You received ${reward.amount} ${(reward.itemMeta.displayName() as TextComponent).content()}§r§6!")
+            println(player.name + " has received " + reward.amount + " " + (reward.itemMeta.displayName() as TextComponent).content())
         }
         player.inventory.addItem(reward)
         inventory.clear()
@@ -240,7 +234,7 @@ fun itemStringToItem(input: String): ItemStack{
             CustomItems.defaultCustomItem(Material.NAME_TAG, keysData[keyId]!!.displayName, mutableListOf(), keyId)
         }
         else -> {
-            println("Could not find $input, good job DasIschBims#1248")
+            println("Could not find $input")
             CustomItems.defaultCustomItem(Material.DIRT, "Item not found: $input", mutableListOf())
         }
     }

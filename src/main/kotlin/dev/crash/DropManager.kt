@@ -63,8 +63,6 @@ fun setDrop(chunk: Chunk, givenType: Int? = null): Boolean {
             println("Set ${dropType.name} Drop, Type=" + type + ",Chunk:" + block.chunk.x + "/" + block.chunk.z)
             return true
         }
-    } else {
-        println("Drop wäre im Claim gespawnt")
     }
     return false
 }
@@ -116,8 +114,8 @@ fun waveManager(chunk: Chunk) {
         return
     }
     if (!drop.started) {
-        if (chunks.containsKey(chunk.chunkKey)) {
-            val chunkClass: ChunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
+        if (chunk.isClaimed()) {
+            val chunkClass = chunk.chunkData()!!
             if (chunkClass.owner_uuid.contentEquals("0")) {
                 drops.remove(chunk)
                 return
@@ -226,8 +224,8 @@ fun Drop.spawnWave() {
 }
 
 fun recoverDrop(chunk: Chunk) {
-    if (chunks.containsKey(chunk.chunkKey) && chunks[chunk.chunkKey]!!.containsKey(chunk.world.name)) {
-        val chunkClass: ChunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
+    if (chunk.isClaimed()) {
+        val chunkClass = chunk.chunkData()!!
         if (chunkClass.owner_uuid.contentEquals("0")) {
             drops.remove(chunk)
             return

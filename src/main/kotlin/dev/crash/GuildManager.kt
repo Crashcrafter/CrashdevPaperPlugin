@@ -39,19 +39,19 @@ internal fun initGuilds(){
 fun guildSetup(player: Player, msg: String){
     val crashPlayer = player.crashPlayer()
     if(crashPlayer.guildId != 0){
-        player.sendMessage("§4Du bist schon in einer Guild!")
+        player.sendMessage("§4You are already in a guild!")
         return
     }
     if(crashPlayer.balance < 50000){
-        player.sendMessage("§4Du benötigst 50.000 Credits, um eine Guild zu gründen!\nDu musst das Setup von vorne anfangen!")
+        player.sendMessage("§4You need 50.000 Credits to create a guild!")
         guildSetupProgress.remove(player)
         return
     }
     if(!guildSetupProgress.containsKey(player)){
         val guild = SetupGuild("", "", player.uniqueId.toString(), player.name)
         guildSetupProgress[player] = guild
-        player.sendMessage("§6§lGuild Setup§r\n\n§cDas erstellen einer Guild kostet dich 25.000 Credits!§r\nWenn du das Setup abbrechen möchtest, gib /guild setup cancel ein.\n" +
-                "§2Gib nun den Namen der Guild ein:")
+        player.sendMessage("§6§lGuild Setup§r\n\n§cThe creation of a guild costs you 50.000 Credits!§r\nIf you want to cancel the setup enter /guild setup cancel\n" +
+                "§2Please enter the name of your guild:")
         player.addMessageListener {event, message ->
             guildSetup(player, message)
             event.isCancelled = true
@@ -61,13 +61,13 @@ fun guildSetup(player: Player, msg: String){
     }
     if(guildSetupProgress[player]!!.name == ""){
         if(msg.length > 20){
-            player.sendMessage("§4Der Name darf maximal 20 Zeichen lang sein!")
+            player.sendMessage("§4The name can't be longer than 20 chars!")
         }else{
             transaction {
                 if(!GuildTable.select(where = {GuildTable.name eq msg}).empty()){
-                    player.sendMessage("§4Eine Guild mit diesem Namen existiert schon! Bitte gib einen anderen ein!")
+                    player.sendMessage("§4There is already another guild with that name!")
                 }else {
-                    player.sendMessage("§2Name wurde gesetzt §r($msg)§2!\nGib jetzt das Kürzel der Guild ein:")
+                    player.sendMessage("§2Name was set! §r($msg)§2!\nPlease enter the short of your guild:")
                     guildSetupProgress[player]!!.name = msg
                     player.addMessageListener {event, message ->
                         guildSetup(player, message)
@@ -81,17 +81,17 @@ fun guildSetup(player: Player, msg: String){
     }
     if(guildSetupProgress[player]!!.suffix == ""){
         if(msg.length > 4){
-            player.sendMessage("§4Das Kürzel darf maximal 4 Zeichen lang sein!")
+            player.sendMessage("§4Your short can't be longer than 4 chars!")
         }else{
             var ret = false
             transaction {
                 if(!GuildTable.select(where = {GuildTable.suffix eq msg}).empty()){
-                    player.sendMessage("§4Eine Guild mit dem Kürzel existiert schon! Gib ein anderes ein!")
+                    player.sendMessage("§4There is already another guild with that short!")
                     ret = true
                 }
             }
             if(ret) return
-            player.sendMessage("§2Kürzel wurde gesetzt! §r[§6$msg§r]\n\n§2Deine Guild wurde erstellt! Solltest du Fragen haben, kannst du auf unserem Discord (/discord) diese stellen!")
+            player.sendMessage("§2Short is set! §r[§6$msg§r]\n\n§2Your Guild have been created! If you have any question feel free to ask on the /discord!")
             val setupGuild = guildSetupProgress[player]!!
             setupGuild.suffix = msg
             val final = setupGuild.finalize()
@@ -109,7 +109,7 @@ fun guildSetup(player: Player, msg: String){
                 crashPlayer.guildId = id
             }
             crashPlayer.setName()
-            pay(player, 50000, "Gründen der Guild")
+            pay(player, 50000, "Guild-Creation")
             guildSetupProgress.remove(player)
             updateTabOfPlayers()
         }
@@ -123,7 +123,7 @@ fun CrashPlayer.removeFromGuild(reason: String){
     val guild = this.guild()!!
     val uuid = this.player.uniqueId.toString()
     if(guild.owner_uuid == uuid){
-        this.player.sendMessage("§4Du bist der Owner der Guild!\nWenn du die Guild löschen möchtest, nutze /guild delete.")
+        this.player.sendMessage("§4You are the owner of the guild!\nIf you want to delete your guild use /guild delete.")
         return
     }
     guild.member_names.remove(this.player.name)
@@ -150,7 +150,7 @@ fun CrashPlayer.deleteGuild(){
     if(guildId == 0) return
     val guild = this.guild()!!
     if(guild.owner_uuid != this.player.uniqueId.toString()){
-        player.sendMessage("§4Du bist nicht der Owner der Guild!")
+        player.sendMessage("§4You are the owner of the guild!")
         return
     }
     this.guildId = 0
@@ -163,7 +163,7 @@ fun CrashPlayer.deleteGuild(){
             if(player != null){
                 player.crashPlayer().guildId = 0
                 player.crashPlayer().setName()
-                player.sendMessage("§4Deine Guild wurde aufgelöst!")
+                player.sendMessage("§4Your guild was deleted!")
             }
         }
         GuildTable.deleteWhere{
@@ -182,10 +182,10 @@ fun CrashPlayer.joinGuild(id: Int) {
         val guild = this.guild()!!
         guild.member_names.add(this.player.name)
         guild.member_uuids.add(this.player.uniqueId.toString())
-        guild.sendMessage("§a${this.player.name} ist der Guild beigetreten!")
+        guild.sendMessage("§a${this.player.name} joined the guild!")
         guild.saveMembers(guildId)
     }else {
-        this.player.sendMessage("§4Du bist bereits in einer Guild!")
+        this.player.sendMessage("§4You are already in a guild!")
     }
 }
 

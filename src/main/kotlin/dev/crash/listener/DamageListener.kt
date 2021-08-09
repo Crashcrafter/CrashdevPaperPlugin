@@ -104,10 +104,10 @@ class DamageListener : Listener {
         if (e.hitEntity != null) {
             val entity = e.hitEntity
             try {
-                if (e.entity.customName.contentEquals("firestaff1")) {
+                if (e.entity.customName == "firestaff1") {
                     if (entity is LivingEntity) {
                         if (entity is Player) {
-                            (entity as LivingEntity).damage(3.0)
+                            entity.damage(3.0)
                         } else {
                             entity.damage(10.0)
                         }

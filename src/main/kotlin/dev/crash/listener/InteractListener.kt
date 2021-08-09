@@ -26,7 +26,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.meta.BookMeta
 import org.bukkit.persistence.PersistentDataType
 import java.util.*
 
@@ -56,7 +55,7 @@ class InteractListener : Listener {
         } else if (e.hasBlock()) {
             val chunk = Objects.requireNonNull(block)!!.chunk
             if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET && chunk.isClaimed()) {
-                val uuid: String = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
+                val uuid: String = chunk.chunkData()!!.owner_uuid
                 if (uuid.length <= 3 && uuid != "0" && block!!.type == Material.CHEST) {
                     waveManager(chunk)
                     if(player.gameMode == GameMode.SURVIVAL) e.isCancelled = true
@@ -83,14 +82,6 @@ class InteractListener : Listener {
         if (itemStack.hasItemMeta() && itemStack.itemMeta.hasCustomModelData()) {
             val cmd = itemStack.itemMeta.customModelData
             when(type) {
-                Material.WRITTEN_BOOK -> {
-                    val bm = itemStack.itemMeta as BookMeta
-                    bm.pages(when(bm.customModelData){
-                        2 -> beginnerbook.toMutableList().toComponentList()
-                        else -> bm.pages()
-                    })
-                    itemStack.setItemMeta(bm)
-                }
                 Material.WOODEN_HOE -> {
                     when(cmd){
                         1 -> NatureStaff1.handleClick(e)
@@ -141,9 +132,11 @@ class InteractListener : Listener {
                     itemStack.enchantments.forEach {
                         damage += it.key.getDamageIncrease(it.value, target.category)
                     }
-                    target.damage(damage, player)
                     val event = EntityDamageByEntityEvent(player, target, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage)
                     Bukkit.getPluginManager().callEvent(event)
+                    if(!event.isCancelled){
+                        target.damage(damage, player)
+                    }
                     return
                 }
             }
@@ -186,6 +179,7 @@ class InteractListener : Listener {
         }
         if (eventCancel(e.player.chunk, e.player)) {
             e.isCancelled = true
+            return
         }
     }
 }

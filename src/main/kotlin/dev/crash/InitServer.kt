@@ -130,11 +130,12 @@ internal fun loadFromDb(){
             val chunkKey = Chunk.getChunkKey(it[ChunkTable.x], it[ChunkTable.z])
             val chunkClass = ChunkClass(it[ChunkTable.x], it[ChunkTable.z], it[ChunkTable.world], it[ChunkTable.uuid], it[ChunkTable.name],
                 it[ChunkTable.shared].split(" ").toMutableList())
-            if(chunks.containsKey(chunkKey)){
-                chunks[chunkKey]!![chunkClass.world] = chunkClass
+            if(chunks.containsKey(chunkClass.world)){
+                chunks[chunkClass.world]!![chunkKey] = chunkClass
             }else {
-                chunks[chunkKey] = hashMapOf(chunkClass.world to chunkClass)
+                chunks[chunkClass.world] = hashMapOf(chunkKey to chunkClass)
             }
+            chunkClassList.add(chunkClass)
         }
         keyChests.clear()
         val keyChestsFile = File(INSTANCE.dataFolder.path + "/keychests.json")

@@ -3,14 +3,12 @@ package dev.crash.items
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.INSTANCE
-import dev.crash.beginnerbook
 import dev.crash.customItemsMap
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.BookMeta
 import org.bukkit.persistence.PersistentDataType
 import java.io.File
 
@@ -67,22 +65,4 @@ object CustomItems {
         itemStack.itemMeta = itemMeta
         return itemStack
     }
-
-    fun bookCustomItem(title: String, author: String, pages: Array<String>, cmd: Int=0): ItemStack {
-        val itemStack = ItemStack(Material.WRITTEN_BOOK)
-        val bm = itemStack.itemMeta as BookMeta
-        bm.displayName(Component.text(title))
-        bm.setCustomModelData(cmd)
-        bm.author(Component.text(author))
-        bm.title(Component.text(title))
-        val componentArray = ArrayList<Component>()
-        pages.forEach {
-            componentArray.add(Component.text(it))
-        }
-        bm.pages(componentArray)
-        itemStack.itemMeta = bm
-        return itemStack
-    }
-
-    fun beginnerBook(): ItemStack = bookCustomItem("Beginner-Guide", "Server Team", beginnerbook, 2)
 }

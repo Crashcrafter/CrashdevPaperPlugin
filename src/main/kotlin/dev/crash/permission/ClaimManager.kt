@@ -15,21 +15,20 @@ import kotlin.collections.HashMap
 
 data class ChunkClass(val x: Int, val z: Int, val world: String, val owner_uuid: String,val name: String, val shared: MutableList<String>)
 
-val chunks: HashMap<Long, HashMap<String, ChunkClass>> = HashMap()
+val chunks: HashMap<String, HashMap<Long, ChunkClass>> = HashMap()
+val chunkClassList: MutableList<ChunkClass> = mutableListOf()
 
 fun Chunk.chunkData(): ChunkClass? {
-    return chunks[this.chunkKey]?.get(this.world.name)
+    return chunks[this.world.name]?.get(this.chunkKey)
 }
 
 fun removeAllClaims(player: Player) {
-    transaction {
-        ChunkTable.deleteWhere {
-            ChunkTable.uuid eq player.uniqueId.toString()
-        }
+    chunkClassList.filter { it.owner_uuid == player.uniqueId.toString() }.forEach {
+        Bukkit.getWorld(it.world)!!.getChunkAt(it.x, it.z).unClaim()
     }
 }
 
-fun Chunk.isClaimed(): Boolean = chunks.containsKey(this.chunkKey) && chunks[this.chunkKey]!!.containsKey(this.world.name)
+fun Chunk.isClaimed(): Boolean = chunks.containsKey(this.world.name) && chunks[this.world.name]!!.containsKey(this.chunkKey)
 
 fun Chunk.claim(uuid: String, name: String, player: Player? = null): Boolean {
     val chunk = this
@@ -44,49 +43,50 @@ fun Chunk.claim(uuid: String, name: String, player: Player? = null): Boolean {
                 it[z] = chunk.z
             }
         }
-        if(player != null) {
-            val crashPlayer = player.crashPlayer()
-            crashPlayer.remainingClaims--
+        if(player != null && uuid.length >= 3) {
+            player.crashPlayer().remainingClaims--
         }
         val chunkClass = ChunkClass(chunk.x, chunk.z, chunk.world.name, uuid, name, ArrayList())
-        if(chunks.containsKey(chunk.chunkKey)){
-            chunks[chunk.chunkKey]!![chunkClass.world] = chunkClass
+        if(chunks.containsKey(chunk.world.name)){
+            chunks[chunkClass.world]!![chunk.chunkKey] = chunkClass
         }else {
-            chunks[chunk.chunkKey] = hashMapOf(chunkClass.world to chunkClass)
+            chunks[chunkClass.world] = hashMapOf(chunk.chunkKey to chunkClass)
         }
-        player?.sendMessage("§2Der Chunk wurde geclaimt!")
-    }else player?.sendMessage("§4Der Chunk gehört ${chunks[chunk.chunkKey]!![chunk.world.name]!!.name}!")
+        chunkClassList.add(chunkClass)
+        player?.sendMessage("§2The chunk has been claimed!")
+    }else player?.sendMessage("§4The chunk belongs to ${chunk.chunkData()!!.name}!")
     return false
 }
 
 fun Chunk.unClaim() {
     val chunk = this
+    if(!chunk.isClaimed()) return
     transaction {
         ChunkTable.deleteWhere {
             ChunkTable.x eq chunk.x and(ChunkTable.z eq chunk.z and(ChunkTable.world eq chunk.world.name))
         }
-        try {
-            val ownerUuid = chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid
-            if(ownerUuid.length > 3){
-                val owner = Bukkit.getPlayer(UUID.fromString(ownerUuid))
-                if(owner != null) {
-                    owner.crashPlayer().remainingClaims++
-                }else {
-                    val remainingClaims = PlayerTable.select(where = {PlayerTable.uuid eq ownerUuid}).first()[PlayerTable.remainingClaims]
-                    PlayerTable.update(where = {PlayerTable.uuid eq ownerUuid}){
-                        it[PlayerTable.remainingClaims] = remainingClaims + 1
-                    }
+        val chunkClass = chunks[chunk.world.name]!![chunk.chunkKey]!!
+        val ownerUuid = chunkClass.owner_uuid
+        if(ownerUuid.length > 3){
+            val owner = Bukkit.getPlayer(UUID.fromString(ownerUuid))
+            if(owner != null) {
+                owner.crashPlayer().remainingClaims++
+            }else {
+                val remainingClaims = PlayerTable.select(where = {PlayerTable.uuid eq ownerUuid}).first()[PlayerTable.remainingClaims]
+                PlayerTable.update(where = {PlayerTable.uuid eq ownerUuid}){
+                    it[PlayerTable.remainingClaims] = remainingClaims + 1
                 }
             }
-            chunks[chunkKey]!!.remove(world.name)
-            if(chunks[chunkKey]!!.size == 0){
-                chunks.remove(chunkKey)
-            }
-        }catch (ex: NullPointerException){}
+        }
+        chunkClassList.remove(chunkClass)
+        chunks[world.name]!!.remove(chunkKey)
+        if(chunks[world.name]!!.size == 0){
+            chunks.remove(world.name)
+        }
     }
 }
 
-fun Chunk.claim(player: Player): Boolean = this.claim(player.uniqueId.toString(), player.name, player)
+fun Chunk.claim(player: Player): Boolean = claim(player.uniqueId.toString(), player.name, player)
 
 fun getRemainingClaims(uuid: String): Int {
     var remainingClaims = 0
@@ -121,29 +121,29 @@ fun Chunk.changeChunkAccess(player: Player, grant: Boolean, executor: Player?){t
 fun Chunk.changeChunkAccess(uuid: String, grant: Boolean, executor: Player?){
     val chunk = this
     if(!chunk.isClaimed()){
-        executor?.sendMessage("§4Der Chunk is nicht geclaimt!")
+        executor?.sendMessage("§4The chunk is not claimed!")
         return
     }
-    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
+    val chunkClass = chunks[chunk.world.name]!![chunk.chunkKey]!!
     if(executor != null && (chunkClass.owner_uuid != executor.uniqueId.toString() && !executor.isOp)){
-        executor.sendMessage("§4Dir gehört der Chunk nicht!")
+        executor.sendMessage("§4You don't own the chunk!")
         return
     }
     transaction {
         val shared = ChunkTable.select(where = {ChunkTable.x eq chunk.x and(ChunkTable.z eq chunk.z and(ChunkTable.world eq chunk.world.name))}).first()[ChunkTable.shared]
         val sharedArray = shared.split(" ").toMutableList()
         if(!grant && !sharedArray.contains(uuid)){
-            executor?.sendMessage("§4Der Spieler hat keinen Zugriff auf diesen Chunk!")
+            executor?.sendMessage("§4The player has no access to this chunk!")
             return@transaction
         }
         if(grant){
             sharedArray.add(uuid)
             chunkClass.shared.add(uuid)
-            executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk gewährt!")
+            executor?.sendMessage("§2The player have been granted access to the chunk!")
         }else {
             sharedArray.remove(uuid)
             chunkClass.shared.remove(uuid)
-            executor?.sendMessage("§2Dem Spieler wurde Zugang zum Chunk entfernt!")
+            executor?.sendMessage("§2The player's access have been revoked!")
         }
         updateChunkShared(chunk, sharedArray)
     }
@@ -155,7 +155,7 @@ private fun Transaction.updateChunkShared(chunk: Chunk, sharedArray: MutableList
     }
 }
 
-fun Player.changeAccessAllChunks(uuid: String, grant: Boolean){
+fun Player.changeAccessAllChunks(uuid: String, grant: Boolean, executor: Player?){
     val player = this
     transaction {
         val chunks = mutableListOf<Chunk>()
@@ -163,7 +163,7 @@ fun Player.changeAccessAllChunks(uuid: String, grant: Boolean){
             chunks.add(Bukkit.getWorld(it[ChunkTable.world])!!.getChunkAt(it[ChunkTable.x], it[ChunkTable.z]))
         }
         chunks.forEach {
-            it.changeChunkAccess(uuid, grant, null)
+            it.changeChunkAccess(uuid, grant, executor)
         }
     }
 }
@@ -173,7 +173,7 @@ fun eventCancel(chunk: Chunk): Boolean = chunk.isClaimed()
 fun eventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
     if(player.crashPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
-    val chunkClass = chunks[chunk.chunkKey]!![chunk.world.name]!!
+    val chunkClass = chunk.chunkData()!!
     if(chunkClass.owner_uuid.length <= 3) return true
     if(chunkClass.owner_uuid == player.uniqueId.toString()) return false
     if(chunkClass.shared.contains(player.uniqueId.toString())) return false

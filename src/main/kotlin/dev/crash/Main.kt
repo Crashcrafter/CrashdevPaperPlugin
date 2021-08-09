@@ -14,7 +14,7 @@ class Main : JavaPlugin() {
 
     override fun onLoad(){
         INSTANCE = this
-        println("[INFO] Plugin wird geladen...")
+        println("[INFO] CrashdevPaperPlugin is loaded!")
     }
 
     override fun onEnable() {
@@ -51,6 +51,6 @@ class Main : JavaPlugin() {
             it.cancel()
         }
         Bukkit.getScheduler().cancelTasks(this)
-        println("[INFO] Plugin wird deaktiviert...")
+        println("[INFO] CrashdevPaperPlugin is disabled!")
     }
 }

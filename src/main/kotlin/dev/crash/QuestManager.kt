@@ -79,34 +79,34 @@ class Quest {
 }
 
 internal fun initQuests() {
-    dailyquests[1] = Quest(1, Reward(3000, 1250), "Ungewöhnlicher Sammler", 3, "Schließe 3 Ungewöhnliche Drops ab", true)
-    dailyquests[2] = Quest(2, Reward(1600, 1250), "Monster Hunter", 100, "Töte 100 feindliche Mobs", true)
-    dailyquests[3] = Quest(3, Reward(1750, 1500), "Killing Streak", 50, "Töte 50 Zombies", true)
-    dailyquests[4] = Quest(4, Reward(5000, 1000), "Epic!", 1, "Absolviere einen Epic-Drop alleine", true)
-    dailyquests[5] = Quest(5, Reward(1750, 1500), "Angler", 10, "Angle 10 mal Kabeljau(Cod)", true)
-    dailyquests[6] = Quest(6, Reward(2500, 1000), "Unboxing!", 3, "Öffne 3 Crates", true)
-    dailyquests[7] = Quest(7, Reward(4500, 2000), "Reisender", 5, "Absolviere 5 Drops", true)
-    dailyquests[8] = Quest(8, Reward(2750, 1000), "Servervoter", 4, "Vote 4 mal für den Server(/vote)", true)
-    dailyquests[9] = Quest(9, Reward(3000, 1000), "Kopfjäger", 3, "Töte 3 andere Spieler", true)
-    dailyquests[10] = Quest(10, Reward(5000, 1000), "Epische Dropjäger", 2, "Absolviere 2 epische Drops", true)
-    dailyquests[11] = Quest(11, Reward(2500, 750), "Namenangler", 1, "Angle einen Nametag", true)
-    dailyquests[12] = Quest(12, Reward(1500, 1000), "Händler", 2500, "Verkaufe Items für 2.500 Credits an den Shop", true)
-    dailyquests[13] = Quest(13, Reward(1500, 500), "Enchanter", 3, "Verzaubere 3 Items", true)
-    dailyquests[14] = Quest(14, Reward(1250, 500), "Fleisch-Lieferant", 30, "Töte 30 Kühe", true)
-    dailyquests[15] = Quest(15, Reward(2250, 1000), "Gewöhnlicher Sammler", 5, "Beende 5 gewöhnliche Drops", true)
-    dailyquests[16] = Quest(16, Reward(1600, 1000), "Pillager-Jäger", 15, "Töte 15 Pillager", true)
+    dailyquests[1] = Quest(1, Reward(3000, 1250), "Uncommon Collector", 3, "Complete 3 Uncommon drops", true)
+    dailyquests[2] = Quest(2, Reward(1600, 1250), "Monster Hunter", 100, "Kill 100 hostile mobs", true)
+    dailyquests[3] = Quest(3, Reward(1750, 1500), "Killing Streak", 50, "Kill 50 Zombies", true)
+    dailyquests[4] = Quest(4, Reward(5000, 1000), "Epic!", 1, "Complete 1 Epic drop alone", true)
+    dailyquests[5] = Quest(5, Reward(1750, 1500), "Fisherman", 10, "Fish 10 Cod", true)
+    dailyquests[6] = Quest(6, Reward(2500, 1000), "Unboxing!", 3, "Open 3 crates", true)
+    dailyquests[7] = Quest(7, Reward(4500, 2000), "Traveller", 5, "Complete 5 drops", true)
+    dailyquests[8] = Quest(8, Reward(2750, 1000), "Servervoter", 4, "Vote 4 times for the server(/vote)", true)
+    dailyquests[9] = Quest(9, Reward(3000, 1000), "Head Hunter", 3, "Kill 3 other player", true)
+    dailyquests[10] = Quest(10, Reward(5000, 1000), "Epic Drop-Hunter", 2, "Complete 2 epic drops", true)
+    dailyquests[11] = Quest(11, Reward(2500, 750), "Nametag-Fishing", 1, "Fish a nametag", true)
+    dailyquests[12] = Quest(12, Reward(1500, 1000), "Trader", 2500, "Sell items for 2.500 Credits at the shop", true)
+    dailyquests[13] = Quest(13, Reward(1500, 500), "Enchanter", 3, "Enchant 3 items", true)
+    dailyquests[14] = Quest(14, Reward(1250, 500), "Meat...", 30, "Kill 30 Cows", true)
+    dailyquests[15] = Quest(15, Reward(2250, 1000), "Common Collector", 5, "Complete 5 common drops", true)
+    dailyquests[16] = Quest(16, Reward(1600, 1000), "Pillager-Hunter", 15, "Kill 15 Pillager", true)
     val is1 = ItemStack(Material.NAME_TAG)
     val im1 = is1.itemMeta
     im1.setCustomModelData(1)
     is1.itemMeta = im1
-    weeklyquests[1] = Quest(1, Reward(7500, 2000, is1), "Besiege das End!", 1, "Besiege den Enderdrache einmal", false)
-    weeklyquests[2] = Quest(2, Reward(2500, 1000), "Weg des Magiers", 1, "Crafte einen Zauberstab", false)
-    weeklyquests[3] = Quest(3, Reward(5000, 5000, is1), "Weg zum Top-Voter", 20, "Vote 20-mal für den Server", false)
-    weeklyquests[4] = Quest(4, Reward(3500, 2000), "Verdorben", 1, "Töte den Wither einmal", false)
-    weeklyquests[5] = Quest(5, Reward(5000, 4500, is1), "Drop-Sammler", 25, "Schließe 25 Drops ab", false)
-    weeklyquests[6] = Quest(6, Reward(4000, 1500), "Monsterjäger", 500, "Töte 500 Monster", false)
-    weeklyquests[7] = Quest(7, Reward(5000, 3000), "Held der Dörfer!", 5, "Gewinne 5 Raids", false)
-    weeklyquests[8] = Quest(8, Reward(3000, 2750, is1), "Schlauer Händler", 25000, "Verdiene 25.000 Credits durch den Shop", false)
+    weeklyquests[1] = Quest(1, Reward(7500, 2000, is1), "Free the End!", 1, "Kill the Enderdragon once", false)
+    weeklyquests[2] = Quest(2, Reward(2500, 1000), "Way of Magician", 1, "Craft a staff", false)
+    weeklyquests[3] = Quest(3, Reward(5000, 5000, is1), "Way to Top-Voter", 20, "Vote 20 times for the server (/vote)", false)
+    weeklyquests[4] = Quest(4, Reward(3500, 2000), "Corrupted", 1, "Kill the wither once", false)
+    weeklyquests[5] = Quest(5, Reward(5000, 4500, is1), "Drop-Collector", 25, "Complete 25 drops", false)
+    weeklyquests[6] = Quest(6, Reward(4000, 1500), "Monster Hunter", 500, "Kill 500 hostile mobs", false)
+    weeklyquests[7] = Quest(7, Reward(5000, 3000), "Hero of the Village!", 5, "Win 5 raids", false)
+    weeklyquests[8] = Quest(8, Reward(3000, 2750, is1), "Smart Trader", 25000, "Get 25.000 from the shop", false)
     val inventory = Bukkit.createInventory(null, 27, Component.text("Quests"))
     val itemStack = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
     val im = itemStack.itemMeta
@@ -142,16 +142,16 @@ fun questCompleted(quest: Quest, player: Player) {
             player.inventory.addItem(quest.reward.itemStack!!)
         }
     }
-    player.sendMessage("§2Du hast die Quest " + quest.name + " erfolgreich abgeschlossen")
+    player.sendMessage("§2You successfully completed the quest ${quest.name}")
     player.updateScoreboard()
 }
 
 fun getQuestLore(quest: Quest, canStart: Boolean): MutableList<String> {
     val list: MutableList<String> = ArrayList()
     if (quest.isDaily) {
-        list.add("§eTägliche Quest")
+        list.add("§eDaily Quest")
     } else {
-        list.add("§eWöchentliche Quest")
+        list.add("§eWeekly Quest")
     }
     list.add("")
     val color: String = when(quest.status){
@@ -161,7 +161,7 @@ fun getQuestLore(quest: Quest, canStart: Boolean): MutableList<String> {
     }
     list.add("§6" + quest.targetdesc + "§f: " + color + "(" + quest.counter + "/" + quest.needed + ")")
     list.add("")
-    list.add("§2Belohnung:")
+    list.add("§2Reward:")
     list.add("§a-" + quest.reward.credits + " Credits")
     list.add("§a-" + quest.reward.xp + " XP")
     if (quest.reward.itemStack != null) {
@@ -178,15 +178,15 @@ fun getQuestLore(quest: Quest, canStart: Boolean): MutableList<String> {
     if (canStart) {
         list.add("")
         if (quest.status == 0) {
-            list.add("§aJetzt starten!")
+            list.add("§aStart Now!")
         } else if (quest.status == 1) {
             if (quest.counter >= quest.needed) {
-                list.add("§2Jetzt Belohnung abholen!")
+                list.add("§2Collect rewards now!")
             } else {
-                list.add("§6Im Gange...")
+                list.add("§6Ongoing...")
             }
         } else {
-            list.add("§aAbgeschlossen!")
+            list.add("§aCompleted!")
         }
     }
     list.add("")
@@ -204,28 +204,21 @@ fun getDailyLore(player: Player): MutableList<String> {
         }
     }
     val list: MutableList<String> = ArrayList()
-    list.add("§eEinmal pro Tag")
+    list.add("§eOnce per day")
     list.add("")
-    if (hascompleted) {
-        list.add("§2Schließe alle täglichen Quests ab!")
-        list.add("")
-        list.add("§2Belohnung:")
-        list.add("§a-3500 Credits")
-        list.add("§a-5000 XP")
-        list.add("§a-Common Key")
+    list.add("§2Complete all daily quests!")
+    list.add("")
+    list.add("§2Reward:")
+    list.add("§a-3500 Credits")
+    list.add("§a-5000 XP")
+    list.add("§a-Common Key")
+    if(hascompleted){
         list.add("")
         if (!crashPlayer.hasDaily) {
-            list.add("§2Jetzt Belohnung abholen!")
+            list.add("§2Collect rewards now!")
         } else {
-            list.add("§aAbgeschlossen!")
+            list.add("§aCompleted!")
         }
-    } else {
-        list.add("§6Schließe alle täglichen Quests ab!")
-        list.add("")
-        list.add("§2Belohnung:")
-        list.add("§a-3500 Credits")
-        list.add("§a-5000 XP")
-        list.add("§a-Common Key")
     }
     return list
 }
@@ -240,28 +233,21 @@ fun getWeeklyLore(player: Player): MutableList<String> {
         }
     }
     val list: MutableList<String> = ArrayList()
-    list.add("§eEinmal pro Woche")
+    list.add("§eOnce per week")
     list.add("")
-    if (hascompleted) {
-        list.add("§2Schließe alle wöchentlichen Quests ab!")
-        list.add("")
-        list.add("§2Belohnung:")
-        list.add("§a-20000 Credits")
-        list.add("§a-10000 XP")
-        list.add("§a-Epic Key")
+    list.add("§2Complete all weekly quests!")
+    list.add("")
+    list.add("§2Reward:")
+    list.add("§a-20000 Credits")
+    list.add("§a-10000 XP")
+    list.add("§a-Epic Key")
+    if(hascompleted){
         list.add("")
         if (!crashPlayer.hasWeekly) {
-            list.add("§2Jetzt Belohnung abholen!")
+            list.add("§2Collect rewards now!")
         } else {
-            list.add("§aAbgeschlossen!")
+            list.add("§aCompleted!")
         }
-    } else {
-        list.add("§6Schließe alle wöchentlichen Quests ab!")
-        list.add("")
-        list.add("§2Belohnung:")
-        list.add("§a-15000 Credits")
-        list.add("§a-10000 XP")
-        list.add("§a-Epic Key")
     }
     return list
 }
@@ -306,8 +292,8 @@ fun showAvailableQuests(player: Player) {
             cloned.setItem(11 + i, quest.getQuestRole())
         }
     }
-    cloned.setItem(20, CustomItems.defaultCustomItem(Material.PAPER, "§eTäglicher Bonus", getDailyLore(player), 1, hashMapOf("crashAction" to "daily")))
-    cloned.setItem(24, CustomItems.defaultCustomItem(Material.PAPER, "§eWöchentlicher Bonus", getWeeklyLore(player), 1, hashMapOf("crashAction" to "weekly")))
+    cloned.setItem(20, CustomItems.defaultCustomItem(Material.PAPER, "§eDaily Bonus", getDailyLore(player), 1, hashMapOf("crashAction" to "daily")))
+    cloned.setItem(24, CustomItems.defaultCustomItem(Material.PAPER, "§eWeekly Bonus", getWeeklyLore(player), 1, hashMapOf("crashAction" to "weekly")))
     player.closeInventory()
     questinventories.add(cloned)
     player.openInventory(cloned)
@@ -342,7 +328,7 @@ fun showQuests(player: Player) {
         questinventories.add(cloned)
         player.openInventory(cloned)
     } else {
-        player.sendMessage("§4Du hast keine offenen Quests!")
+        player.sendMessage("§4You have no ongoing quests!")
     }
 }
 
@@ -358,10 +344,10 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
                 val isDaily = dataArray[2].toBoolean()
                 val quest = crashPlayer.quests.first { it.qid == qid && it.isDaily == isDaily }
                 quest.status = 1
-                player.sendMessage("§2Du hast die Quest " + quest.name + " erfolgreich gestarted!")
+                player.sendMessage("§2You started the quest ${quest.name}")
                 player.closeInventory()
                 player.updateScoreboard()
-            }else player.sendMessage("§4Du kannst nicht mehr Quests gleichzeitig haben!")
+            }else player.sendMessage("§4You can't have more quests at the same time!")
         }
         "1" -> {
             val qid = dataArray[1].toInt()
@@ -371,7 +357,7 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
                 questCompleted(quest, player)
                 player.closeInventory()
             }else {
-                player.sendMessage("§4Schließe die Quest ab, um die Belohnung zu erhalten!")
+                player.sendMessage("§4Complete the quest to receive your reward!")
             }
         }
         "daily" -> {
@@ -385,10 +371,10 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
                 }
                 if(hascompleted) {
                     crashPlayer.hasDaily = true
-                    giveBalance(player, 3500, "Täglicher Bonus")
+                    giveBalance(player, 3500, "Daily Bonus")
                     crashPlayer.changeXP(5000)
                     player.inventory.addItem(genKey(1))
-                    player.sendMessage("§2Du hast deinen täglichen Bonus erhalten!")
+                    player.sendMessage("§2You received your daily bonus!")
                     player.closeInventory()
                 }
             }
@@ -404,10 +390,10 @@ fun questClickHandler(player: Player, inventory: Inventory, slot: Int) {
                 }
                 if(hascompleted) {
                     crashPlayer.hasWeekly = true
-                    giveBalance(player, 15000, "Wöchentlicher Bonus")
+                    giveBalance(player, 15000, "Weekly Bonus")
                     crashPlayer.changeXP(10000)
                     player.inventory.addItem(genKey(2))
-                    player.sendMessage("§2Du hast deinen wöchentlichen Bonus erhalten!")
+                    player.sendMessage("§2You received your weekly bonus!")
                     player.closeInventory()
                 }
             }
@@ -423,7 +409,7 @@ fun CrashPlayer.dailyQuestCreation() {
     }
     changeXP(100)
     lastDailyQuest = System.currentTimeMillis()
-    giveBalance(player, 500, "Täglicher Login")
+    giveBalance(player, 500, "Daily Login")
 }
 
 private fun createDailyQuest(i: Int, player: Player, dailyChosen:MutableList<Int>): Int{
@@ -470,7 +456,7 @@ fun Player.canGetQuest(): Boolean {
     val limit = crashPlayer.rankData().quests
     val can = count < limit
     if (!can) {
-        this.sendMessage("§4Du kannst maximal $limit Quests gleichzeitig machen!")
+        this.sendMessage("§4You can't have more than $limit quests at the same time!")
     }
     return can
 }

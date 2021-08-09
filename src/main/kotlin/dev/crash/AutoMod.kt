@@ -100,7 +100,7 @@ val domainEndings = listOf(
 )
 //endregion
 
-//region Beleidigung
+//region Offenses
 val offenses = listOf(
     "arschloch",
     "hurensohn",
@@ -134,16 +134,16 @@ fun checkMessage(message: String, player: Player): Boolean {
     for (domain in domainEndings) {
         if (message.contains(domain)) {
             addLinkSend(player)
-            player.sendMessage("§4Links in Minecraft zu senden ist verboten!")
-            println("§4" + player.name + " hat einen Link gesendet")
+            player.sendMessage("§4Sending links in minecraft is not allowed!")
+            println("§4${player.name} has sent a link!")
             return true
         }
     }
     for (offense in offenses) {
         if (message.contains(" $offense")) {
             addOffense(player)
-            player.sendMessage("§4EY, nicht beleidigen!")
-            println("§4" + player.name + " hat versucht zu beleidigen")
+            player.sendMessage("§4EY, do not offend!")
+            println("§4${player.name} tried to offend someone!")
             return true
         }
     }
@@ -171,17 +171,17 @@ fun addLinkSend(player: Player) {
     crashPlayer.playerLinkCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
     crashPlayer.playerLinkCounter.checkCounter()
     if (crashPlayer.playerLinkCounter.size >= 3) {
-        tempbanOnlineUser(player, "Du wurdest gebannt wegen Senden von Links!\nDauer: 3 Tage", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
-    }else crashPlayer.warn( "Senden von Links", "Automod")
+        tempbanOnlineUser(player, "You have been banned for sending links!\nDuration: 3 Days", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
+    }else crashPlayer.warn( "Sending links", "Automod")
 }
 
 fun addOffense(player: Player) {
     val crashPlayer = player.crashPlayer()
     crashPlayer.playerOffenseCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
-    crashPlayer.warn("Beleidigung", "Automod")
+    crashPlayer.warn("Offense", "Automod")
     crashPlayer.playerOffenseCounter.checkCounter()
     if (crashPlayer.playerOffenseCounter.size >= 3) {
-        tempbanOnlineUser(player, "Du wurdest gebannt wegen Beleidigung im Chat!\nDauer: 3 Tage", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
+        tempbanOnlineUser(player, "You have been banned for offenses in chat!\nDuration: 3 Days", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
     }
 }
 
@@ -191,7 +191,7 @@ fun addAFKCounter(player: Player) {
     if (crashPlayer.playerAfkCounter.size >= 30) {
         crashPlayer.playerAfkCounter.checkCounter()
         if (crashPlayer.playerAfkCounter.size >= 30) {
-            player.kick(Component.text("AFK-Farming ist verboten!"))
+            player.kick(Component.text("AFK-Farming is not allowed!"))
         }
     }
 }
@@ -211,7 +211,7 @@ private fun MutableList<Long>.checkCounter(){
 
 fun CrashPlayer.warn(reason: String, modName: String){
     if(player.isOp) return
-    player.sendMessage("Du wurdest wegen $reason gewarnt!")
+    player.sendMessage("You have been warned for $reason!")
     warns.add(Warn(reason, modName, System.currentTimeMillis()))
     checkWarns()
 }
@@ -236,12 +236,12 @@ fun CrashPlayer.getWarnsString(): String {
 }
 
 fun CrashPlayer.mute(seconds: Long) {
-    player.sendMessage("§4Du wurdest temporär gemuted!")
+    player.sendMessage("§4You have been tempmuted!")
     mutedUntil = System.currentTimeMillis()+(seconds*1000)
 }
 
 fun CrashPlayer.unmute() {
-    player.sendMessage("§2Du wurdest entmuted!")
+    player.sendMessage("§2You have been unmuted!")
     mutedUntil = System.currentTimeMillis()
 }
 

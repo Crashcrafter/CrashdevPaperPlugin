@@ -29,8 +29,8 @@ fun CommandSender.asPlayer() : Player = if (this is Player) this else throw Exce
 
 fun updateTabOfPlayers(leave: Boolean = false) {
     Bukkit.getOnlinePlayers().forEach {
-        it.sendPlayerListHeader(Component.text("§e§l---------------  ${Bukkit.getIp()}  ---------------§r§6\nPlayer online: §a${Bukkit.getOnlinePlayers().size - if(leave) 1 else 0}"))
-        it.sendPlayerListFooter(Component.text("\n§6Komm auf unseren Discord (/discord) um Mitspieler zu finden\nund Vorschläge für neuen Content zu machen§r\n\n§2Du kannst für unseren Server voten (/vote) um Vote Keys zu erhalten!"))
+        it.sendPlayerListHeader(Component.text("§e§l---------------  ${CONFIG.scoreBoardTitle}§r§e§l  ---------------§r§6\nPlayer online: §a${Bukkit.getOnlinePlayers().size - if(leave) 1 else 0}"))
+        it.sendPlayerListFooter(Component.text(CONFIG.playerListFooter))
         it.updateScoreboard()
     }
 }
@@ -39,9 +39,9 @@ fun Player.updateScoreboard(){
     val player = this
     val list: MutableList<String> = ArrayList()
     list.add("             ")
-    list.add("§6§lRELAUNCH!§r")
+    list.add(CONFIG.scoreBoardNews)
     list.add("-------------------  ")
-    list.add("§aDein Kontostand:")
+    list.add("§aYour Balance:")
     list.add("§6" + player.crashPlayer().balance.withPoints() + " Credits")
     val quests: List<Quest> = getActiveQuests(player)
     if (quests.isNotEmpty()) {
@@ -56,14 +56,14 @@ fun Player.updateScoreboard(){
         }
     }
     list.add("------------------- ")
-    list.add("§4Tode:")
+    list.add("§4Deaths:")
     list.add(INSTANCE.config.getInt("Players." + player.uniqueId.toString() + ".Deaths").toString())
     Bukkit.getScheduler().runTask(INSTANCE, Runnable {
         val scoreboard = Bukkit.getScoreboardManager().newScoreboard
         scoreboard.getServerTeams()
         val objective = scoreboard.registerNewObjective("scoreboard", "scoreboard", Component.text("scoreboard"))
         objective.displaySlot = DisplaySlot.SIDEBAR
-        objective.displayName(Component.text("§e§l${Bukkit.getIp()}"))
+        objective.displayName(Component.text(CONFIG.scoreBoardTitle))
         for (i in list.indices) {
             val score = objective.getScore(list[i])
             score.score = list.size - i

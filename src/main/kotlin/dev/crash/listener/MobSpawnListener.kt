@@ -1,7 +1,7 @@
 package dev.crash.listener
 
 import dev.crash.dropWardenName
-import dev.crash.permission.chunks
+import dev.crash.permission.chunkData
 import dev.crash.permission.isClaimed
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Vex
@@ -27,7 +27,7 @@ class MobSpawnListener : Listener {
             }
         } else if (entity.type != EntityType.DROPPED_ITEM && entity.type != EntityType.FALLING_BLOCK && entity.type != EntityType.FIREWORK) {
             if(!chunk.isClaimed()) return
-            if (chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid.contentEquals("0")) {
+            if (chunk.chunkData()!!.owner_uuid.contentEquals("0")) {
                 if (e.entityType != EntityType.VILLAGER && e.entityType != EntityType.ARMOR_STAND && e.entityType != EntityType.WANDERING_TRADER && e.entityType != EntityType.ITEM_FRAME && e.entityType != EntityType.EVOKER_FANGS && e.entityType != EntityType.PAINTING) {
                     if (e.entity.entitySpawnReason != CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
                         e.isCancelled = true
@@ -36,7 +36,7 @@ class MobSpawnListener : Listener {
             }
         } else if (entity.type == EntityType.VEX) {
             val vex = entity as Vex
-            if(chunk.isClaimed() && chunks[chunk.chunkKey]!![chunk.world.name]!!.owner_uuid.length < 3){
+            if(chunk.isClaimed() && chunk.chunkData()!!.owner_uuid.length < 3){
                 vex.addPotionEffect(PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1, 0))
                 if (vex.entitySpawnReason == CreatureSpawnEvent.SpawnReason.DEFAULT) {
                     vex.customName = dropWardenName
