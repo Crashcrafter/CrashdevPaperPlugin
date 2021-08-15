@@ -4,7 +4,7 @@ version: 0.1
 description: Nix lol
 api-version: 1.17
 author: Crashcrafter_LP
-depend: [Votifier]
+softdepend: [Votifier]
 
 commands:
   back:

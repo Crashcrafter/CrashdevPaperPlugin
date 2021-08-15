@@ -64,9 +64,9 @@ var natureBlocks: List<Material> = arrayListOf(
 
 data class PluginConfig(val dbUser: String, val dbPw: String, val dbIp: String, val dbName: String, val dcLink: String,
                         val texturePackURL: String, val texturePackHash: String, val defaultWarpName: String, val scoreBoardTitle: String, val scoreBoardNews: String,
-                        val playerListFooter: String)
+                        val playerListFooter: String, val votifierEnabled: Boolean)
 private val DEFAULT_CONFIG = PluginConfig("NOTSET", "NOTSET", "localhost", "mcplugin", "https://discord.gg/NbW6JVvxY7",
-    "", "", "spawn", Bukkit.getIp(), "", "")
+    "", "", "spawn", Bukkit.getIp(), "", "", false)
 lateinit var CONFIG: PluginConfig
 
 internal fun loadPluginConfig(){
@@ -81,7 +81,7 @@ internal fun loadPluginConfig(){
                     getStringOrDefault("dcLink", DEFAULT_CONFIG.dcLink), getStringOrDefault("texturePackURL", DEFAULT_CONFIG.texturePackURL),
                     getStringOrDefault("texturePackHash", DEFAULT_CONFIG.texturePackHash), getStringOrDefault("defaultWarpName", DEFAULT_CONFIG.defaultWarpName),
                     getStringOrDefault("scoreBoardTitle", DEFAULT_CONFIG.scoreBoardTitle), getStringOrDefault("scoreBoardNews", DEFAULT_CONFIG.scoreBoardNews),
-                    getStringOrDefault("playerListFooter", DEFAULT_CONFIG.playerListFooter))
+                    getStringOrDefault("playerListFooter", DEFAULT_CONFIG.playerListFooter), getBooleanOrDefault("votifierEnabled", DEFAULT_CONFIG.votifierEnabled))
             }
         }
     }else {

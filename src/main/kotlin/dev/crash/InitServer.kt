@@ -48,11 +48,14 @@ internal fun initServer(){
 internal fun registerEvents(){
     val listener = listOf(AnvilListener(), ChatListener(), CheatListener(), ChunkListener(), ClaimListener(), CraftingListener(), DamageListener(),
     DeathListener(), DeSpawnListener(), ElytraListener(), InteractListener(), InventoryListener(), JoinListener(), LeaveListener(), MobSpawnListener(),
-    PortalListener(), QuestListener(), RespawnListener(), SignListener(), VoteListener(), ProjectileListener())
+    PortalListener(), QuestListener(), RespawnListener(), SignListener(), ProjectileListener())
 
     val pluginManager = Bukkit.getPluginManager()
     listener.forEach {
         pluginManager.registerEvents(it, INSTANCE)
+    }
+    if(CONFIG.votifierEnabled){
+        pluginManager.registerEvents(VoteListener(), INSTANCE)
     }
 }
 

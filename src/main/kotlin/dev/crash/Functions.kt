@@ -269,3 +269,7 @@ private fun copyFile(sourceFile: File, destinationFile: File) {
 fun JsonNode.getStringOrDefault(name: String, default: String): String {
     return this[name].asText().ifEmpty { default }
 }
+
+fun JsonNode.getBooleanOrDefault(name: String, default: Boolean): Boolean {
+    return if(this.has(name)) this[name].asBoolean() else default
+}
