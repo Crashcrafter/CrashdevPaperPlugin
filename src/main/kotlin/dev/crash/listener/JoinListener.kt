@@ -38,19 +38,15 @@ class JoinListener : Listener{
             if(it.address.hostString == hostString) {
                 count++
                 if(count >= 2){
-                    player.kick(Component.text("§4Mehrere Accounts vom selben PC sind nicht erlaubt!"))
-                    sendModchatMessage("Doppelter Account wurde geblockt: ${player.name} von $hostString")
+                    player.kick(Component.text("§4Multiple Accounts from the same PC are not allowed!"))
+                    sendModchatMessage("Account was blocked: ${player.name} via $hostString")
                     return
                 }
             }
         }
-        player.sendMessage("Willkommen, ${player.name}!\nJoin unserem Discord Server, um Mitspieler zu finden und den Support zu kontaktieren!\n§o§nhttps://discord.gg/qQtaYsDN6w\n")
         player.crashPlayer()
         player.setResourcePack(CONFIG.texturePackURL, CONFIG.texturePackHash)
-        if(player.hasResourcePack()){
-            player.sendMessage("§4Die Texturen des Server-Texturepack sind auf das Standard-Texturen ausgelegt!")
-        }
-        joinEvent.joinMessage(Component.text("§a${player.name} ist erschienen!"))
+        joinEvent.joinMessage(Component.text("§a${player.name} joined!"))
         updateTabOfPlayers()
         player.isCustomNameVisible = true
         val remove: MutableList<Vote> = ArrayList()
@@ -61,7 +57,7 @@ class JoinListener : Listener{
                 INSTANCE.saveConfig()
                 remove.add(vote)
                 player.inventory.addItem(genKey(4))
-                player.sendMessage("§2Vielen Dank für das Voten!\nDu hast einen Vote Key erhalten!")
+                player.sendMessage("§2Thank you for voting!\nYou received a vote key!")
                 Bukkit.getScheduler().runTask(INSTANCE,
                     Runnable { player.world.spawnEntity(player.location, EntityType.FIREWORK) })
                 questCount(player, 8, 1, true)

@@ -246,7 +246,7 @@ fun getWeeklyLore(player: Player): MutableList<String> {
         if (!crashPlayer.hasWeekly) {
             list.add("§2Collect rewards now!")
         } else {
-            list.add("§aCompleted!")
+            list.add("§2Completed!")
         }
     }
     return list

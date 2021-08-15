@@ -13,17 +13,9 @@ class LeaveListener : Listener {
     @EventHandler
     fun onQuit(leaveEvent: PlayerQuitEvent){
         val player: Player = leaveEvent.player
-        amount_Sleeping.remove(player)
-        var time = player.world.time
-        while (time > 24000) {
-            time -= 24000
-        }
-        leaveEvent.quitMessage(Component.text("§c${player.name} hat uns verlassen!"))
+        leaveEvent.quitMessage(Component.text("§c${player.name} left us!"))
         moderator.remove(player)
         updateTabOfPlayers(true)
-        if (amount_Sleeping.size > 0 && time > 12541) {
-            calcSleepMessage()
-        }
         player.unload()
     }
 }

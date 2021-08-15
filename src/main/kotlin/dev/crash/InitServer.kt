@@ -48,7 +48,7 @@ internal fun initServer(){
 internal fun registerEvents(){
     val listener = listOf(AnvilListener(), ChatListener(), CheatListener(), ChunkListener(), ClaimListener(), CraftingListener(), DamageListener(),
     DeathListener(), DeSpawnListener(), ElytraListener(), InteractListener(), InventoryListener(), JoinListener(), LeaveListener(), MobSpawnListener(),
-    PortalListener(), QuestListener(), RespawnListener(), SignListener(), SleepListener(), VoteListener(), ProjectileListener())
+    PortalListener(), QuestListener(), RespawnListener(), SignListener(), VoteListener(), ProjectileListener())
 
     val pluginManager = Bukkit.getPluginManager()
     listener.forEach {

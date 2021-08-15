@@ -128,17 +128,17 @@ fun CrashPlayer.removeFromGuild(reason: String){
     }
     guild.member_names.remove(this.player.name)
     guild.member_uuids.remove(uuid)
-    guild.saveMembers(guildId)
+    guild.saveMembers()
     guild.sendMessage(reason)
     this.guildId = 0
     this.setName()
     updateTabOfPlayers()
 }
 
-fun Guild.saveMembers(guildId: Int){
+fun Guild.saveMembers(){
     val guild = this
     transaction {
-        GuildTable.update(where = {GuildTable.id eq guildId}){
+        GuildTable.update(where = {GuildTable.id eq guild.id}){
             it[member_names] = guild.member_names.joinToString(" ")
             it[member_uuids] = guild.member_uuids.joinToString(" ")
         }
@@ -161,8 +161,9 @@ fun CrashPlayer.deleteGuild(){
             }
             val player = Bukkit.getPlayer(UUID.fromString(it2))
             if(player != null){
-                player.crashPlayer().guildId = 0
-                player.crashPlayer().setName()
+                val crashPlayer = player.crashPlayer()
+                crashPlayer.guildId = 0
+                crashPlayer.setName()
                 player.sendMessage("§4Your guild was deleted!")
             }
         }
@@ -183,7 +184,7 @@ fun CrashPlayer.joinGuild(id: Int) {
         guild.member_names.add(this.player.name)
         guild.member_uuids.add(this.player.uniqueId.toString())
         guild.sendMessage("§a${this.player.name} joined the guild!")
-        guild.saveMembers(guildId)
+        guild.saveMembers()
     }else {
         this.player.sendMessage("§4You are already in a guild!")
     }

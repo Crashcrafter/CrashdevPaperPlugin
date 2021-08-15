@@ -1,5 +1,6 @@
 package dev.crash
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.vexsoftware.votifier.model.Vote
@@ -23,7 +24,6 @@ val customItemsMap = HashMap<String, ItemStack>()
 var dropWardenName = "§4§lDrop Warden"
 
 //VARIABLE DATA
-val amount_Sleeping: ArrayList<Player> = ArrayList()
 val targetMap = HashMap<UUID, UUID>()
 val portals = HashMap<Block, String>()
 var keyChests = HashMap<Block, Int>()
@@ -35,8 +35,7 @@ val allJobs: ArrayList<Job> = ArrayList()
 var lastUpdate: Date? = null
 
 //region NatureBlocks
-var natureBlocks: List<Material> = ArrayList(
-    listOf(
+var natureBlocks: List<Material> = arrayListOf(
         Material.GRASS,
         Material.TALL_GRASS,
         Material.LILY_PAD,
@@ -60,9 +59,7 @@ var natureBlocks: List<Material> = ArrayList(
         Material.OAK_LEAVES,
         Material.DARK_OAK_LEAVES,
         Material.JUNGLE_LEAVES,
-        Material.SPRUCE_LEAVES
-    )
-)
+        Material.SPRUCE_LEAVES)
 //endregion
 
 data class PluginConfig(val dbUser: String, val dbPw: String, val dbIp: String, val dbName: String, val dcLink: String,
@@ -74,11 +71,22 @@ lateinit var CONFIG: PluginConfig
 
 internal fun loadPluginConfig(){
     val configFile = File(INSTANCE.dataFolder.path + "/config.json")
-    if(configFile.exists()){
-        CONFIG = jacksonObjectMapper().readValue(configFile)
+    CONFIG = if(configFile.exists()){
+        try {
+            jacksonObjectMapper().readValue(configFile)
+        }catch (ex: MismatchedInputException){
+            jacksonObjectMapper().readTree(configFile).run {
+                PluginConfig(getStringOrDefault("dbUser", DEFAULT_CONFIG.dbUser), getStringOrDefault("dbPw", DEFAULT_CONFIG.dbPw),
+                    getStringOrDefault("dbIp", DEFAULT_CONFIG.dbIp), getStringOrDefault("dbName", DEFAULT_CONFIG.dbName),
+                    getStringOrDefault("dcLink", DEFAULT_CONFIG.dcLink), getStringOrDefault("texturePackURL", DEFAULT_CONFIG.texturePackURL),
+                    getStringOrDefault("texturePackHash", DEFAULT_CONFIG.texturePackHash), getStringOrDefault("defaultWarpName", DEFAULT_CONFIG.defaultWarpName),
+                    getStringOrDefault("scoreBoardTitle", DEFAULT_CONFIG.scoreBoardTitle), getStringOrDefault("scoreBoardNews", DEFAULT_CONFIG.scoreBoardNews),
+                    getStringOrDefault("playerListFooter", DEFAULT_CONFIG.playerListFooter))
+            }
+        }
     }else {
         configFile.createNewFile()
-        CONFIG = DEFAULT_CONFIG
-        jacksonObjectMapper().writeValue(configFile, DEFAULT_CONFIG)
+        DEFAULT_CONFIG
     }
+    jacksonObjectMapper().writeValue(configFile, CONFIG)
 }

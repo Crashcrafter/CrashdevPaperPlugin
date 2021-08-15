@@ -1,5 +1,6 @@
 package dev.crash
 
+import com.fasterxml.jackson.databind.JsonNode
 import dev.crash.permission.rankData
 import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
@@ -263,4 +264,8 @@ private fun copyFile(sourceFile: File, destinationFile: File) {
             }
         }
     }
+}
+
+fun JsonNode.getStringOrDefault(name: String, default: String): String {
+    return this[name].asText().ifEmpty { default }
 }

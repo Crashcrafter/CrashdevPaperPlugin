@@ -70,7 +70,7 @@ internal fun initTradingInventories() {
             Material.POLISHED_DIORITE,
             Material.POLISHED_GRANITE,
             Material.BRICKS,
-            Material.WHITE_CONCRETE
+            Material.DEEPSLATE_BRICKS
         )
     )
     for (j in buildMaterials.indices) {
