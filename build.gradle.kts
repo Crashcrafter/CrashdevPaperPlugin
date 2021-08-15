@@ -17,16 +17,16 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.exposed:exposed-core:0.32.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.32.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.32.1")
+    implementation("org.jetbrains.exposed:exposed-core:0.33.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.33.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.33.1")
     implementation("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
     implementation("com.github.NuVotifier.NuVotifier:nuvotifier-bukkit:2.7.2")
     implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:2.7.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4")
     implementation("com.github.KevinPriv:MojangAPI:1.0")
-    implementation(kotlin("stdlib"))
-    testImplementation(kotlin("test"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.21")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21")
 }
 
 tasks.test {
