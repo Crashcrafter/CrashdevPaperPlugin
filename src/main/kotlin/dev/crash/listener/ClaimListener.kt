@@ -4,7 +4,7 @@ import dev.crash.*
 import dev.crash.commands.admin.removeKeyChest
 import dev.crash.commands.admin.removePortal
 import dev.crash.permission.eventCancel
-import dev.crash.permission.heventCancel
+import dev.crash.permission.hitEventCancel
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Creeper
@@ -54,7 +54,7 @@ class ClaimListener : Listener {
 
     @EventHandler
     fun onHit(e: EntityDamageByEntityEvent) {
-        if (e.damager is Player && heventCancel(e.damager.location.chunk, e.damager as Player)) {
+        if (e.damager is Player && hitEventCancel(e.damager.location.chunk, e.damager as Player)) {
             e.isCancelled = true
             return
         }

@@ -112,23 +112,26 @@ class InteractListener : Listener {
                             e.isCancelled = true
                             changeAddedClaims(player, 1)
                             player.inventory.itemInMainHand.amount--
-                            player.sendMessage("§2Herzlichen Glückwunsch! §6Du hast einen zusätzlichen Claim erhalten!")
+                            player.sendMessage("§2Congratulation! §6You received an additional claim!")
                         }
                         "addHome" -> {
                             e.isCancelled = true
                             changeAddedHomes(player, 1)
                             player.inventory.itemInMainHand.amount--
-                            player.sendMessage("§2Herzlichen Glückwunsch! §6Du hast einen zusätzlichen Homepoint erhalten!")
+                            player.sendMessage("§2Congratulation! §6You received an additional homepoint!")
                         }
                     }
                     return
                 }
+                else -> {}
             }
             if(itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashRange"), PersistentDataType.STRING) && e.action == Action.LEFT_CLICK_AIR){
                 val range = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashRange"), PersistentDataType.STRING)!!.toInt()
                 val target = player.getTargetEntity(range, false)
                 if(target != null && target is LivingEntity){
-                    var damage = itemStack.itemMeta.attributeModifiers?.get(Attribute.GENERIC_ATTACK_DAMAGE)?.first()?.amount ?: type.getItemAttributes(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE).first().amount
+                    var damage = itemStack.itemMeta.attributeModifiers?.get(Attribute.GENERIC_ATTACK_DAMAGE)?.first()?.amount ?:
+                    type.getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE).first().amount
+
                     itemStack.enchantments.forEach {
                         damage += it.key.getDamageIncrease(it.value, target.category)
                     }

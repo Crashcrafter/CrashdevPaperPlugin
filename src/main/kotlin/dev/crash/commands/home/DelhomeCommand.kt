@@ -16,7 +16,7 @@ class DelhomeCommand : CommandExecutor {
                 crashPlayer.homes.remove(keyword)
                 crashPlayer.delHome(keyword)
             } else {
-                player.sendMessage("§4You dont have a homepoint called $keyword")
+                player.sendMessage("§4You don't have a homepoint called $keyword")
             }
         } else {
             player.sendMessage("§4Please enter the name of the homepoint")

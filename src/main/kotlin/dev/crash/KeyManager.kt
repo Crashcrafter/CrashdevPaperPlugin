@@ -163,6 +163,7 @@ internal fun loadLootTables(){
     }
 }
 
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
 @OptIn(DelicateCoroutinesApi::class)
 fun createNewLottery(player: Player, inventory: Inventory, type: Int) {
     allJobs.add(GlobalScope.launch {

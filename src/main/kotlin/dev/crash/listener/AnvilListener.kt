@@ -42,7 +42,7 @@ internal fun loadMaxEnchantmentLevel(){
         enchantments.forEach {
             try {
                 maxEnchLevel[Enchantment.getByKey(NamespacedKey.fromString(it.key))!!] = it.level
-            }catch (ex: NullPointerException){}
+            }catch (_: NullPointerException){}
         }
     }else {
         file.createNewFile()
@@ -70,6 +70,7 @@ fun ItemStack.getAllEnchantments(): MutableMap<Enchantment, Int> {
     }
 }
 
+@Suppress("KotlinConstantConditions")
 fun ItemStack.applyEnchantment(enchantment: Enchantment, is1: ItemStack, is2: ItemStack){
     val ench1 = is1.getEnchLevel(enchantment)
     val ench2 = is2.getEnchLevel(enchantment)

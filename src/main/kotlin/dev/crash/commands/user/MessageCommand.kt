@@ -13,7 +13,7 @@ class MessageCommand : CommandExecutor {
         val player = sender.asPlayer()
         val target = Bukkit.getPlayer(args[0])
         if(target == null) {
-            player.sendMessage("§4Der Spieler ${args[0]} wurde nicht gefunden!")
+            player.sendMessage("§4Player ${args[0]} was not found!")
             return true
         }
         val msgBuilder = StringBuilder()
@@ -22,8 +22,8 @@ class MessageCommand : CommandExecutor {
         }
         val msg = msgBuilder.toString()
         if (!checkMessage(msg, sender.asPlayer()) && player.crashPlayer().mutedUntil <= System.currentTimeMillis()) {
-            target.sendMessage("§7" + player.name + " sagt: " + msg)
-            player.sendMessage("§7" + target.name + " wurde gesagt: " + msg)
+            target.sendMessage("§7" + player.name + " says: " + msg)
+            player.sendMessage("§7" + target.name + " said: " + msg)
         }
         return true
     }

@@ -26,12 +26,12 @@ class InventoryListener : Listener {
                 tradingInventoryCopies.remove(inventory)
                 inventory.clear()
             }
-            shopinventories.contains(inventory) -> {
-                shopinventories.remove(inventory)
+            shopInvs.contains(inventory) -> {
+                shopInvs.remove(inventory)
                 inventory.clear()
             }
-            questinventories.contains(inventory) -> {
-                questinventories.remove(inventory)
+            questInvs.contains(inventory) -> {
+                questInvs.remove(inventory)
                 inventory.clear()
             }
         }
@@ -74,13 +74,13 @@ class InventoryListener : Listener {
             } else if (e.slot == 15) {
                 sellItem(player)
             }
-        } else if (shopinventories.contains(e.inventory)) {
+        } else if (shopInvs.contains(e.inventory)) {
             e.isCancelled = true
             try {
                 clickHandler(e.clickedInventory!!.getItem(e.slot)!!, player)
             } catch (ignored: NullPointerException) { }
             catch (ignored: ArrayIndexOutOfBoundsException) { }
-        } else if (questinventories.contains(e.clickedInventory)) {
+        } else if (questInvs.contains(e.clickedInventory)) {
             e.isCancelled = true
             questClickHandler(e.whoClicked as Player, e.clickedInventory!!, e.slot)
         }

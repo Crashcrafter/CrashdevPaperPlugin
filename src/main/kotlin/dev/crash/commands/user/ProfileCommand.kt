@@ -21,16 +21,16 @@ class ProfileCommand : CommandExecutor {
                 target = player
             }
         }else target = player
-        val targetcrashPlayer = target.crashPlayer()
+        val targetCrashPlayer = target.crashPlayer()
         val builder = StringBuilder()
-        builder.append("§6Level ").append(targetcrashPlayer.xpLevel).append(": ")
-        val percent: Double = (targetcrashPlayer.xp.toDouble().div(getEXPForLevel(targetcrashPlayer.xpLevel)))
+        builder.append("§6Level ").append(targetCrashPlayer.xpLevel).append(": ")
+        val percent: Double = (targetCrashPlayer.xp.toDouble().div(getEXPForLevel(targetCrashPlayer.xpLevel)))
         builder.getExpDisplay(percent)
         player.sendMessage(
             """
-                §7----------------Profil----------------
+                §7----------------Profile----------------
                 §6Name: §a${target.name}
-                §6Credits: §a${targetcrashPlayer.balance.withPoints()}
+                §6Credits: §a${targetCrashPlayer.balance.withPoints()}
                 $builder
                 """.trimIndent()
         )

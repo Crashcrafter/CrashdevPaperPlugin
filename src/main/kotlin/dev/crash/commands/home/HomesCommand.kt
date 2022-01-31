@@ -16,10 +16,10 @@ class HomesCommand : CommandExecutor {
         val crashPlayer = player.crashPlayer()
         if (crashPlayer.isMod && args.isNotEmpty()) {
             val target: Player = Bukkit.getPlayer(args[0])!!
-            val targetcrashPlayer = target.crashPlayer()
+            val targetCrashPlayer = target.crashPlayer()
             val msgBuilder = StringBuilder()
             msgBuilder.append("§6These are ${target.name}'s homepoints:§r")
-            msgBuilder.addHomes(targetcrashPlayer)
+            msgBuilder.addHomes(targetCrashPlayer)
             player.sendMessage(msgBuilder.toString())
         } else {
             val msgBuilder = StringBuilder()

@@ -9,7 +9,7 @@
   "defaultWarpName":"spawn",
   "scoreBoardTitle": "Crashdev Plugin",
   "scoreBoardNews": "Crashdev Development Server",
-  "playerListFooter":"Crashdev Development Server",
+  "playerListFooter":"\nCrashdev Development Server",
   "votifierEnabled":false,
   "voteLinks": []
 }

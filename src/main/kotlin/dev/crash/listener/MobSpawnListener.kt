@@ -20,11 +20,6 @@ class MobSpawnListener : Listener {
         val chunk = entity.location.chunk
         if (entity.type == EntityType.PHANTOM) {
             e.isCancelled = true
-        } else if (entity.type == EntityType.WITHER) {
-            val location = entity.location
-            if (location.x > -200 && location.x < 800 || location.z > -600 && location.z < 400) {
-                if (location.world.name.contentEquals("newworld")) e.isCancelled = true
-            }
         } else if (entity.type != EntityType.DROPPED_ITEM && entity.type != EntityType.FALLING_BLOCK && entity.type != EntityType.FIREWORK) {
             if(!chunk.isClaimed()) return
             if (chunk.chunkData()!!.owner_uuid.contentEquals("0")) {

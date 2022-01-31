@@ -84,8 +84,8 @@ class GuildCommand : CommandExecutor, TabCompleter {
                             player.sendMessage("§4You must enter a valid player!")
                             return true
                         }
-                        val targetcrashPlayer = target.crashPlayer()
-                        if(targetcrashPlayer.guildId != 0){
+                        val targetCrashPlayer = target.crashPlayer()
+                        if(targetCrashPlayer.guildId != 0){
                             player.sendMessage("§4The player ${target.name} is already in a guild!")
                             return true
                         }

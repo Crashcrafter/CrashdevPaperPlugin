@@ -21,7 +21,7 @@ class DeSpawnListener : Listener {
                 if (tokenExists(token)) {
                     redeemKey(token)
                 }
-            }catch (ex: NullPointerException) {}
+            }catch (_: NullPointerException) {}
         }
     }
 }

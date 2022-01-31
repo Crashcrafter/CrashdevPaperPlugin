@@ -13,29 +13,29 @@ class CreditsCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
         if (args.isEmpty()) {
-            player.sendMessage("§6Dein aktueller Kontostand: " + player.crashPlayer().balance.withPoints() + " Credits")
+            player.sendMessage("§6Your current balance: " + player.crashPlayer().balance.withPoints() + " Credits")
         } else if (args[0].contentEquals("transfer")) {
             try {
                 val target: Player
                 try {
                     target = Bukkit.getPlayer(args[1])!!
                 } catch (ignored: ArrayIndexOutOfBoundsException) {
-                    player.sendMessage("Bitte gib einen Spieler an!")
+                    player.sendMessage("§4Please specify a player!")
                     return true
                 }
                 val amount: Long = try {
                     args[2].toLong()
                 } catch (ignored: ArrayIndexOutOfBoundsException) {
-                    player.sendMessage("Bitte gib eine Anzahl an!")
+                    player.sendMessage("§4Please specify an amount!")
                     return true
                 }
                 if (transferBalance(player, target, amount)) {
-                    player.sendMessage("§aTransaktion war erfolgreich")
+                    player.sendMessage("§aTransaction was successful!")
                 }
             } catch (e: NullPointerException) {
-                player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
             } catch (e: NumberFormatException) {
-                player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
             }
         } else if (args[0].contentEquals("add")) {
             if (player.isOp) {
@@ -43,11 +43,11 @@ class CreditsCommand : CommandExecutor, TabCompleter {
                     val target: Player = Bukkit.getPlayer(args[1])!!
                     val amount: Long = args[2].toLong()
                     giveBalance(target, amount, player.name)
-                    player.sendMessage("§2Dem Spieler " + target.name + " wurden " + amount.withPoints() + " Credits gegeben")
+                    player.sendMessage("§2${amount.withPoints()} credits were given to ${target.name}")
                 } catch (e: NullPointerException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                    player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
                 } catch (e: NumberFormatException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                    player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
                 }
             }
         } else if (args[0].contentEquals("remove")) {
@@ -56,11 +56,11 @@ class CreditsCommand : CommandExecutor, TabCompleter {
                     val target: Player = Bukkit.getPlayer(args[1])!!
                     val amount: Long = args[2].toLong()
                     giveBalance(target, -amount, player.name)
-                    player.sendMessage("§2Dem Spieler " + target.name + " wurden " + amount + " Credits entfernt")
+                    player.sendMessage("§2${amount.withPoints()} credits were removed from ${target.name}")
                 } catch (e: NullPointerException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                    player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
                 } catch (e: NumberFormatException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                    player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
                 }
             }
         } else if (args[0].contentEquals("info")) {
@@ -69,9 +69,9 @@ class CreditsCommand : CommandExecutor, TabCompleter {
                     val target: Player = Bukkit.getPlayer(args[1])!!
                     player.sendMessage("§6" + target.name + " hat " + target.crashPlayer().balance.withPoints() + " Credits")
                 } catch (e: NullPointerException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                    player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
                 } catch (e: NumberFormatException) {
-                    player.sendMessage("§4Bitte gib einen gültigen Spieler/gültige Menge an Credits an")
+                    player.sendMessage("§4Please specify a valid player/a valid amount of credits!")
                 }
             }
         } else if (args[0].contentEquals("shop")) {

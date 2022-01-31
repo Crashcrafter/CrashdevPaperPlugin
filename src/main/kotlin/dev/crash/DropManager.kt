@@ -36,13 +36,13 @@ fun setDrop(chunk: Chunk, givenType: Int? = null): Boolean {
         }
         val m: Material = Material.valueOf(dropType.glassPaneMaterial)
         if(dropType.spawnBeacon) {
-            val localy = y-dropType.beaconHeight
-            if(localy < 0) return false
-            world.getBlockAt(x, localy, z).type = Material.BEACON
-            for (i in 0 until dropType.beaconHeight) world.getBlockAt(x, localy + 1 + i, z).type = m
+            val localY = y-dropType.beaconHeight
+            if(localY < 0) return false
+            world.getBlockAt(x, localY, z).type = Material.BEACON
+            for (i in 0 until dropType.beaconHeight) world.getBlockAt(x, localY + 1 + i, z).type = m
             for (xPoint in x - 1..x + 1) {
                 for (zPoint in z - 1..z + 1) {
-                    world.getBlockAt(xPoint, localy - 1, zPoint).type = Material.IRON_BLOCK
+                    world.getBlockAt(xPoint, localY - 1, zPoint).type = Material.IRON_BLOCK
                 }
             }
         }
@@ -97,10 +97,11 @@ fun unsetDrop(chunk: Chunk, alsoLoot: Boolean) {
     drop.participatingPlayer.forEach {
         it.stopSound("crash.drop.music", SoundCategory.AMBIENT)
     }
-    try { drop.waveManager!!.cancel() }catch (ex: NullPointerException) {}
+    try { drop.waveManager!!.cancel() } catch (_: NullPointerException) {}
     drops.remove(chunk)
 }
 
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
 @OptIn(DelicateCoroutinesApi::class)
 fun waveManager(chunk: Chunk) {
     if (!canDropStart) {

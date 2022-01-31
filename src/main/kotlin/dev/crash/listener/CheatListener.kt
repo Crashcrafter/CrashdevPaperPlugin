@@ -26,13 +26,13 @@ class CheatListener : Listener {
             itemStack.itemMeta = im
             if (im.hasLore()) {
                 val list = itemStack.lore()!!.toStringList()
-                if (!list.contains("Aus Creative-Inventar")) {
-                    list.add("Aus Creative-Inventar")
-                    list.add("Von " + e.whoClicked.name)
+                if (!list.contains("From creative inventory")) {
+                    list.add("From creative inventory")
+                    list.add("Made by " + e.whoClicked.name)
                     itemStack.lore(list.toComponentList())
                 }
             } else {
-                itemStack.lore(arrayListOf("Aus Creative-Inventar", "Von " + e.whoClicked.name).toComponentList())
+                itemStack.lore(arrayListOf("From creative inventory", "Made by " + e.whoClicked.name).toComponentList())
             }
         } catch (ignored: NullPointerException) { }
     }

@@ -23,10 +23,8 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -36,8 +34,8 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 
 var prices = HashMap<Material, HashMap<Int, Long>>()
-var amountmap = hashMapOf(0 to 1, 1 to 8, 2 to 16, 3 to 64)
-var shopinventories: MutableList<Inventory> = ArrayList()
+var amountMap = hashMapOf(0 to 1, 1 to 8, 2 to 16, 3 to 64)
+var shopInvs: MutableList<Inventory> = ArrayList()
 var creditsScoreBoard = ""
 
 internal fun initTradingInventories() {
@@ -50,19 +48,19 @@ internal fun initTradingInventories() {
     val woodMaterials: List<Material> = arrayListOf(Material.OAK_LOG, Material.BIRCH_LOG, Material.SPRUCE_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG, Material.JUNGLE_LOG)
     val woodOverview: Inventory = Bukkit.createInventory(null, 54, Component.text("Wood-Shop"))
     for (j in woodMaterials.indices) {
-        for (i in 0 until amountmap.size) {
+        for (i in 0 until amountMap.size) {
             woodOverview.setItem(i + 9 * j, CustomItems.defaultCustomItem(woodMaterials[j],
-                "Buy " + amountmap[i] + " " + woodMaterials[j].toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " for " + (amountmap[i]!! * 16) + " Credits", arrayListOf(),0,
-                hashMapOf("crashAction" to "wood ${woodMaterials[j].name.lowercase()} ${amountmap[i]}")))
+                "Buy " + amountMap[i] + " " + woodMaterials[j].toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " for " + (amountMap[i]!! * 16) + " Credits", arrayListOf(),0,
+                hashMapOf("crashAction" to "wood ${woodMaterials[j].name.lowercase()} ${amountMap[i]}")))
         }
     }
     TradingInventories.woodOverview = woodOverview
 
     val buildOverview: Inventory = Bukkit.createInventory(null, 54, Component.text("Build-Shop"))
-    for (i in 0 until amountmap.size) {
+    for (i in 0 until amountMap.size) {
         buildOverview.setItem(i, CustomItems.defaultCustomItem(Material.STONE,
-            "Buy " + amountmap[i] + " " + Material.STONE.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " for " + (amountmap[i]!! * 16) + " Credits", arrayListOf(), 0,
-        hashMapOf("crashAction" to "build stone ${amountmap[i]}")))
+            "Buy " + amountMap[i] + " " + Material.STONE.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " for " + (amountMap[i]!! * 16) + " Credits", arrayListOf(), 0,
+        hashMapOf("crashAction" to "build stone ${amountMap[i]}")))
     }
     val buildMaterials: List<Material> = ArrayList(
         listOf(
@@ -74,10 +72,10 @@ internal fun initTradingInventories() {
         )
     )
     for (j in buildMaterials.indices) {
-        for (i in 0 until amountmap.size) {
+        for (i in 0 until amountMap.size) {
             buildOverview.setItem(i + (9 * j) + 9, CustomItems.defaultCustomItem(buildMaterials[j],
-                "Buy " + amountmap[i] + " " + buildMaterials[j].toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " for " + (amountmap[i]!! * 32) + " Credits", arrayListOf(), 0,
-                hashMapOf("crashAction" to "build ${buildMaterials[j].name.lowercase()} ${amountmap[i]}")))
+                "Buy " + amountMap[i] + " " + buildMaterials[j].toString().lowercase(Locale.ROOT).toStartUppercaseMaterial() + " for " + (amountMap[i]!! * 32) + " Credits", arrayListOf(), 0,
+                hashMapOf("crashAction" to "build ${buildMaterials[j].name.lowercase()} ${amountMap[i]}")))
         }
     }
     TradingInventories.buildOverview = buildOverview
@@ -101,17 +99,17 @@ internal fun initTradingInventories() {
 }
 
 fun transferBalance(player: Player, target: Player, amount: Long): Boolean {
-    val playercrashPlayer = player.crashPlayer()
-    if (playercrashPlayer.balance < amount) {
+    val playerCrashPlayer = player.crashPlayer()
+    if (playerCrashPlayer.balance < amount) {
         player.sendMessage("§4You don't have enough Credits to start this transaction!")
         return false
     }
-    playercrashPlayer.balance -= amount
+    playerCrashPlayer.balance -= amount
     val onePercent = amount/100
     val newAmount = amount - onePercent
     player.sendMessage("§2${newAmount.withPoints()} Credits have been sent to " + target.name)
-    val targetcrashPlayer = target.crashPlayer()
-    targetcrashPlayer.balance += newAmount
+    val targetCrashPlayer = target.crashPlayer()
+    targetCrashPlayer.balance += newAmount
     target.sendMessage("§2You received " + newAmount.withPoints() + " Credits from " + player.name)
     player.updateScoreboard()
     target.updateScoreboard()
@@ -194,10 +192,10 @@ fun tradingInventory(player: Player) {
     player.openInventory(result)
 }
 
-fun showTradingInventory(player: Player, inventory: Inventory?, iname: String) {
-    val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(iname))
+fun showTradingInventory(player: Player, inventory: Inventory?, iName: String) {
+    val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(iName))
     cloned.contents = inventory.contents!!.copyOf()
-    shopinventories.add(cloned)
+    shopInvs.add(cloned)
     player.closeInventory()
     player.openInventory(cloned)
 }
@@ -240,17 +238,17 @@ fun clickHandler(item: ItemStack, player: Player) {
             if(player.crashPlayer().xpLevel < 15) return
             if(dataArray.size == 1){
                 val cryptoOverview: Inventory = Bukkit.createInventory(null, 45, Component.text("Crypto Shop"))
-                for (i in 0 until amountmap.size){
-                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountmap[i]} Bitcoin for ${(amountmap[i]!! * prices[Material.STICK]!![1]!!).withPoints()} Credits", arrayListOf(), 1,
-                        hashMapOf("crashAction" to "crypto bitcoin ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountmap[i]} Ethereum for ${(amountmap[i]!! * prices[Material.STICK]!![2]!!).withPoints()} Credits", arrayListOf(), 2,
-                        hashMapOf("crashAction" to "crypto ethereum ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountmap[i]} Litecoin for ${(amountmap[i]!! * prices[Material.STICK]!![3]!!).withPoints()} Credits", arrayListOf(), 3,
-                        hashMapOf("crashAction" to "crypto litecoin ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountmap[i]} Nano for ${(amountmap[i]!! * prices[Material.STICK]!![5]!!).withPoints()} Credits", arrayListOf(), 5,
-                        hashMapOf("crashAction" to "crypto nano ${amountmap[i]}")))
-                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountmap[i]} Dogecoin for ${(amountmap[i]!! * prices[Material.STICK]!![4]!!).withPoints()} Credits", arrayListOf(), 4,
-                        hashMapOf("crashAction" to "crypto dogecoin ${amountmap[i]}")))
+                for (i in 0 until amountMap.size){
+                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Bitcoin for ${(amountMap[i]!! * prices[Material.STICK]!![1]!!).withPoints()} Credits", arrayListOf(), 1,
+                        hashMapOf("crashAction" to "crypto bitcoin ${amountMap[i]}")))
+                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Ethereum for ${(amountMap[i]!! * prices[Material.STICK]!![2]!!).withPoints()} Credits", arrayListOf(), 2,
+                        hashMapOf("crashAction" to "crypto ethereum ${amountMap[i]}")))
+                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Litecoin for ${(amountMap[i]!! * prices[Material.STICK]!![3]!!).withPoints()} Credits", arrayListOf(), 3,
+                        hashMapOf("crashAction" to "crypto litecoin ${amountMap[i]}")))
+                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Nano for ${(amountMap[i]!! * prices[Material.STICK]!![5]!!).withPoints()} Credits", arrayListOf(), 5,
+                        hashMapOf("crashAction" to "crypto nano ${amountMap[i]}")))
+                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Dogecoin for ${(amountMap[i]!! * prices[Material.STICK]!![4]!!).withPoints()} Credits", arrayListOf(), 4,
+                        hashMapOf("crashAction" to "crypto dogecoin ${amountMap[i]}")))
                 }
                 showTradingInventory(player, cryptoOverview, "Crypto-Shop")
                 return
@@ -260,11 +258,11 @@ fun clickHandler(item: ItemStack, player: Player) {
     }
 }
 
-fun buyItem(m: Material, amount: Int, priceperone: Int, player: Player) {
+fun buyItem(m: Material, amount: Int, pricePerUnit: Int, player: Player) {
     if (isSpace(player.inventory)) {
         if (pay(
                 player,
-                amount.toLong() * priceperone,
+                amount.toLong() * pricePerUnit,
                 m.toString().lowercase(Locale.ROOT).toStartUppercaseMaterial()
             )
         ) {
@@ -296,7 +294,7 @@ fun buyCrypto(type: String, amount: Int, player: Player) {
 
 fun buyKey(type: Int, player: Player, price: Long) {
     if (isSpace(player.inventory)) {
-        if (pay(player, price, "Schwarzmarkt")) {
+        if (pay(player, price, "Blackmarket")) {
             player.inventory.addItem(genKey(type))
         }
     } else {
@@ -320,23 +318,7 @@ object ShopInventories {
     var normalView: Inventory? = null
 }
 
-fun addCreditsToPlayer(uuid: String, amount: Long){
-    transaction {
-        val currentBalance = PlayerTable.select(where = {PlayerTable.uuid eq uuid}).first()[PlayerTable.balance]
-        PlayerTable.update(where = {PlayerTable.uuid eq uuid}){
-            it[balance] = currentBalance + amount
-        }
-    }
-}
-
-fun getCredits(uuid: String): Long{
-    var currentBalance = 0L
-    transaction {
-        currentBalance = PlayerTable.select(where = {PlayerTable.uuid eq uuid}).first()[PlayerTable.balance]
-    }
-    return currentBalance
-}
-
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
 @OptIn(DelicateCoroutinesApi::class)
 internal fun updateCreditScore(){
     allJobs.add(GlobalScope.launch {

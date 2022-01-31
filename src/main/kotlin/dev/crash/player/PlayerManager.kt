@@ -61,7 +61,7 @@ internal fun Player.load(){
 internal fun Player.unload(){
     if(!PlayerData.containsKey(this)) return
     val crashPlayer = crashPlayer()
-    crashPlayer.managen?.cancel()
+    crashPlayer.manaGen?.cancel()
     crashPlayer.save()
     PlayerData.remove(this)
 }

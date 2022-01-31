@@ -29,15 +29,15 @@ class CrashPlayer(val player: Player) {
     var remainingHomes by Delegates.notNull<Int>()
     var addedHomes by Delegates.notNull<Int>()
     var balance by Delegates.notNull<Long>()
-    var lastKeys by Delegates.notNull<Long>()
-    var weeklyKeys = HashMap<Int, Int>()
+    private var lastKeys by Delegates.notNull<Long>()
+    private var weeklyKeys = HashMap<Int, Int>()
     var xpLevel by Delegates.notNull<Int>()
     var xp by Delegates.notNull<Long>()
-    var vxpLevel by Delegates.notNull<Int>()
+    private var vxpLevel by Delegates.notNull<Int>()
     var guildId = 0
     var isMod = false
     var mana = 0
-    var managen: Job? = null
+    var manaGen: Job? = null
     var lastDailyQuest by Delegates.notNull<Long>()
     var lastWeeklyQuest by Delegates.notNull<Long>()
     var quests :MutableList<Quest> = mutableListOf()
@@ -89,10 +89,11 @@ class CrashPlayer(val player: Player) {
         check()
     }
 
+    @Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
     @OptIn(DelicateCoroutinesApi::class)
     fun changeMana(amount: Int) {
         mana -= amount
-        managen?.cancel()
+        manaGen?.cancel()
         player.sendActionBar(Component.text("§1Mana: $mana"))
         val job = GlobalScope.launch {
             try {
@@ -116,7 +117,7 @@ class CrashPlayer(val player: Player) {
             }
         }
         allJobs.add(job)
-        this.managen = job
+        this.manaGen = job
     }
 
     fun changeXP(amount: Long) {
@@ -129,7 +130,7 @@ class CrashPlayer(val player: Player) {
                 xpLevel--
                 xpForLevel = getEXPForLevel(xpLevel-1)
             }
-            player.sendMessage("§4Dir wurden Level abgezogen!")
+            player.sendMessage("§4Your level has been reduced!")
             return
         }
         player.sendMessage("§a+$amount XP")
@@ -142,7 +143,7 @@ class CrashPlayer(val player: Player) {
                 xp -= needed
                 needed = getEXPForLevel(xpLevel)
             }
-            player.sendMessage("§2Level Up!\n§6Du bist jetzt Level $xpLevel!")
+            player.sendMessage("§2Level Up!\n§6You are now level $xpLevel!")
         }
         if (amount > 100) {
             val builder = StringBuilder()
@@ -214,6 +215,7 @@ class CrashPlayer(val player: Player) {
         player.isCustomNameVisible = true
     }
 
+    @Suppress("DuplicatedCode")
     fun save(){
         val uuid = player.uniqueId.toString()
         val questList = mutableListOf<QuestSaveObj>()

@@ -18,13 +18,13 @@ class SetHomeCommand : CommandExecutor {
             if(crashPlayer.remainingHomes > 0){
                 if (!crashPlayer.homes.containsKey(keyword)) {
                     if(chunk.isClaimed()){
-                        if(chunk.chunkData()!!.owner_uuid == player.uniqueId.toString())crashPlayer.setHome(keyword) else player.sendMessage("§4Du kannst nicht in fremden Chunks Homepoints setzen!")
+                        if(chunk.chunkData()!!.owner_uuid == player.uniqueId.toString())crashPlayer.setHome(keyword) else player.sendMessage("§4You can't set homepoints in foreign claims!")
                     }else crashPlayer.setHome(keyword)
                 } else {
                     player.sendMessage("§4You already have a homepoint with that name!")
                 }
             }else {
-                player.sendMessage("§4You cant set more homepoints!")
+                player.sendMessage("§4You can't set more homepoints!")
             }
         } else {
             player.sendMessage("§4Please enter a name for the homepoint!")

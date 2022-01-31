@@ -28,7 +28,7 @@ val targetMap = HashMap<UUID, UUID>()
 val portals = HashMap<Block, String>()
 var keyChests = HashMap<Block, Int>()
 val tradingInventoryCopies: ArrayList<Inventory> = ArrayList()
-var questinventories: MutableList<Inventory> = java.util.ArrayList()
+var questInvs: MutableList<Inventory> = java.util.ArrayList()
 val moderator: ArrayList<Player> = ArrayList()
 val cachedVoteRewards: ArrayList<Vote> = ArrayList()
 val allJobs: ArrayList<Job> = ArrayList()
@@ -65,7 +65,7 @@ var natureBlocks: List<Material> = arrayListOf(
 data class PluginConfig(val dbUser: String, val dbPw: String, val dbIp: String, val dbName: String, val dcLink: String,
                         val texturePackURL: String, val texturePackHash: String, val defaultWarpName: String, val scoreBoardTitle: String, val scoreBoardNews: String,
                         val playerListFooter: String, val votifierEnabled: Boolean, val voteLinks: MutableList<String>)
-private val DEFAULT_CONFIG = PluginConfig("NOTSET", "NOTSET", "localhost", "mcplugin", "https://discord.gg/NbW6JVvxY7",
+private val DEFAULT_CONFIG = PluginConfig("NOT SET", "NOT SET", "localhost", "crashdev_mc", "https://discord.gg/NbW6JVvxY7",
     "", "", "spawn", Bukkit.getIp(), "", "", false, mutableListOf())
 lateinit var CONFIG: PluginConfig
 

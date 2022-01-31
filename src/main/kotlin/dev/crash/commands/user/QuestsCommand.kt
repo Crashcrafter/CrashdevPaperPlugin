@@ -31,17 +31,17 @@ class QuestsCommand : CommandExecutor, TabCompleter {
                         val amount: Int = args[3].toInt()
                         val isDaily = java.lang.Boolean.parseBoolean(args[4])
                         questCount(target, qid, amount, isDaily)
-                        player.sendMessage("§2Quest Counter Changed")
+                        player.sendMessage("§2Quest counter changed")
                     } catch (ignored: ArrayIndexOutOfBoundsException) {
-                        player.sendMessage("§4Unvollständiger Command du Lappen")
+                        player.sendMessage("§4Invalid arguments!")
                     }
                 } else if (args[0].contentEquals("reset")) {
                     if (args.size >= 2) {
                         val target: Player = Bukkit.getPlayer(args[1])!!
                         target.crashPlayer().weeklyQuestCreation()
-                        player.sendMessage("§2Die Quests von dem Spieler wurden zurückgesetzt!")
+                        player.sendMessage("§2Quests of ${target.name} were resetted!")
                     } else {
-                        player.sendMessage("§2Unvollständiger Command!")
+                        player.sendMessage("§4Invalid arguments!")
                     }
                 }
             } else {
@@ -76,15 +76,15 @@ class QuestsCommand : CommandExecutor, TabCompleter {
             } else if (args.size == 3) {
                 if (args[0].contentEquals("counter")) {
                     val target: Player = Bukkit.getPlayer(args[1])!!
-                    var hasvalidquest = false
+                    var hasValidQuest = false
                     for (quest in target.crashPlayer().quests) {
                         if (quest.status == 1) {
                             list.add(java.lang.String.valueOf(quest.qid))
-                            hasvalidquest = true
+                            hasValidQuest = true
                         }
                     }
-                    if (!hasvalidquest) {
-                        list.add("SPIELER HAT KEINE OFFENE QUEST")
+                    if (!hasValidQuest) {
+                        list.add("Player has no open quests!")
                     }
                 }
             } else if (args.size == 4) {

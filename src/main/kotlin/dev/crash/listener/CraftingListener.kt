@@ -30,9 +30,9 @@ class CraftingListener : Listener {
             }
         }
         if (e.recipe.result.hasItemMeta() && e.recipe.result.itemMeta.hasCustomModelData()) {
-            val modeldata = e.recipe.result.itemMeta.customModelData
+            val modelData = e.recipe.result.itemMeta.customModelData
             val material = e.recipe.result.type
-            if (material == Material.WOODEN_HOE && modeldata in 1..5) {
+            if (material == Material.WOODEN_HOE && modelData in 1..5) {
                 questCount(e.whoClicked as Player, 2, 1, false)
             }
         }

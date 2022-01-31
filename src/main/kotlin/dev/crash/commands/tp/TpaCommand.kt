@@ -43,7 +43,7 @@ You have 5 minutes to respond."""
                 }
             }.runTaskLaterAsynchronously(INSTANCE, 1200L)
         } else {
-            sender.sendMessage(ChatColor.RED.toString() + "Invalid synax!")
+            sender.sendMessage(ChatColor.RED.toString() + "Invalid syntax!")
         }
         return true
     }

@@ -17,7 +17,7 @@ class KeyCommand : CommandExecutor, TabCompleter {
             if (args[0] == "chest") {
                 val block = player.rayTraceBlocks(4.0)!!.hitBlock
                 if(block == null) {
-                    player.sendMessage("§4Du musst eine Kiste anschauen!")
+                    player.sendMessage("§4You must look at a chest!")
                     return true
                 }
                 if (args[1] == "add") {
@@ -29,7 +29,7 @@ class KeyCommand : CommandExecutor, TabCompleter {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "execute positioned ${block.x+0.5} ${block.y} ${block.z+0.5} run kill @e[tag=crates,distance=..1,limit=1]")
                     removeKeyChest(block)
                 } else {
-                    player.sendMessage("&4Enter valid argument")
+                    player.sendMessage("&4Invalid arguments!")
                 }
             } else if (args[0] == "create") {
                 if(args.size < 3){
@@ -42,7 +42,7 @@ class KeyCommand : CommandExecutor, TabCompleter {
                     target.inventory.addItem(genKey(key.id))
                 }
             } else {
-                player.sendMessage("&4Enter valid argument")
+                player.sendMessage("&4Invalid arguments!")
             }
         }
         return true

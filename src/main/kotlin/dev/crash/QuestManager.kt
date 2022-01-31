@@ -295,7 +295,7 @@ fun showAvailableQuests(player: Player) {
     cloned.setItem(20, CustomItems.defaultCustomItem(Material.PAPER, "§eDaily Bonus", getDailyLore(player), 1, hashMapOf("crashAction" to "daily")))
     cloned.setItem(24, CustomItems.defaultCustomItem(Material.PAPER, "§eWeekly Bonus", getWeeklyLore(player), 1, hashMapOf("crashAction" to "weekly")))
     player.closeInventory()
-    questinventories.add(cloned)
+    questInvs.add(cloned)
     player.openInventory(cloned)
 }
 
@@ -325,7 +325,7 @@ fun showQuests(player: Player) {
             }
         }
         player.closeInventory()
-        questinventories.add(cloned)
+        questInvs.add(cloned)
         player.openInventory(cloned)
     } else {
         player.sendMessage("§4You have no ongoing quests!")

@@ -180,7 +180,7 @@ fun eventCancel(chunk: Chunk, player: Player): Boolean {
     return true
 }
 
-fun heventCancel(chunk: Chunk, player: Player): Boolean {
+fun hitEventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
     if(player.crashPlayer().isMod && player.gameMode == GameMode.CREATIVE) return false
     val chunkClass = chunk.chunkData()!!
@@ -191,7 +191,7 @@ fun heventCancel(chunk: Chunk, player: Player): Boolean {
     return true
 }
 
-fun deventCancel(chunk: Chunk, player: Player): Boolean {
+fun damageEventCancel(chunk: Chunk, player: Player): Boolean {
     if(!chunk.isClaimed()) return false
     val chunkClass = chunk.chunkData()!!
     if(chunkClass.owner_uuid == "0") return true

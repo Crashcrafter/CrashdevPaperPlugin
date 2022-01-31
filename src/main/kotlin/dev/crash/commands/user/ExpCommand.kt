@@ -18,7 +18,7 @@ class ExpCommand : CommandExecutor, TabCompleter{
                 val arg: String = args[0]
                 val target: Player = Bukkit.getPlayer(args[1])!!
                 if (args.size <= 3) {
-                    player.sendMessage("§4Bitte gib eine Anzahl und einen Typ an")
+                    player.sendMessage("§4Invalid arguments!")
                     return true
                 }
                 val amount: Long = args[2].toLong()
@@ -26,16 +26,16 @@ class ExpCommand : CommandExecutor, TabCompleter{
                 if (args[3].contentEquals("XP")) {
                     target.crashPlayer().changeXP(amount * factor)
                 } else if (args[3].contentEquals("Level")) {
-                    var finalexp: Long = 0
+                    var finalExp: Long = 0
                     val crashPlayer = target.crashPlayer()
                     for (i in 0 until amount) {
-                        finalexp += getEXPForLevel(crashPlayer.xpLevel + (i.toInt() * factor) - if(factor == -1) 1 else 0)
+                        finalExp += getEXPForLevel(crashPlayer.xpLevel + (i.toInt() * factor) - if(factor == -1) 1 else 0)
                     }
-                    crashPlayer.changeXP(finalexp * factor)
+                    crashPlayer.changeXP(finalExp * factor)
                 }
-                player.sendMessage("§2Dem Spieler wurden " + (amount*factor) + " " + args[3] + " gegeben!")
+                player.sendMessage("§2${(amount*factor)} ${args[3]} were given to ${args[1]}!")
             } else {
-                player.sendMessage("§4Unvollständiger Command")
+                player.sendMessage("§4Invalid arguments!")
             }
         }
         return true

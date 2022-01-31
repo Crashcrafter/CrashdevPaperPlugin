@@ -47,12 +47,10 @@ val domainEndings = listOf(
     ".ink",
     ".in",
     ".immo",
-    ".immobilien",
     ".international",
     ".it",
     ".irish",
     ".je",
-    ".kaufen",
     ".land",
     ".li",
     ".link",
@@ -100,35 +98,6 @@ val domainEndings = listOf(
 )
 //endregion
 
-//region Offenses
-val offenses = listOf(
-    "arschloch",
-    "hurensohn",
-    "huso",
-    "wixer",
-    "idiot",
-    "nutte",
-    "nude ",
-    "vollidiot",
-    "hure",
-    "behindert",
-    "wixkind",
-    "fotze",
-    "figgo",
-    "scheißhaufen",
-    "anal",
-    "muschis",
-    "take your knife",
-    "drown yourself",
-    "bitch",
-    "fuck",
-    "whore",
-    "cock",
-    "fick",
-    "pussy"
-)
-//endregion
-
 fun checkMessage(message: String, player: Player): Boolean {
     if(player.isOp) return false
     for (domain in domainEndings) {
@@ -139,20 +108,12 @@ fun checkMessage(message: String, player: Player): Boolean {
             return true
         }
     }
-    for (offense in offenses) {
-        if (message.contains(" $offense")) {
-            addOffense(player)
-            player.sendMessage("§4EY, do not offend!")
-            println("§4${player.name} tried to offend someone!")
-            return true
-        }
-    }
     return false
 }
 
-fun tempbanUser(reason: String, date: Date?, player: Player, playername: String) {
+fun tempbanUser(reason: String, date: Date?, player: Player, playerName: String) {
     val banList1 = Bukkit.getBanList(BanList.Type.NAME)
-    banList1.addBan(playername, "$reason Name:$playername", date, player.name)
+    banList1.addBan(playerName, "$reason Name:$playerName", date, player.name)
 }
 
 fun tempbanOnlineUser(target: Player, reason: String, date: Date?) {
@@ -173,16 +134,6 @@ fun addLinkSend(player: Player) {
     if (crashPlayer.playerLinkCounter.size >= 3) {
         tempbanOnlineUser(player, "You have been banned for sending links!\nDuration: 3 Days", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
     }else crashPlayer.warn( "Sending links", "Automod")
-}
-
-fun addOffense(player: Player) {
-    val crashPlayer = player.crashPlayer()
-    crashPlayer.playerOffenseCounter.add(System.currentTimeMillis() + 1000 * 60 * 60)
-    crashPlayer.warn("Offense", "Automod")
-    crashPlayer.playerOffenseCounter.checkCounter()
-    if (crashPlayer.playerOffenseCounter.size >= 3) {
-        tempbanOnlineUser(player, "You have been banned for offenses in chat!\nDuration: 3 Days", Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
-    }
 }
 
 fun addAFKCounter(player: Player) {

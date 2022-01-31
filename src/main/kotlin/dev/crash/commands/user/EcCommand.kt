@@ -11,7 +11,7 @@ class EcCommand : CommandExecutor {
         if ((!player.world.name.contentEquals("event") || player.isOp) && player.hasPermission("crash.ec")) {
             player.openInventory(player.enderChest)
         } else {
-            player.sendMessage("§4Du kannst nicht /ec nutzen!")
+            player.sendMessage("§4You can't use /ec!")
         }
         return true
     }

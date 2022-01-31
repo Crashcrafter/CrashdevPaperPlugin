@@ -1,6 +1,6 @@
 package dev.crash.listener
 
-import dev.crash.permission.deventCancel
+import dev.crash.permission.damageEventCancel
 import dev.crash.permission.eventCancel
 import dev.crash.player.crashPlayer
 import org.bukkit.Material
@@ -21,7 +21,7 @@ class DamageListener : Listener {
             val player = e.entity as Player
             val crashPlayer = player.crashPlayer()
             val chunk = player.location.chunk
-            if (e.cause != EntityDamageEvent.DamageCause.VOID && deventCancel(chunk, player)) {
+            if (e.cause != EntityDamageEvent.DamageCause.VOID && damageEventCancel(chunk, player)) {
                 e.isCancelled = true
                 return
             }

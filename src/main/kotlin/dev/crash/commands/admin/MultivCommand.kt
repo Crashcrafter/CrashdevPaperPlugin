@@ -21,60 +21,54 @@ class MultivCommand : CommandExecutor, TabCompleter {
                     var p: Player? = null
                     try {
                         p = Bukkit.getPlayer(args[2])
-                    }catch (ex: ArrayIndexOutOfBoundsException){ }
+                    } catch (_: ArrayIndexOutOfBoundsException){ }
                     if (p == null) {
                         p = player
                     }
                     p.teleport(w.spawnLocation.add(0.5, 0.0, 0.5))
                     println(p.name + " teleported to " + w.name)
                 } else {
-                    player.sendMessage("Ungültige Argumente")
+                    player.sendMessage("Invalid arguments!")
                 }
             } else if (args[0] == "create") {
                 if (args.size >= 3) {
                     val worldName: String = args[1]
                     val environment: String = args[2]
-                    var worldtype = "NORMAL"
+                    var worldType = "NORMAL"
                     try {
-                        worldtype = args[3]
+                        worldType = args[3]
                     } catch (ignored: NullPointerException) {
                     } catch (ignored: ArrayIndexOutOfBoundsException) {
                     }
                     try {
                         val seed: String = args[4]
-                        player.sendMessage("§6Welt wird erstellt...")
+                        player.sendMessage("§6World is generating...")
                         Bukkit.createWorld(
                             WorldCreator.name(worldName).environment(World.Environment.valueOf(environment)).type(
-                                WorldType.valueOf(
-                                    worldtype
-                                )
+                                WorldType.valueOf(worldType)
                             ).seed(seed.toLong())
                         )
-                        player.sendMessage("§2Welt wurde erstellt!")
+                        player.sendMessage("§2World was created!")
                     } catch (ignored: NullPointerException) {
-                        player.sendMessage("§6Welt wird erstellt...")
+                        player.sendMessage("§6World is generating...")
                         Bukkit.createWorld(
                             WorldCreator.name(worldName).environment(World.Environment.valueOf(environment)).type(
-                                WorldType.valueOf(
-                                    worldtype
-                                )
+                                WorldType.valueOf(worldType)
                             )
                         )
-                        player.sendMessage("§2Welt wurde erstellt!")
+                        player.sendMessage("§2World was created!")
                     } catch (ignored: ArrayIndexOutOfBoundsException) {
-                        player.sendMessage("§6Welt wird erstellt...")
+                        player.sendMessage("§6World is generating...")
                         Bukkit.createWorld(
                             WorldCreator.name(worldName).environment(World.Environment.valueOf(environment)).type(
-                                WorldType.valueOf(
-                                    worldtype
-                                )
+                                WorldType.valueOf(worldType)
                             )
                         )
-                        player.sendMessage("§2Welt wurde erstellt!")
+                        player.sendMessage("§2World was created!")
                     }
                     addWorld(worldName)
                 } else {
-                    player.sendMessage("§4Bitte die richtigen Arguments benutzen!")
+                    player.sendMessage("§4Invalid arguments!")
                 }
             } else if (args[0] == "portal") {
                 if (args.size == 2) {
@@ -82,13 +76,13 @@ class MultivCommand : CommandExecutor, TabCompleter {
                     addPortal(block, args[1])
                     block.type = Material.END_PORTAL
                 } else {
-                    player.sendMessage("Ungültige Argumente")
+                    player.sendMessage("§4Invalid arguments!")
                 }
             } else if(args[0] == "remove") {
                 if(args.size == 2) {
                     val worldName = args[1]
                     removeWorld(worldName)
-                    player.sendMessage("§2Die Welt $worldName wird beim nächsten Server Restart deaktiviert")
+                    player.sendMessage("§2The world $worldName will be removed on next server restart!")
                 }
             }
         }

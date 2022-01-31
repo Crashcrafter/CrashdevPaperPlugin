@@ -19,7 +19,7 @@ class CheckItemCommand : CommandExecutor {
         }else if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING)){
             val crafterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING)
             player.sendMessage("§6This item was crafted by $crafterName!")
-        }else player.sendMessage("§4Item hat keine Daten!")
+        }else player.sendMessage("§4Item has no data!")
         return true
     }
 }

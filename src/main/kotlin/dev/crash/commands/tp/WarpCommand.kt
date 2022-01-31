@@ -37,10 +37,10 @@ class WarpCommand : CommandExecutor, TabCompleter {
                     deleteWarp(key)
                     return true
                 }else {
-                    teleportToWarppoint(player, args[0])
+                    teleportToWarp(player, args[0])
                 }
             }else {
-                teleportToWarppoint(player, args[0])
+                teleportToWarp(player, args[0])
             }
         }
         return true
@@ -67,10 +67,10 @@ class WarpCommand : CommandExecutor, TabCompleter {
     }
 }
 
-fun teleportToWarppoint(player: Player, key: String){
+fun teleportToWarp(player: Player, key: String){
     val location = warps[key]
     if(location == null){
-        player.sendMessage("§4Es gibt keinen Warppoint mit diesem Namen!")
+        player.sendMessage("§4Invalid warp name!")
         return
     }
     delayedTeleport(player, warps[key]!!)
@@ -95,6 +95,7 @@ internal fun loadWarps(){
     }
 }
 
+@Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
 @OptIn(DelicateCoroutinesApi::class)
 fun delayedTeleport(player: Player, location: Location, after: (()->Unit)? = null){
     if(player.isOp){
@@ -108,24 +109,24 @@ fun delayedTeleport(player: Player, location: Location, after: (()->Unit)? = nul
         crashPlayer.dropCoolDown = System.currentTimeMillis() + 1000 * 30
     }
     allJobs.add(GlobalScope.launch {
-        var lastpos = player.location
+        var lastPos = player.location
         var i = 0
         player.sendMessage("§6Teleport in")
         while (true) {
             player.sendMessage("§6" + (3 - i) + "...")
             delay(1000L)
-            if (lastpos.z != player.location.z || lastpos.y != player.location
-                    .y || lastpos.x != player.location.x
+            if (lastPos.z != player.location.z || lastPos.y != player.location
+                    .y || lastPos.x != player.location.x
             ) {
-                player.sendMessage("§4Du hast dich bewegt! Stehe 3 Sekunden still, um dich zu teleportieren.")
+                player.sendMessage("§4Teleport cancelled! You must stand still for 3 seconds.")
                 break
             }
-            lastpos = player.location
+            lastPos = player.location
             i++
             if (i == 3) {
                 Bukkit.getScheduler().runTask(INSTANCE, Runnable {
                     player.teleport(location)
-                    player.sendMessage("§2Du wurdest teleportiert!")
+                    player.sendMessage("§2You've been teleported!")
                     after?.invoke()
                 })
                 break
