@@ -39,7 +39,7 @@ class DropCommand : CommandExecutor, TabCompleter {
             }
             "resetdropcooldown" -> {
                 player.crashPlayer().dropCoolDown = System.currentTimeMillis()
-                player.sendMessage("§2Dropcooldown resetted!")
+                player.sendMessage("§2Drop-cooldown resetted!")
         }
         }
         return true

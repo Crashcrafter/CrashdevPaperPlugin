@@ -25,7 +25,6 @@
         {"itemString":"mc:leather","probability":2,"amount":6,"enchantments":null},
         {"itemString":"mc:bread","probability":3,"amount":8,"enchantments":null},
         {"itemString":"mc:bone","probability":2,"amount":6,"enchantments":null},
-        {"itemString":"ci:katze_rose","probability":1,"amount":1,"enchantments":null},
         {"itemString":"ci:small_fireball","probability":1,"amount":1,"enchantments":null},
         {"itemString":"ci:dogecoin","probability":2,"amount":6,"enchantments":null},
         {"itemString":"ci:mud_ball","probability":1,"amount":8,"enchantments":null}
@@ -56,7 +55,6 @@
         {"itemString":"mc:spectral_arrow","probability":1,"amount":8,"enchantments":null},
         {"itemString":"mc:bread","probability":2,"amount":12,"enchantments":null},
         {"itemString":"mc:gunpowder","probability":2,"amount":8,"enchantments":null},
-        {"itemString":"ci:katze_rose","probability":1,"amount":1,"enchantments":null},
         {"itemString":"ci:small_fireball","probability":1,"amount":3,"enchantments":null},
         {"itemString":"ci:dogecoin","probability":2,"amount":32,"enchantments":null},
         {"itemString":"ci:nano","probability":1,"amount":4,"enchantments":null},

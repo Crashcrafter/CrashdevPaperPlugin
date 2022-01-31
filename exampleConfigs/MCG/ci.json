@@ -193,13 +193,6 @@
     "cmd":0,
     "data":{"crashitemdata":"throwSmallFireball"}
   },
-  "katze_rose":{
-    "material":"POPPY",
-    "displayName":"Katze's Liebesrosen",
-    "lore":["Das Original"],
-    "cmd":0,
-    "data":{}
-  },
   "dogecoin":{
     "material":"STICK",
     "displayName":"§eDogecoin",
