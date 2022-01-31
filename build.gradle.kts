@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.21"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    kotlin("jvm") version "1.6.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = "dev.crash"
@@ -17,16 +17,16 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.exposed:exposed-core:0.33.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.33.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.33.1")
-    implementation("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
-    implementation("com.github.NuVotifier.NuVotifier:nuvotifier-bukkit:2.7.2")
-    implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:2.7.2")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4")
+    implementation("org.jetbrains.exposed:exposed-core:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
+    implementation("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
+    implementation("com.github.NuVotifier.NuVotifier:nuvotifier-bukkit:2.7.3")
+    implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:2.7.3")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
     implementation("com.github.KevinPriv:MojangAPI:1.0")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.21")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.6.10")
 }
 
 tasks.test {
@@ -34,7 +34,7 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.jvmTarget = "17"
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
