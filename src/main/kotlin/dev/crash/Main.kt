@@ -7,7 +7,6 @@ import org.bukkit.Bukkit
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
-import java.io.File
 
 lateinit var INSTANCE : Main
 class Main : JavaPlugin() {
@@ -32,9 +31,6 @@ class Main : JavaPlugin() {
                 Bukkit.getOnlinePlayers().forEach {
                     it.crashPlayer().save()
                 }
-                val backupDirectory = File(INSTANCE.dataFolder.path + "/playerBackup/")
-                backupDirectory.delete()
-                copyDirectory(File(INSTANCE.dataFolder.path + "/player/"), backupDirectory)
             }
         }.runTaskTimerAsynchronously(INSTANCE, 0, 20*60)
         println("[INFO] CrashdevPaperPlugin was enabled!")

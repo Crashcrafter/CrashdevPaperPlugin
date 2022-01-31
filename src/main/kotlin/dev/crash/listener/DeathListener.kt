@@ -114,10 +114,12 @@ class DeathListener : Listener {
                         EntityType.IRON_GOLEM -> deathMessage.append(player.name)
                             .append(" hat sich mit dem Falschen angelegt")
                         EntityType.WOLF -> deathMessage.append(player.name).append(" wurde von einem Hund zerbissen")
+                        else -> {}
                     }
                 }
                 DamageCause.ENTITY_EXPLOSION -> deathMessage.append(player.name)
                     .append(" hat das Zischen nicht gehört")
+                else -> {}
             }
         } catch (ignored: NullPointerException) {
             deathMessage.append(deathEvent.deathMessage().toString())
@@ -127,8 +129,9 @@ class DeathListener : Listener {
         }else {
             deathEvent.deathMessage(Component.text("§4${deathEvent.deathMessage}"))
         }
-        player.inventory.armorContents.forEach {
+        player.inventory.armorContents!!.forEach {
             try {
+                it ?: return@forEach
                 val durability = (it.itemMeta as Damageable).damage
                 val maxDurability = it.type.maxDurability
                 val newDurability = (durability + maxDurability / 4)
@@ -137,7 +140,7 @@ class DeathListener : Listener {
                 } else {
                     (it.itemMeta as Damageable).damage = newDurability
                 }
-            }catch (ex: NullPointerException) {}
+            }catch (_: NullPointerException) {}
         }
         val deaths: Int = INSTANCE.config.getInt("Players." + player.uniqueId.toString() + ".Deaths")
         INSTANCE.config.set("Players." + player.uniqueId.toString() + ".Deaths", deaths + 1)

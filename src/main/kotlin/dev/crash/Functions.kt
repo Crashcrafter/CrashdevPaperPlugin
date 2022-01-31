@@ -18,9 +18,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Scoreboard
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.pow
@@ -228,7 +225,7 @@ fun HashMap<Int,Int>.copy(): HashMap<Int,Int> {
 }
 
 fun Inventory.getItem(itemStack: ItemStack): ItemStack? {
-    this.contents.forEach {
+    this.contents!!.forEach {
         if(it != null && it.type == itemStack.type && if (itemStack.hasItemMeta() && itemStack.itemMeta.hasCustomModelData())
                 try {it.itemMeta.customModelData == itemStack.itemMeta.customModelData}catch (ex:Exception){false} else true){
             return it
@@ -237,37 +234,8 @@ fun Inventory.getItem(itemStack: ItemStack): ItemStack? {
     return null
 }
 
-fun copyDirectory(sourceDirectory: File, destinationDirectory: File) {
-    if (!destinationDirectory.exists()) {
-        destinationDirectory.mkdir()
-    }
-    for (f in sourceDirectory.list()!!) {
-        copyDirectoryCompatibityMode(File(sourceDirectory, f), File(destinationDirectory, f))
-    }
-}
-
-private fun copyDirectoryCompatibityMode(source: File, destination: File) {
-    if (source.isDirectory) {
-        copyDirectory(source, destination)
-    } else {
-        copyFile(source, destination)
-    }
-}
-
-private fun copyFile(sourceFile: File, destinationFile: File) {
-    FileInputStream(sourceFile).use { `in` ->
-        FileOutputStream(destinationFile).use { out ->
-            val buf = ByteArray(1024)
-            var length: Int
-            while (`in`.read(buf).also { length = it } > 0) {
-                out.write(buf, 0, length)
-            }
-        }
-    }
-}
-
 fun JsonNode.getStringOrDefault(name: String, default: String): String {
-    return this[name].asText().ifEmpty { default }
+    return if(this.has(name)) this[name].asText() else default
 }
 
 fun JsonNode.getBooleanOrDefault(name: String, default: Boolean): Boolean {

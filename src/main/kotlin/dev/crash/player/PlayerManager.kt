@@ -20,11 +20,6 @@ fun Player.crashPlayer() : CrashPlayer {
     }
     return PlayerData[this]!!
 }
-data class OldPlayerSaveData(val uuid: String, var rank: Int, var remainingClaims: Int, var sharedClaims: MutableList<String>, var remainingHomes: Int,
-                          var addedClaims: Int, var addedHomes: Int, var balance: Long, var quests: MutableList<QuestSaveObj>, var hasDaily: Boolean,
-                          var hasWeekly: Boolean, var lastDailyQuest: Long, var lastWeeklyQuest: Long, var xpLevel: Int, var xp: Long, var vxpLevel: Int,
-                          var guildId: Int, var lastKeys: Long, var leftKeys: HashMap<Int, Int>, var homepoints: HashMap<String, String>,
-                          var warns: MutableList<Warn>, var chunks: MutableList<String>)
 
 data class PlayerSaveData(val uuid: String, var quests: MutableList<QuestSaveObj>, var hasDaily: Boolean,
                           var hasWeekly: Boolean, var lastDailyQuest: Long, var lastWeeklyQuest: Long, var lastKeys: Long, var leftKeys: HashMap<Int, Int>,
@@ -38,9 +33,8 @@ internal fun Player.load(){
     val saveFile = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
     if(!saveFile.exists()){
         saveFile.createNewFile()
-        val playerSaveData = PlayerSaveData(player.uniqueId.toString(), mutableListOf(),false, false, System.currentTimeMillis(),
-            System.currentTimeMillis(), 0, hashMapOf(), hashMapOf(), mutableListOf())
-        player.teleport(warps[CONFIG.defaultWarpName]!!)
+        val playerSaveData = CrashPlayer.getDefaultPlayerSaveData(player)
+        if(warps.containsKey(CONFIG.defaultWarpName)) player.teleport(warps[CONFIG.defaultWarpName]!!)
         transaction {
             PlayerTable.insert {
                 it[uuid] = player.uniqueId.toString()

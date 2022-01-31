@@ -168,7 +168,7 @@ fun tradingInventory(player: Player) {
     try {
         if (player.inventory.itemInMainHand.type == Material.AIR) {
             val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
-            overview.contents = TradingInventories.overview!!.contents.copyOf()
+            overview.contents = TradingInventories.overview!!.contents!!.copyOf()
             if(crashPlayer.xpLevel <= 10){
                 overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 10 required"), 1, hashMapOf("crashAction" to "crypto")))
             }
@@ -196,7 +196,7 @@ fun tradingInventory(player: Player) {
 
 fun showTradingInventory(player: Player, inventory: Inventory?, iname: String) {
     val cloned = Bukkit.createInventory(null, inventory!!.size, Component.text(iname))
-    cloned.contents = inventory.contents.copyOf()
+    cloned.contents = inventory.contents!!.copyOf()
     shopinventories.add(cloned)
     player.closeInventory()
     player.openInventory(cloned)
@@ -287,7 +287,7 @@ fun buyCrypto(type: String, amount: Int, player: Player) {
                 player.inventory.addItem(itemStack)
                 player.updateScoreboard()
             }
-        } catch (ex: NullPointerException) {}
+        } catch (_: NullPointerException) {}
     } else {
         player.sendMessage("§4Your Inventory is full!")
         player.closeInventory()

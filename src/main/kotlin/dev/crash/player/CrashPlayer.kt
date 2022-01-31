@@ -1,6 +1,5 @@
 package dev.crash.player
 
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.*
@@ -13,7 +12,6 @@ import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -23,9 +21,7 @@ import java.time.temporal.ChronoUnit
 import java.util.Random
 import kotlin.properties.Delegates
 
-class CrashPlayer {
-
-    var player by Delegates.notNull<Player>()
+class CrashPlayer(val player: Player) {
     var rank by Delegates.notNull<Int>()
     var remainingClaims by Delegates.notNull<Int>()
     var addedClaims by Delegates.notNull<Int>()
@@ -57,43 +53,9 @@ class CrashPlayer {
     val playerAfkCounter = mutableListOf<Long>()
     var warns = mutableListOf<Warn>()
 
-    constructor(player: Player) {
+    init {
         val saveFile = File("${INSTANCE.dataFolder.path}/player/${player.uniqueId}.json")
-        val saveObj: PlayerSaveData = try {
-            jacksonObjectMapper().readValue(saveFile)
-        }catch (ex: MismatchedInputException){
-            val altFile = File("${INSTANCE.dataFolder.path}/playerBackup/${player.uniqueId}.json")
-            try {
-                jacksonObjectMapper().readValue(altFile)
-            }catch (ex: MismatchedInputException){
-                val oldData: OldPlayerSaveData = try {
-                    jacksonObjectMapper().readValue(saveFile)
-                }catch (ex: MismatchedInputException){
-                    jacksonObjectMapper().readValue(altFile)
-                }
-                transaction {
-                    println("write player ${oldData.uuid}")
-                    if(PlayerTable.select(where = {PlayerTable.uuid eq oldData.uuid}).empty()){
-                        PlayerTable.insert {
-                            it[uuid] = oldData.uuid
-                            it[rank] = oldData.rank
-                            it[remainingClaims] = oldData.remainingClaims
-                            it[remainingHomes] = oldData.remainingHomes
-                            it[addedClaims] = oldData.addedClaims
-                            it[addedHomes] = oldData.addedHomes
-                            it[balance] = oldData.balance
-                            it[xpLevel] = oldData.xpLevel
-                            it[xp] = oldData.xp
-                            it[vxpLevel] = oldData.vxpLevel
-                            it[guildId] = oldData.guildId
-                        }
-                    }
-                }
-                PlayerSaveData(oldData.uuid, oldData.quests, oldData.hasDaily, oldData.hasWeekly, oldData.lastDailyQuest, oldData.lastWeeklyQuest, oldData.lastKeys,
-                oldData.leftKeys, oldData.homepoints, oldData.warns)
-            }
-        }
-        this.player = player
+        val saveObj: PlayerSaveData = if(saveFile.exists()) jacksonObjectMapper().readValue(saveFile) else getDefaultPlayerSaveData(player)
         val homes = hashMapOf<String, Block>()
         saveObj.homepoints.forEach {
             homes[it.key] = getBlockByPositionString(it.value)
@@ -122,7 +84,7 @@ class CrashPlayer {
         this.setName()
         if(Instant.ofEpochMilli(saveObj.lastKeys).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
             this.weeklyKeys = rankData().weeklyKeys
-            player.sendMessage("§2You can receive your weekly keys with /weekly!")
+            if(weeklyKeys.isNotEmpty()) player.sendMessage("§2You can receive your weekly keys with /weekly!")
         }
         check()
     }
@@ -310,5 +272,20 @@ class CrashPlayer {
             vxpLevel = query[PlayerTable.vxpLevel]
             guildId = query[PlayerTable.guildId]
         }
+    }
+
+    companion object {
+        fun getDefaultPlayerSaveData(player: Player) = PlayerSaveData(
+            uuid = player.uniqueId.toString(),
+            quests = mutableListOf(),
+            hasDaily = false,
+            hasWeekly = false,
+            lastDailyQuest = 0,
+            lastWeeklyQuest = 0,
+            lastKeys = 0,
+            leftKeys = hashMapOf(),
+            homepoints = hashMapOf(),
+            warns = mutableListOf()
+        )
     }
 }

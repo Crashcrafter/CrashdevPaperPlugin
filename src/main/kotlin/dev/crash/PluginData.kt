@@ -64,24 +64,32 @@ var natureBlocks: List<Material> = arrayListOf(
 
 data class PluginConfig(val dbUser: String, val dbPw: String, val dbIp: String, val dbName: String, val dcLink: String,
                         val texturePackURL: String, val texturePackHash: String, val defaultWarpName: String, val scoreBoardTitle: String, val scoreBoardNews: String,
-                        val playerListFooter: String, val votifierEnabled: Boolean)
+                        val playerListFooter: String, val votifierEnabled: Boolean, val voteLinks: MutableList<String>)
 private val DEFAULT_CONFIG = PluginConfig("NOTSET", "NOTSET", "localhost", "mcplugin", "https://discord.gg/NbW6JVvxY7",
-    "", "", "spawn", Bukkit.getIp(), "", "", false)
+    "", "", "spawn", Bukkit.getIp(), "", "", false, mutableListOf())
 lateinit var CONFIG: PluginConfig
 
 internal fun loadPluginConfig(){
+    if(!File(INSTANCE.dataFolder.path).exists()) File(INSTANCE.dataFolder.path).mkdirs()
     val configFile = File(INSTANCE.dataFolder.path + "/config.json")
     CONFIG = if(configFile.exists()){
         try {
             jacksonObjectMapper().readValue(configFile)
         }catch (ex: MismatchedInputException){
             jacksonObjectMapper().readTree(configFile).run {
+                val votes = this["votes"].elements()
+                val voteList = mutableListOf<String>()
+                votes.forEach {
+                    voteList.add(it.asText())
+                }
                 PluginConfig(getStringOrDefault("dbUser", DEFAULT_CONFIG.dbUser), getStringOrDefault("dbPw", DEFAULT_CONFIG.dbPw),
                     getStringOrDefault("dbIp", DEFAULT_CONFIG.dbIp), getStringOrDefault("dbName", DEFAULT_CONFIG.dbName),
                     getStringOrDefault("dcLink", DEFAULT_CONFIG.dcLink), getStringOrDefault("texturePackURL", DEFAULT_CONFIG.texturePackURL),
                     getStringOrDefault("texturePackHash", DEFAULT_CONFIG.texturePackHash), getStringOrDefault("defaultWarpName", DEFAULT_CONFIG.defaultWarpName),
                     getStringOrDefault("scoreBoardTitle", DEFAULT_CONFIG.scoreBoardTitle), getStringOrDefault("scoreBoardNews", DEFAULT_CONFIG.scoreBoardNews),
-                    getStringOrDefault("playerListFooter", DEFAULT_CONFIG.playerListFooter), getBooleanOrDefault("votifierEnabled", DEFAULT_CONFIG.votifierEnabled))
+                    getStringOrDefault("playerListFooter", DEFAULT_CONFIG.playerListFooter), getBooleanOrDefault("votifierEnabled", DEFAULT_CONFIG.votifierEnabled),
+                    voteList
+                )
             }
         }
     }else {

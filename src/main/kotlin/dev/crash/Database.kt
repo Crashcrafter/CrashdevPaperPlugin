@@ -3,11 +3,28 @@ package dev.crash
 import dev.crash.permission.ranks
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
 
 internal fun initDatabase(){
     TransactionManager.defaultDatabase = Database.connect("jdbc:mysql://${CONFIG.dbIp}/${CONFIG.dbName}", user = CONFIG.dbUser, password = CONFIG.dbPw)
+    transaction {
+        if(!ChunkTable.exists()) {
+            SchemaUtils.create(ChunkTable)
+        }
+        if(!PlayerTable.exists()) {
+            SchemaUtils.create(PlayerTable)
+        }
+        if(!GuildTable.exists()) {
+            SchemaUtils.create(GuildTable)
+        }
+        if(!KeyIndexTable.exists()) {
+            SchemaUtils.create(KeyIndexTable)
+        }
+    }
 }
 
 object ChunkTable : Table("chunks"){
@@ -37,8 +54,8 @@ object GuildTable : IntIdTable("guilds"){
 object PlayerTable : Table("players"){
     val uuid = varchar("uuid", 36)
     val rank = integer("rank").default(0)
-    val remainingClaims = integer("remainingclaims").default(ranks[0]!!.claims)
-    val remainingHomes = integer("remaininghomes").default(ranks[0]!!.homes)
+    val remainingClaims = integer("remainingClaims").default(ranks[0]!!.claims)
+    val remainingHomes = integer("remainingHomes").default(ranks[0]!!.homes)
     val addedClaims = integer("addedClaims").default(0)
     val addedHomes = integer("addedHomes").default(0)
     val balance = long("balance").default(0)

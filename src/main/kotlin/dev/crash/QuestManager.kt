@@ -264,7 +264,7 @@ fun getActiveQuests(player: Player): List<Quest> {
 
 fun showAvailableQuests(player: Player) {
     val cloned = Bukkit.createInventory(null, blanckinv!!.size, Component.text("Quests"))
-    val original = blanckinv!!.contents
+    val original = blanckinv!!.contents!!
     val clone = original.copyOf()
     cloned.contents = clone
     val quests: List<Quest?> = player.crashPlayer().quests
@@ -306,7 +306,7 @@ fun showQuests(player: Player) {
     val crashPlayer = player.crashPlayer()
     if (crashPlayer.quests.size != 0) {
         val cloned = Bukkit.createInventory(null, blanckinv!!.size, Component.text("Quests"))
-        val original = blanckinv!!.contents
+        val original = blanckinv!!.contents!!
         val clone = original.copyOf()
         cloned.contents = clone
         val processedQuests: MutableList<Int> = ArrayList()
