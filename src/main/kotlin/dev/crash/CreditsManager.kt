@@ -1,7 +1,5 @@
 package dev.crash
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.items.CustomItems
 import dev.crash.permission.rankData
 import dev.crash.player.crashPlayer
@@ -25,13 +23,11 @@ import org.bukkit.persistence.PersistentDataType
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.floor
-import kotlin.math.roundToInt
 
 var prices = HashMap<Material, HashMap<Int, Long>>()
 var amountMap = hashMapOf(0 to 1, 1 to 8, 2 to 16, 3 to 64)
@@ -42,7 +38,6 @@ internal fun initTradingInventories() {
     val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
     overview.setItem(0, CustomItems.defaultCustomItem(Material.OAK_LOG, "§cWood-Shop", arrayListOf(), 0, hashMapOf("crashAction" to "wood")))
     overview.setItem(1, CustomItems.defaultCustomItem(Material.POLISHED_ANDESITE, "§6Build-Shop", arrayListOf(), 0, hashMapOf("crashAction" to "build")))
-    overview.setItem(2, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf(), 1, hashMapOf("crashAction" to "crypto")))
     TradingInventories.overview = overview
 
     val woodMaterials: List<Material> = arrayListOf(Material.OAK_LOG, Material.BIRCH_LOG, Material.SPRUCE_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG, Material.JUNGLE_LOG)
@@ -148,14 +143,11 @@ fun sellItem(player: Player) {
     val crashPlayer = player.crashPlayer()
     val multiplier = crashPlayer.rankData().shopMultiplier
     val cmd = if(!itemStack.itemMeta.hasCustomModelData()) 0 else itemStack.itemMeta.customModelData
-    val isNotCrypto = (itemStack.type == Material.STICK && cmd !in 1..5) || itemStack.type != Material.STICK
-    val value = if(isNotCrypto) (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong() else prices[itemStack.type]!![cmd]!! * itemStack.amount
+    val value = (prices[itemStack.type]!![cmd]!! * itemStack.amount * multiplier).toLong()
     giveBalance(player, value, "Shop")
-    if(isNotCrypto){
-        questCount(player, 12, value.toInt(), true)
-        questCount(player, 8, value.toInt(), false)
-        crashPlayer.changeXP(floor(value / 10.0).toLong())
-    }
+    questCount(player, 12, value.toInt(), true)
+    questCount(player, 8, value.toInt(), false)
+    crashPlayer.changeXP(floor(value / 10.0).toLong())
     player.inventory.removeItem(itemStack)
     player.closeInventory()
     player.updateScoreboard()
@@ -167,9 +159,6 @@ fun tradingInventory(player: Player) {
         if (player.inventory.itemInMainHand.type == Material.AIR) {
             val overview: Inventory = Bukkit.createInventory(null, 9, Component.text("Shop"))
             overview.contents = TradingInventories.overview!!.contents!!.copyOf()
-            if(crashPlayer.xpLevel <= 10){
-                overview.setItem(3, CustomItems.defaultCustomItem(Material.STICK, "§eCrypto-Shop", arrayListOf("", "§4Level 10 required"), 1, hashMapOf("crashAction" to "crypto")))
-            }
             showTradingInventory(player, overview, "Shop")
             return
         }
@@ -179,9 +168,9 @@ fun tradingInventory(player: Player) {
     val multiplier = crashPlayer.rankData().shopMultiplier
     val cmd = if(!isGiven.itemMeta.hasCustomModelData()) 0 else isGiven.itemMeta.customModelData
     val price: Long = try {
-        (prices[isGiven.type]!![cmd]!!.toLong() * isGiven.amount * (if((isGiven.type == Material.STICK && cmd !in 1..5) || isGiven.type != Material.STICK) multiplier else 1.0)).toLong()
+        (prices[isGiven.type]!![cmd]!!.toLong() * isGiven.amount * multiplier).toLong()
     } catch (e: NullPointerException) {
-        player.sendMessage("§4This item can not be sold!")
+        player.sendMessage("§4This item can't be sold!")
         return
     }
     val result = Bukkit.createInventory(null, 27, Component.text("Sell for ${price.withPoints()} Credits"))
@@ -234,27 +223,6 @@ fun clickHandler(item: ItemStack, player: Player) {
                 else -> showTradingInventory(player, BlackMarketInventories.blackMarketKeyOverview, "Keys-Shop")
             }
         }
-        "crypto" -> {
-            if(player.crashPlayer().xpLevel < 15) return
-            if(dataArray.size == 1){
-                val cryptoOverview: Inventory = Bukkit.createInventory(null, 45, Component.text("Crypto Shop"))
-                for (i in 0 until amountMap.size){
-                    cryptoOverview.setItem(i + (9*0), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Bitcoin for ${(amountMap[i]!! * prices[Material.STICK]!![1]!!).withPoints()} Credits", arrayListOf(), 1,
-                        hashMapOf("crashAction" to "crypto bitcoin ${amountMap[i]}")))
-                    cryptoOverview.setItem(i + (9*1), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Ethereum for ${(amountMap[i]!! * prices[Material.STICK]!![2]!!).withPoints()} Credits", arrayListOf(), 2,
-                        hashMapOf("crashAction" to "crypto ethereum ${amountMap[i]}")))
-                    cryptoOverview.setItem(i + (9*2), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Litecoin for ${(amountMap[i]!! * prices[Material.STICK]!![3]!!).withPoints()} Credits", arrayListOf(), 3,
-                        hashMapOf("crashAction" to "crypto litecoin ${amountMap[i]}")))
-                    cryptoOverview.setItem(i + (9*3), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Nano for ${(amountMap[i]!! * prices[Material.STICK]!![5]!!).withPoints()} Credits", arrayListOf(), 5,
-                        hashMapOf("crashAction" to "crypto nano ${amountMap[i]}")))
-                    cryptoOverview.setItem(i + (9*4), CustomItems.defaultCustomItem(Material.STICK, "Buy ${amountMap[i]} Dogecoin for ${(amountMap[i]!! * prices[Material.STICK]!![4]!!).withPoints()} Credits", arrayListOf(), 4,
-                        hashMapOf("crashAction" to "crypto dogecoin ${amountMap[i]}")))
-                }
-                showTradingInventory(player, cryptoOverview, "Crypto-Shop")
-                return
-            }
-            buyCrypto(dataArray[1], dataArray[2].toInt(), player)
-        }
     }
 }
 
@@ -270,22 +238,6 @@ fun buyItem(m: Material, amount: Int, pricePerUnit: Int, player: Player) {
             itemStack.amount = amount
             player.inventory.addItem(itemStack)
         }
-    } else {
-        player.sendMessage("§4Your Inventory is full!")
-        player.closeInventory()
-    }
-}
-
-fun buyCrypto(type: String, amount: Int, player: Player) {
-    if (isSpace(player.inventory)) {
-        try {
-            if (pay(player, amount.toLong() * getCryptoPrice(type), type.toStartUppercaseMaterial())) {
-                val itemStack = customItemsMap[type]!!
-                itemStack.amount = amount
-                player.inventory.addItem(itemStack)
-                player.updateScoreboard()
-            }
-        } catch (_: NullPointerException) {}
     } else {
         player.sendMessage("§4Your Inventory is full!")
         player.closeInventory()
@@ -325,13 +277,6 @@ internal fun updateCreditScore(){
         while (true){
             lastUpdate = Date(System.currentTimeMillis())
             creditsScoreBoard = getCreditsScoreboard()
-            val response = URL("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,dogecoin,nano,ethereum,litecoin&vs_currencies=usd").readText()
-            val obj = jacksonObjectMapper().readValue<CoingeckoPriceInfo>(response)
-            prices[Material.STICK]!![1] = (obj["bitcoin"]!!.usd * 100).roundToInt().toLong()
-            prices[Material.STICK]!![2] = (obj["ethereum"]!!.usd * 100).roundToInt().toLong()
-            prices[Material.STICK]!![3] = (obj["litecoin"]!!.usd * 100).roundToInt().toLong()
-            prices[Material.STICK]!![5] = (obj["nano"]!!.usd * 100).roundToInt().toLong()
-            prices[Material.STICK]!![4] = (obj["dogecoin"]!!.usd * 100).roundToInt().toLong()
             delay(300000)
         }
     })
