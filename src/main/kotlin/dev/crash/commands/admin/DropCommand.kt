@@ -56,7 +56,7 @@ class DropCommand : CommandExecutor, TabCompleter {
             return mutableListOf("set", "unset", "enable", "disable", "resetdropcooldown")
         } else if (args.size == 2) {
             if (args[0].contentEquals("set")) {
-                return mutableListOf("common", "uncommon", "rare", "epic", "supreme")
+                return dropTypeMap.values.map { it.name }.toMutableList()
             }
         }
         return list

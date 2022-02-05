@@ -29,7 +29,7 @@ object CustomItems {
         }
     }
 
-    fun CustomItem.toItemstack(): ItemStack {
+    private fun CustomItem.toItemstack(): ItemStack {
         val itemStack = ItemStack(Material.valueOf(material))
         val itemMeta = itemStack.itemMeta
         itemMeta.displayName(Component.text(displayName))
