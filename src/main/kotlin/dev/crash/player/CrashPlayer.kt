@@ -12,6 +12,7 @@ import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -49,7 +50,6 @@ class CrashPlayer(val player: Player) {
     var elytraCoolDown = System.currentTimeMillis() + 1000*30
     var mutedUntil = System.currentTimeMillis()
     val playerLinkCounter = mutableListOf<Long>()
-    val playerOffenseCounter = mutableListOf<Long>()
     val playerAfkCounter = mutableListOf<Long>()
     var warns = mutableListOf<Warn>()
 
@@ -80,12 +80,12 @@ class CrashPlayer(val player: Player) {
                 vxpLevel++
             }else break
         }
-        changeMana(0)
         this.setName()
         if(Instant.ofEpochMilli(saveObj.lastKeys).isBefore(Instant.now().minus(7, ChronoUnit.DAYS))){
             this.weeklyKeys = rankData().weeklyKeys
             if(weeklyKeys.isNotEmpty()) player.sendMessage("§2You can receive your weekly keys with /weekly!")
         }
+        changeMana(0)
         check()
     }
 
@@ -262,7 +262,23 @@ class CrashPlayer(val player: Player) {
 
     private fun loadFromDb(){
         transaction {
-            val query = PlayerTable.select(where = {PlayerTable.uuid eq player.uniqueId.toString()}).first()
+            val query = PlayerTable.select(where = {PlayerTable.uuid eq player.uniqueId.toString()}).firstOrNull()
+            if(query == null) {
+                rank = 0
+                remainingClaims = ranks[0]!!.claims
+                remainingHomes = ranks[0]!!.homes
+                addedClaims = 0
+                addedHomes = 0
+                balance = 0
+                xpLevel = 0
+                xp = 0
+                vxpLevel = 0
+                guildId = 0
+                PlayerTable.insert {
+                    it[uuid] = player.uniqueId.toString()
+                }
+                return@transaction
+            }
             rank = query[PlayerTable.rank]
             remainingClaims = query[PlayerTable.remainingClaims]
             remainingHomes = query[PlayerTable.remainingHomes]

@@ -38,7 +38,7 @@ data class EnchantmentSaveObj(val key: String, val level: Int)
 internal fun loadMaxEnchantmentLevel(){
     val file = File(INSTANCE.dataFolder.path + "/enchantments.json")
     if(file.exists()){
-        val enchantments = jacksonObjectMapper().readValue<List<EnchantmentSaveObj>>(File(INSTANCE.dataFolder.path + "/enchantments.json"))
+        val enchantments = jacksonObjectMapper().readValue<List<EnchantmentSaveObj>>(file)
         enchantments.forEach {
             try {
                 maxEnchLevel[Enchantment.getByKey(NamespacedKey.fromString(it.key))!!] = it.level
@@ -74,7 +74,6 @@ fun ItemStack.getAllEnchantments(): MutableMap<Enchantment, Int> {
 fun ItemStack.applyEnchantment(enchantment: Enchantment, is1: ItemStack, is2: ItemStack){
     val ench1 = is1.getEnchLevel(enchantment)
     val ench2 = is2.getEnchLevel(enchantment)
-    if(!enchantment.canEnchantItem(is1)) return
     is1.enchantments.forEach {
         if(enchantment.conflictsWith(it.key)) return
     }
@@ -95,6 +94,7 @@ fun ItemStack.applyEnchantment(enchantment: Enchantment, is1: ItemStack, is2: It
             ench1
         }
     }
+
     if(type == Material.ENCHANTED_BOOK){
         val meta =  (itemMeta as EnchantmentStorageMeta)
         meta.addStoredEnchant(enchantment, resultLevel, true)

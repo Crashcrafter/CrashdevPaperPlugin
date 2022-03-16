@@ -18,10 +18,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
@@ -53,27 +49,19 @@ fun genKey(type: Int): ItemStack {
     im.lore(lore)
     im.displayName(Component.text(keysData[type]!!.displayName))
     im.setCustomModelData(type)
-    im.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashKeyToken"), PersistentDataType.STRING, token)
+    im.persistentDataContainer.set(NamespacedKey(INSTANCE, "keyToken"), PersistentDataType.STRING, token)
     itemStack.itemMeta = im
     insertKey(token, type)
     return itemStack
 }
 
 fun tokenExists(token: String): Boolean{
-    var result = true
-    transaction {
-        result = !KeyIndexTable.select(where = {KeyIndexTable.token eq token}).empty()
-    }
-    return result
+    return INSTANCE.config.get("tokens.$token") != null
 }
 
 private fun insertKey(token: String, type: Int){
-    transaction {
-        KeyIndexTable.insert {
-            it[KeyIndexTable.token] = token
-            it[KeyIndexTable.type] = type
-        }
-    }
+    INSTANCE.config.set("tokens.$token", type)
+    INSTANCE.saveConfig()
 }
 
 fun redeemKey(playerInventory: Inventory, itemStack: ItemStack, token: String): Boolean {
@@ -85,24 +73,13 @@ fun redeemKey(playerInventory: Inventory, itemStack: ItemStack, token: String): 
 }
 
 fun redeemKey(token: String): Boolean {
-    var result = false
-    transaction { 
-        if(!KeyIndexTable.select(where = {KeyIndexTable.token eq token}).empty()){
-            result = true
-        }
-        KeyIndexTable.deleteWhere {
-            KeyIndexTable.token eq token
-        }
-    }
-    return result
+    val tokenObj = INSTANCE.config.get("tokens.$token")
+    INSTANCE.config.set("tokens.$token", null)
+    return tokenObj != null
 }
 
 fun getKeyType(token: String): Int {
-    var type = 0
-    transaction {
-        type = KeyIndexTable.select(where = {KeyIndexTable.token eq token}).first()[KeyIndexTable.type]
-    }
-    return type
+    return INSTANCE.config.getInt("tokens.$token", -1)
 }
 
 private fun getToken(): String {
@@ -141,7 +118,7 @@ data class Key(val id: Int, val name: String, val displayName: String, val crate
         }
     }
 }
-data class LootTableItem(val itemString: String, val probability: Int, val amount: Int = 1, val enchantments: HashMap<String, Int>? = null)
+data class LootTableItem(val itemString: String, val chance: Int, val amount: Int = 1, val enchantments: HashMap<String, Int>? = null)
 
 internal fun loadLootTables(){
     val file = File(INSTANCE.dataFolder.path + "/keys.json")
@@ -151,7 +128,7 @@ internal fun loadLootTables(){
             keysData[key.id] = key
             val lootTable = mutableListOf<LootTableItem>()
             key.lootTable.forEach {
-                for(i in 0..it.probability){
+                for(i in 0..it.chance){
                     lootTable.add(it)
                 }
             }
@@ -178,7 +155,7 @@ fun createNewLottery(player: Player, inventory: Inventory, type: Int) {
             val item = items[chosen]
             val itemStack = item.toItemstack()
             resultSet[i] = itemStack
-            planes[i] = getPlane(item.probability)
+            planes[i] = getPlane(item.chance)
         }
         var reward = resultSet[54]!!
         if (reward.type == Material.NAME_TAG && reward.itemMeta.hasCustomModelData()) {

@@ -3,6 +3,7 @@ package dev.crash.listener
 import dev.crash.dropWardenName
 import dev.crash.permission.chunkData
 import dev.crash.permission.isClaimed
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Vex
 import org.bukkit.event.EventHandler
@@ -34,7 +35,7 @@ class MobSpawnListener : Listener {
             if(chunk.isClaimed() && chunk.chunkData()!!.owner_uuid.length < 3){
                 vex.addPotionEffect(PotionEffect(PotionEffectType.INCREASE_DAMAGE, 1, 0))
                 if (vex.entitySpawnReason == CreatureSpawnEvent.SpawnReason.DEFAULT) {
-                    vex.customName = dropWardenName
+                    vex.customName(Component.text(dropWardenName))
                     vex.isCustomNameVisible = false
                 }
             }

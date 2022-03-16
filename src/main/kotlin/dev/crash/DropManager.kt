@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import dev.crash.permission.*
 import dev.crash.player.crashPlayer
 import kotlinx.coroutines.*
+import net.kyori.adventure.text.Component
 import org.bukkit.*
 import org.bukkit.block.Chest
 import org.bukkit.entity.Entity
@@ -203,7 +204,7 @@ fun waveManager(chunk: Chunk) {
 
 fun Drop.spawnWave() {
     val drop = this
-    drop.data.waves[drop.wave]!!.forEach {
+    drop.data.waves[drop.wave].forEach {
         try {
             Bukkit.getScheduler().runTask(INSTANCE, Runnable {
                 val x = Random().nextInt(8) - 4
@@ -211,7 +212,7 @@ fun Drop.spawnWave() {
                 val world = location.world
                 val entity = world.spawnEntity(world.getHighestBlockAt(location.blockX + x, location.blockZ + z).location.add(0.5, 1.0, 0.5), EntityType.valueOf(it.uppercase()))
                 entity.isGlowing = true
-                entity.customName = dropWardenName
+                entity.customName(Component.text(dropWardenName))
                 entity.isCustomNameVisible = true
                 entity.isPersistent = true
                 (entity as LivingEntity).removeWhenFarAway = false
@@ -294,7 +295,7 @@ fun Player.canGenDrops(): Boolean {
 
 data class DropsSaveObj(val dropWardenName: String, val dropRange: Int, val drops: List<DropObj>)
 data class DropObj(val type: Int, val possibility: Int, val allowedWorlds: List<String>, val name: String, val spawnInWater: Boolean, val spawnUnderWater: Boolean,
-                   val spawnBeacon: Boolean, val beaconHeight: Int, val glassPaneMaterial: String, val waves: HashMap<Int, List<String>>, val lootTable: List<LootTableItem>)
+                   val spawnBeacon: Boolean, val beaconHeight: Int, val glassPaneMaterial: String, val waves: List<List<String>>, val lootTable: List<LootTableItem>)
 
 val dropTypeMap = hashMapOf<Int, DropObj>()
 val dropLootTableMap = hashMapOf<Int, MutableList<LootTableItem>>()
@@ -311,7 +312,7 @@ internal fun loadDropTables(){
             dropTypeMap[type] = dropObj
             dropLootTableMap[type] = mutableListOf()
             dropObj.lootTable.forEach {
-                for(i in 0..it.probability){
+                for(i in 0..it.chance){
                     dropLootTableMap[type]!!.add(it)
                 }
             }

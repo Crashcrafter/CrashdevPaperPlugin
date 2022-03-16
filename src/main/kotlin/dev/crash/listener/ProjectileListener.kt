@@ -15,9 +15,9 @@ class ProjectileListener : Listener {
     @EventHandler
     fun onProjectileHit(e: ProjectileHitEvent) {
         if(e.hitEntity!=null && e.hitEntity is LivingEntity){
-            if(e.entity.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING)){
+            if(e.entity.persistentDataContainer.has(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING)){
                 val entity = e.hitEntity as LivingEntity
-                when(e.entity.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING)){
+                when(e.entity.persistentDataContainer.get(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING)){
                     "mudBall" -> {
                         entity.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 50, 2))
                         entity.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 100, 4))
@@ -25,9 +25,9 @@ class ProjectileListener : Listener {
                 }
             }
         }else {
-            if(e.entity.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING)){
+            if(e.entity.persistentDataContainer.has(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING)){
                 val loc = e.entity.location
-                when(e.entity.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING)) {
+                when(e.entity.persistentDataContainer.get(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING)) {
                     "throwSmallFireball" -> {
                         loc.world.createExplosion(loc, 1f)
                     }

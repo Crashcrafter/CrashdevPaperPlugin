@@ -17,14 +17,14 @@ import dev.crash.player.clearPlayerData
 import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
 import org.bukkit.*
+import org.bukkit.block.ShulkerBox
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 
 internal fun initServer(){
-    if(!File(INSTANCE.dataFolder.path + "/player/").exists()){
-        File(INSTANCE.dataFolder.path + "/player/").mkdir()
-    }
+    File(INSTANCE.dataFolder.path + "/player/").mkdir()
+
     loadPluginConfig()
     loadRanks()
     initDatabase()
@@ -37,7 +37,6 @@ internal fun initServer(){
     initTradingInventories()
     loadWorlds()
     loadDropTables()
-    updateCreditScore()
     CraftingRecipes.loadRecipes()
     loadMaxEnchantmentLevel()
     loadPrices()
@@ -106,7 +105,6 @@ internal fun registerCommands(){
     INSTANCE.getCommand("mute")!!.setExecutor(MuteCommand())
     INSTANCE.getCommand("mute")!!.tabCompleter = MuteCommand()
     INSTANCE.getCommand("unmute")!!.setExecutor(UnmuteCommand())
-    INSTANCE.getCommand("crypto")!!.setExecutor(CryptoCommand())
     INSTANCE.getCommand("checkitem")!!.setExecutor(CheckItemCommand())
     INSTANCE.getCommand("guild")!!.setExecutor(GuildCommand())
     INSTANCE.getCommand("guild")!!.tabCompleter = GuildCommand()
@@ -117,7 +115,6 @@ internal fun registerCommands(){
 internal fun loadWorlds(){
     val worlds = INSTANCE.config.getStringList("worlds")
     if(worlds.isEmpty()){
-        worlds.add("event")
         INSTANCE.config.set("worlds", worlds)
         INSTANCE.saveConfig()
     }
@@ -140,43 +137,43 @@ internal fun loadFromDb(){
             }
             chunkClassList.add(chunkClass)
         }
-        keyChests.clear()
-        val keyChestsFile = File(INSTANCE.dataFolder.path + "/keychests.json")
-        if(keyChestsFile.exists()){
-            val keyChestsMap = jacksonObjectMapper().readValue<HashMap<String, Int>>(keyChestsFile)
-            keyChestsMap.forEach {
-                keyChests[getBlockByPositionString(it.key)] = it.value
-            }
-        }else {
-            keyChestsFile.createNewFile()
-            jacksonObjectMapper().writeValue(keyChestsFile, hashMapOf<String, Int>())
-        }
-        portals.clear()
-        val portalFile = File(INSTANCE.dataFolder.path + "/portals.json")
-        if(portalFile.exists()){
-            val portalMap = jacksonObjectMapper().readValue<HashMap<String, String>>(portalFile)
-            portalMap.forEach {
-                portals[getBlockByPositionString(it.key)] = it.value
-            }
-        }else {
-            portalFile.createNewFile()
-            jacksonObjectMapper().writeValue(portalFile, hashMapOf<String, String>())
-        }
     }
+
+    keyChests.clear()
+    INSTANCE.config.getConfigurationSection("keychests")?.getKeys(false)?.forEach {
+        val block = getBlockByPositionString(it)
+        if(block.type != Material.CHEST && block.type != Material.BARREL && block !is ShulkerBox && block.type != Material.ENDER_CHEST) {
+            INSTANCE.config.set("keychests.$it", null)
+            return@forEach
+        }
+        keyChests[getBlockByPositionString(it)] = INSTANCE.config.getInt("keychests.$it")
+    }
+
+    portals.clear()
+    INSTANCE.config.getConfigurationSection("portals")?.getKeys(false)?.forEach {
+        val block = getBlockByPositionString(it)
+        if(block.type != Material.END_PORTAL && block.type != Material.NETHER_PORTAL) {
+            INSTANCE.config.set("portals.$it", null)
+            return@forEach
+        }
+        portals[getBlockByPositionString(it)] = INSTANCE.config.getString("portals.$it") ?: return@forEach
+    }
+
     updateTabOfPlayers()
     clearPlayerData()
     Bukkit.getOnlinePlayers().forEach {
         it.setResourcePack(CONFIG.texturePackURL, CONFIG.texturePackHash)
         val playerTextComponent = Component.text("${it.crashPlayer().rankData().prefix} ${it.name}")
-        it.updateScoreboard()
         it.playerListName(playerTextComponent)
         it.displayName(playerTextComponent)
         it.customName(playerTextComponent)
         it.isCustomNameVisible = true
+        it.updateScoreboard()
     }
 }
 
 data class PricesSaveObj(val material: String, val cmd: Int, val price: Long)
+
 internal fun loadPrices(){
     prices.clear()
     val file = File(INSTANCE.dataFolder.path + "/prices.json")

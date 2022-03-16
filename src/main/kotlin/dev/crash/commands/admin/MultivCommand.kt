@@ -1,6 +1,5 @@
 package dev.crash.commands.admin
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import dev.crash.*
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -9,7 +8,6 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
-import java.io.File
 
 class MultivCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -141,12 +139,14 @@ class MultivCommand : CommandExecutor, TabCompleter {
 fun addWorld(worldName: String) {
     val worlds = INSTANCE.config.getStringList("worlds")
     worlds.add(worldName)
+    INSTANCE.config.set("worlds", worlds)
     INSTANCE.saveConfig()
 }
 
 fun removeWorld(worldName: String) {
     val worlds = INSTANCE.config.getStringList("worlds")
     worlds.remove(worldName)
+    INSTANCE.config.set("worlds", worlds)
     INSTANCE.saveConfig()
 }
 
@@ -161,9 +161,9 @@ fun removePortal(block: Block) {
 }
 
 private fun savePortals(){
-    val portalMap = hashMapOf<String, String>()
+    INSTANCE.config.set("portals", null)
     portals.forEach {
-        portalMap[it.key.toPositionString()] = it.value
+        INSTANCE.config.set("portals.${it.key.toPositionString()}", it.value)
     }
-    jacksonObjectMapper().writeValue(File(INSTANCE.dataFolder.path + "/portals.json"), portalMap)
+    INSTANCE.saveConfig()
 }

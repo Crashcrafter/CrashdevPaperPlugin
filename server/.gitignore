@@ -1,4 +1,7 @@
 *
 
-!paper-1.18.1-177.jar
+!paper-1.18.2-242.jar
 !spigot.yml
+!/plugins/
+!/plugins/CrashdevPaperPlugin/
+!/plugins/CrashdevPaperPlugin/*.json

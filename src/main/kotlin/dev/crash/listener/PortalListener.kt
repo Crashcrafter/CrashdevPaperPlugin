@@ -1,10 +1,8 @@
 package dev.crash.listener
 
 import dev.crash.INSTANCE
-import dev.crash.player.crashPlayer
 import dev.crash.portals
 import org.bukkit.Bukkit
-import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -22,10 +20,6 @@ class PortalListener : Listener {
                 Bukkit.getWorld(portals[block]!!)!!.spawnLocation.add(0.5, 0.0, 0.5)
             object : BukkitRunnable() {
                 override fun run() {
-                    if (!portals[block].contentEquals("event") && (player.gameMode == GameMode.CREATIVE || player.gameMode == GameMode.SPECTATOR) && !player.isOp && !player.crashPlayer().isMod) {
-                        player.gameMode = GameMode.SURVIVAL
-                        player.inventory.clear()
-                    }
                     player.teleport(location)
                 }
             }.runTaskLater(INSTANCE, 5L)

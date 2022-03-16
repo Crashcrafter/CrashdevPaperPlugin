@@ -17,10 +17,10 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.exposed:exposed-core:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
-    implementation("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
+    implementation("org.jetbrains.exposed:exposed-core:0.37.3")
+    implementation("org.jetbrains.exposed:exposed-dao:0.37.3")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
+    implementation("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
     implementation("com.github.NuVotifier.NuVotifier:nuvotifier-bukkit:2.7.2")
     implementation("com.github.NuVotifier.NuVotifier:nuvotifier-api:2.7.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")

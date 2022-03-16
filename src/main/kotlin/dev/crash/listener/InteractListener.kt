@@ -1,7 +1,8 @@
 package dev.crash.listener
 
+import com.google.common.base.Functions
+import com.google.common.collect.ImmutableMap
 import dev.crash.*
-import dev.crash.items.staffs.*
 import dev.crash.permission.*
 import dev.crash.player.crashPlayer
 import net.kyori.adventure.text.Component
@@ -35,26 +36,22 @@ class InteractListener : Listener {
     fun onPlayerInteract(e: PlayerInteractEvent) {
         val block = e.clickedBlock
         val player = e.player
+        val itemInHand = player.inventory.itemInMainHand
         if (keyChests.containsKey(block)) {
-            try {
-                val inventory = when(val state = block!!.state){
-                    is ShulkerBox -> state.inventory
-                    is Chest -> state.inventory
-                    is Barrel -> state.inventory
-                    else -> return
-                }
-                if (!player.inventory.itemInMainHand.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashKeyToken"), PersistentDataType.STRING)
-                    && !lotteryI.contains(inventory)) {
-                    e.isCancelled = true
-                    return
-                }
-            }catch (ex: NullPointerException) {
+            val inventory = when(val state = block?.state){
+                is ShulkerBox -> state.inventory
+                is Chest -> state.inventory
+                is Barrel -> state.inventory
+                else -> return
+            }
+            if (!itemInHand.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "keyToken"), PersistentDataType.STRING)
+                && !lotteryI.contains(inventory)) {
                 e.isCancelled = true
                 return
             }
         } else if (e.hasBlock()) {
             val chunk = Objects.requireNonNull(block)!!.chunk
-            if (player.inventory.itemInMainHand.type != Material.FIREWORK_ROCKET && chunk.isClaimed()) {
+            if (itemInHand.type != Material.FIREWORK_ROCKET && chunk.isClaimed()) {
                 val uuid: String = chunk.chunkData()!!.owner_uuid
                 if (uuid.length <= 3 && uuid != "0" && block!!.type == Material.CHEST) {
                     waveManager(chunk)
@@ -77,34 +74,22 @@ class InteractListener : Listener {
                 addAFKCounter(player)
             }
         }
-        val itemStack = player.inventory.itemInMainHand
-        val type = itemStack.type
-        if (itemStack.hasItemMeta() && itemStack.itemMeta.hasCustomModelData()) {
-            val cmd = itemStack.itemMeta.customModelData
+        val type = itemInHand.type
+        if (itemInHand.hasItemMeta() && itemInHand.itemMeta.hasCustomModelData()) {
             when(type) {
-                Material.WOODEN_HOE -> {
-                    when(cmd){
-                        1 -> NatureStaff1.handleClick(e)
-                        2 -> FireStaff1.handleClick(e)
-                        3 -> WeatherStaff1.handleClick(e)
-                        4 -> ChaosStaff1.handleClick(e)
-                        5 -> WaterStaff1.handleClick(e)
-                    }
-                    e.isCancelled = true
-                }
                 Material.FIRE_CHARGE -> {
-                    val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashItemData"), PersistentDataType.STRING) ?: return
+                    val data = itemInHand.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "itemData"), PersistentDataType.STRING) ?: return
                     if(!eventCancel(player.location.chunk, player)){
                         e.isCancelled = true
                         val fireball = player.launchProjectile(Fireball::class.java, player.velocity)
-                        fireball.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, data)
-                        player.inventory.itemInMainHand.amount--
+                        fireball.persistentDataContainer.set(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING, data)
+                        if(player.gameMode != GameMode.CREATIVE) player.inventory.itemInMainHand.amount--
                     }
                     return
                 }
                 Material.STICK -> {
-                    val data = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashItemData"), PersistentDataType.STRING) ?: return
-                    if(itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
+                    val data = itemInHand.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "itemData"), PersistentDataType.STRING) ?: return
+                    if(itemInHand.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
                        return
                     }
                     when(data){
@@ -125,17 +110,20 @@ class InteractListener : Listener {
                 }
                 else -> {}
             }
-            if(itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashRange"), PersistentDataType.STRING) && e.action == Action.LEFT_CLICK_AIR){
-                val range = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashRange"), PersistentDataType.STRING)!!.toInt()
+            if(itemInHand.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "range"), PersistentDataType.STRING) && e.action == Action.LEFT_CLICK_AIR){
+                val range = itemInHand.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "range"), PersistentDataType.STRING)!!.toInt()
                 val target = player.getTargetEntity(range, false)
                 if(target != null && target is LivingEntity){
-                    var damage = itemStack.itemMeta.attributeModifiers?.get(Attribute.GENERIC_ATTACK_DAMAGE)?.first()?.amount ?:
+                    var damage = itemInHand.itemMeta.attributeModifiers?.get(Attribute.GENERIC_ATTACK_DAMAGE)?.first()?.amount ?:
                     type.getDefaultAttributeModifiers(EquipmentSlot.HAND).get(Attribute.GENERIC_ATTACK_DAMAGE).first().amount
 
-                    itemStack.enchantments.forEach {
+                    itemInHand.enchantments.forEach {
                         damage += it.key.getDamageIncrease(it.value, target.category)
                     }
-                    val event = EntityDamageByEntityEvent(player, target, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage)
+                    val event = EntityDamageByEntityEvent(player, target, EntityDamageEvent.DamageCause.ENTITY_ATTACK,
+                        EnumMap(ImmutableMap.of(EntityDamageEvent.DamageModifier.BASE, damage)),
+                        EnumMap(ImmutableMap.of(EntityDamageEvent.DamageModifier.BASE, Functions.constant(damage))),
+                        false)
                     Bukkit.getPluginManager().callEvent(event)
                     if(!event.isCancelled){
                         target.damage(damage, player)
@@ -151,7 +139,7 @@ class InteractListener : Listener {
         if (e.rightClicked is Villager) {
             val shop = e.rightClicked as Villager
             try {
-                when(shop.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING)) {
+                when(shop.persistentDataContainer.get(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING)) {
                     "shop" -> {
                         tradingInventory(e.player)
                         e.isCancelled = true
@@ -169,12 +157,12 @@ class InteractListener : Listener {
             val player = e.player
             val crashPlayer = player.crashPlayer()
             try {
-                if (shop.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING) == "blackmarket") {
+                if (shop.persistentDataContainer.get(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING) == "blackmarket") {
                     e.isCancelled = true
                     if(crashPlayer.xpLevel >= 25){
-                        showTradingInventory(e.player, BlackMarketInventories.blackMarketOverview, "Schwarzmarkt")
+                        showTradingInventory(e.player, BlackMarketInventories.blackMarketOverview, "Blackmarket")
                     }else {
-                        player.sendActionBar(Component.text("§6Du benötigst Level 25, um auf den Schwarzmarkt zugreifen zu können!"))
+                        player.sendActionBar(Component.text("§6You need level 25 to access the blackmarket!"))
                     }
                     return
                 }

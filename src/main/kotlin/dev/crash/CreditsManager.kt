@@ -3,11 +3,6 @@ package dev.crash
 import dev.crash.items.CustomItems
 import dev.crash.permission.rankData
 import dev.crash.player.crashPlayer
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import me.kbrewster.mojangapi.MojangAPI
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -20,10 +15,6 @@ import org.bukkit.entity.WanderingTrader
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.abs
@@ -137,7 +128,7 @@ fun pay(target: Player, amount: Long, reason: String): Boolean {
 
 fun sellItem(player: Player) {
     val itemStack = player.inventory.itemInMainHand
-    if (itemStack.hasItemMeta() && itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)) {
+    if (itemStack.hasItemMeta() && itemStack.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)) {
         return
     }
     val crashPlayer = player.crashPlayer()
@@ -164,7 +155,7 @@ fun tradingInventory(player: Player) {
         }
     } catch (e: NullPointerException) {return}
     val isGiven = player.inventory.itemInMainHand
-    if(isGiven.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)) return
+    if(isGiven.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)) return
     val multiplier = crashPlayer.rankData().shopMultiplier
     val cmd = if(!isGiven.itemMeta.hasCustomModelData()) 0 else isGiven.itemMeta.customModelData
     val price: Long = try {
@@ -270,53 +261,26 @@ object ShopInventories {
     var normalView: Inventory? = null
 }
 
-@Suppress("EXPERIMENTAL_IS_NOT_ENABLED")
-@OptIn(DelicateCoroutinesApi::class)
-internal fun updateCreditScore(){
-    allJobs.add(GlobalScope.launch {
-        while (true){
-            lastUpdate = Date(System.currentTimeMillis())
-            creditsScoreBoard = getCreditsScoreboard()
-            delay(300000)
-        }
-    })
-}
-
-fun getCreditsScoreboard(): String {
-    val messageBuilder = StringBuilder()
-    val time = SimpleDateFormat("HH:mm:ss").format(lastUpdate)
-    messageBuilder.append("§6§l§nCurrent Ranking:§r\n§7Last update: $time\n")
-    transaction {
-        var count = 1
-        PlayerTable.selectAll().orderBy(PlayerTable.balance, SortOrder.DESC).limit(5).forEach {
-            messageBuilder.append("§7$count. §2${MojangAPI.getName(UUID.fromString(it[PlayerTable.uuid]))}: §6${it[PlayerTable.balance].withPoints()} Credits§r\n")
-            count++
-        }
-    }
-    messageBuilder.append("§6These stats are refreshed every 5 minutes!")
-    return messageBuilder.toString()
-}
-
 fun shopVillager(location: Location) {
     val shop: Villager = location.world.spawnEntity(location, EntityType.VILLAGER) as Villager
     shop.setAI(false)
     shop.isInvulnerable = true
     shop.villagerLevel = 3
     shop.profession = Villager.Profession.LIBRARIAN
-    shop.customName = "§6§l§nShop"
+    shop.customName(Component.text("§6§l§nShop"))
     shop.isCustomNameVisible = true
     shop.isSilent = true
     shop.removeWhenFarAway = false
-    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, "shop")
+    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING, "shop")
 }
 
 fun blackMarketVillager(location: Location) {
     val blackMarket: WanderingTrader = location.world.spawnEntity(location, EntityType.WANDERING_TRADER) as WanderingTrader
     blackMarket.setAI(false)
     blackMarket.isInvulnerable = true
-    blackMarket.customName = "§0§lBlackmarket"
+    blackMarket.customName(Component.text("§0§lBlackmarket"))
     blackMarket.isCustomNameVisible = true
     blackMarket.isSilent = true
     blackMarket.removeWhenFarAway = false
-    blackMarket.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, "blackmarket")
+    blackMarket.persistentDataContainer.set(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING, "blackmarket")
 }

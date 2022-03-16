@@ -21,9 +21,6 @@ internal fun initDatabase(){
         if(!GuildTable.exists()) {
             SchemaUtils.create(GuildTable)
         }
-        if(!KeyIndexTable.exists()) {
-            SchemaUtils.create(KeyIndexTable)
-        }
     }
 }
 
@@ -34,12 +31,6 @@ object ChunkTable : Table("chunks"){
     val uuid = varchar("uuid", 36)
     val name = varchar("name", 100)
     val shared = text("shared")
-}
-
-object KeyIndexTable : Table("keyindex"){
-    val token = varchar("token", 20)
-    val type = integer("type")
-    override val primaryKey = PrimaryKey(token)
 }
 
 object GuildTable : IntIdTable("guilds"){

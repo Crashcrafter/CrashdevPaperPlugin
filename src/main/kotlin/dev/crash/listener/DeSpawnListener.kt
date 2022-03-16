@@ -16,12 +16,10 @@ class DeSpawnListener : Listener {
     fun onItemDeSpawn(e: ItemDespawnEvent) {
         val itemStack = e.entity.itemStack
         if (itemStack.type == Material.NAME_TAG && itemStack.itemMeta.hasCustomModelData()) {
-            try {
-                val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashKeyToken"), PersistentDataType.STRING)!!
-                if (tokenExists(token)) {
-                    redeemKey(token)
-                }
-            }catch (_: NullPointerException) {}
+            val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "keyToken"), PersistentDataType.STRING)
+            if (token != null && tokenExists(token)) {
+                redeemKey(token)
+            }
         }
     }
 }

@@ -14,14 +14,13 @@ import java.io.File
 
 object CustomItems {
 
-    data class CustomItem(val material: String, val displayName: String, val lore: List<String>? = null, val cmd: Int? = null, val enchantments: HashMap<String, Int>? = null, val data: HashMap<String, String>? = null)
+    data class CustomItem(val ciId: String, val material: String, val displayName: String, val lore: List<String>? = null, val cmd: Int? = null, val enchantments: HashMap<String, Int>? = null, val data: HashMap<String, String>? = null)
 
     internal fun loadItems(){
         val file = File(INSTANCE.dataFolder.path + "/ci.json")
         if(file.exists()){
-            val customItems = jacksonObjectMapper().readValue<HashMap<String, CustomItem>>(file)
-            customItems.forEach { (name, itemObj) ->
-                customItemsMap[name] = itemObj.toItemstack()
+            jacksonObjectMapper().readValue<List<CustomItem>>(file).forEach { itemObj ->
+                customItemsMap[itemObj.ciId] = itemObj.toItemstack()
             }
         }else {
             file.createNewFile()

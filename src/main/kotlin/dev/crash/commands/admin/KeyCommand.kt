@@ -1,22 +1,22 @@
 package dev.crash.commands.admin
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import dev.crash.*
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.ShulkerBox
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
-import java.io.File
 
 class KeyCommand : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val player = sender.asPlayer()
         if (player.hasPermission("crash.key")) {
             if (args[0] == "chest") {
-                val block = player.rayTraceBlocks(4.0)!!.hitBlock
-                if(block == null) {
+                val block = player.rayTraceBlocks(4.0)?.hitBlock
+                if(block == null || (block.type != Material.CHEST && block.type != Material.BARREL && block !is ShulkerBox && block.type != Material.ENDER_CHEST)) {
                     player.sendMessage("§4You must look at a chest!")
                     return true
                 }
@@ -87,9 +87,9 @@ fun removeKeyChest(block: Block) {
 }
 
 private fun saveKeyChests(){
-    val resultKeyChests = hashMapOf<String, Int>()
+    INSTANCE.config.set("keychests", null)
     keyChests.forEach {
-        resultKeyChests[it.key.toPositionString()] = it.value
+        INSTANCE.config.set("keychests.${it.key.toPositionString()}", it.value)
     }
-    jacksonObjectMapper().writeValue(File(INSTANCE.dataFolder.path + "/keychests.json"), resultKeyChests)
+    INSTANCE.saveConfig()
 }

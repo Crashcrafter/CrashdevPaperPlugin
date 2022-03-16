@@ -5,6 +5,9 @@ import dev.crash.permission.invSeeECs
 import dev.crash.permission.invSeeInventories
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.block.Barrel
+import org.bukkit.block.Block
+import org.bukkit.block.Chest
 import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -20,8 +23,14 @@ class InventoryListener : Listener {
     fun onInventoryClose(e: InventoryCloseEvent) {
         val inventory = e.inventory
         when{
-            invSeeInventories.containsKey(inventory) -> invSeeInventories[inventory]!!.updateInventory()
-            invSeeECs.containsKey(inventory) -> invSeeECs[inventory]!!.updateInventory()
+            invSeeInventories.containsKey(inventory) ->{
+                invSeeInventories[inventory]!!.updateInventory()
+                invSeeInventories.remove(inventory)
+            }
+            invSeeECs.containsKey(inventory) ->{
+                invSeeECs[inventory]!!.updateInventory()
+                invSeeECs.remove(inventory)
+            }
             tradingInventoryCopies.contains(inventory) -> {
                 tradingInventoryCopies.remove(inventory)
                 inventory.clear()
@@ -39,24 +48,26 @@ class InventoryListener : Listener {
 
     @EventHandler
     fun onInventoryOpen(e: InventoryOpenEvent) {
-        if (e.inventory.holder is ShulkerBox && keyChests.containsKey((e.inventory.holder as ShulkerBox?)!!.block) && !lotteryI.contains(e.inventory)) {
+        val block: Block = when(val holder = e.inventory.holder) {
+            is ShulkerBox -> holder.block
+            is Chest -> holder.block
+            is Barrel -> holder.block
+            else -> return
+        }
+        if (keyChests.containsKey(block) && !lotteryI.contains(e.inventory)) {
             val player = e.player as Player
             val playerInventory = player.inventory
             val itemStack = playerInventory.itemInMainHand
-            try {
-                if (itemStack.type == Material.NAME_TAG) {
-                    val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashKeyToken"), PersistentDataType.STRING)!!
-                    val type: Int = keyChests[(e.inventory.holder as ShulkerBox).block]!!
-                    if (getKeyType(token) == type) {
-                        createNewLottery(player, e.inventory, type)
-                        redeemKey(playerInventory, itemStack, token)
-                    } else {
-                        e.isCancelled = true
-                    }
+            if (itemStack.type == Material.NAME_TAG) {
+                val token = itemStack.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "keyToken"), PersistentDataType.STRING) ?: return
+                val type: Int = keyChests[block]!!
+                if (getKeyType(token) == type) {
+                    createNewLottery(player, e.inventory, type)
+                    redeemKey(playerInventory, itemStack, token)
                 } else {
                     e.isCancelled = true
                 }
-            } catch (exception: NullPointerException) {
+            } else {
                 e.isCancelled = true
             }
         }

@@ -18,8 +18,8 @@ class CheckItemCommand : CommandExecutor {
             player.sendMessage("§4You have no item in your main hand!")
             return true
         }
-        if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)){
-            val cheaterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "crashCheated"), PersistentDataType.STRING)
+        if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)){
+            val cheaterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "cheated"), PersistentDataType.STRING)
             player.sendMessage("§6The item was made by $cheaterName in creative mode!")
         }else if(item.itemMeta.persistentDataContainer.has(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING)){
             val crafterName = item.itemMeta.persistentDataContainer.get(NamespacedKey(INSTANCE, "craftedBy"), PersistentDataType.STRING)

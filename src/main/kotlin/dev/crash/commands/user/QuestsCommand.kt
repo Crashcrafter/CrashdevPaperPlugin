@@ -2,6 +2,7 @@ package dev.crash.commands.user
 
 import dev.crash.*
 import dev.crash.player.crashPlayer
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -110,9 +111,9 @@ fun questVillager(location: Location) {
     shop.isInvulnerable = true
     shop.villagerLevel = 3
     shop.profession = Villager.Profession.CARTOGRAPHER
-    shop.customName = "§a§l§nQuests"
+    shop.customName(Component.text("§a§l§nQuests"))
     shop.isCustomNameVisible = true
     shop.isSilent = true
     shop.removeWhenFarAway = false
-    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "crashEntityData"), PersistentDataType.STRING, "quester")
+    shop.persistentDataContainer.set(NamespacedKey(INSTANCE, "entityData"), PersistentDataType.STRING, "quester")
 }

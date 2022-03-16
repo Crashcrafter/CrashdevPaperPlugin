@@ -13,7 +13,7 @@ class Main : JavaPlugin() {
 
     override fun onLoad(){
         INSTANCE = this
-        println("[INFO] CrashdevPaperPlugin is loaded!")
+        println("[INFO] CrashdevPlugin is loaded!")
     }
 
     override fun onEnable() {
@@ -33,7 +33,7 @@ class Main : JavaPlugin() {
                 }
             }
         }.runTaskTimerAsynchronously(INSTANCE, 0, 20*60)
-        println("[INFO] CrashdevPaperPlugin was enabled!")
+        println("[INFO] CrashdevPlugin was enabled!")
     }
 
     override fun onDisable() {
@@ -47,6 +47,6 @@ class Main : JavaPlugin() {
             it.cancel()
         }
         Bukkit.getScheduler().cancelTasks(this)
-        println("[INFO] CrashdevPaperPlugin is disabled!")
+        println("[INFO] CrashdevPlugin is disabled!")
     }
 }
